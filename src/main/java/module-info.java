@@ -1,10 +1,10 @@
-module io.github.xen0rstar.historicconquest {
+module com.historicconquest.historicconquest {
     requires javafx.controls;
     requires javafx.fxml;
     requires com.fasterxml.jackson.databind;
     requires java.xml;
 
 
-    opens io.github.xen0rstar.historicconquest to javafx.fxml;
-    exports io.github.xen0rstar.historicconquest;
+    opens com.historicconquest.historicconquest to javafx.fxml;
+    exports com.historicconquest.historicconquest;
 }

@@ -1,4 +1,4 @@
-package io.github.xen0rstar.historicconquest;
+package com.historicconquest.historicconquest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

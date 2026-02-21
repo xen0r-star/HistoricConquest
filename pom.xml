@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.xen0r-star</groupId>
+    <groupId>com.historicconquest</groupId>
     <artifactId>historic-conquest</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
 
     <name>HistoricConquest</name>
     <description>HistoricConquest is a game of global conquest where knowledge is the primary weapon. Based on a self-assessment mechanism ranging from 1 to 4, players must answer themed questions (History, IT, Tourism, Entertainment) to expand their empire, move their armies and lay siege to enemy territories.</description>
@@ -131,7 +131,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                io.github.xen0rstar.historicconquest/io.github.xen0rstar.historicconquest.HelloApplication
+                                com.historicconquest.historicconquest/com.historicconquest.historicconquest.HelloApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
