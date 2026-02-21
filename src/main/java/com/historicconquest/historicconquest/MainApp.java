@@ -34,7 +34,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        chargerMapDepuisJson("/io/github/xen0rstar/historicconquest/zones/map_config.json");
+        chargerMapDepuisJson("/com/historicconquest/historicconquest/zones/map_config.json");
 
 //        pion = new Circle(15, Color.RED);
 //        pion.setStroke(Color.WHITE);
@@ -108,7 +108,7 @@ public class MainApp extends Application {
                     double zoneY = zone.get("y").asDouble();
 
                     Group svgGroup = new Group();
-                    chargerSVG("/io/github/xen0rstar/historicconquest/zones/" + nomBloc + "/" + nomZone + ".svg", svgGroup);
+                    chargerSVG("/com/historicconquest/historicconquest/zones/" + nomBloc + "/" + nomZone + ".svg", svgGroup);
 
                     svgGroup.setLayoutX(zoneX);
                     svgGroup.setLayoutY(zoneY);
