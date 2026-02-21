@@ -1,0 +1,318 @@
+[
+    {
+        "name": "Asia",
+        "x": 918,
+        "y": 1063,
+        "w": 707,
+        "h": 474,
+        "children": [
+            {
+                "name": "Australasia",
+                "x": 1321,
+                "y": 1333,
+                "w": 304,
+                "h": 204
+            },
+            {
+                "name": "Southeast Asia",
+                "x": 1238,
+                "y": 1234,
+                "w": 213,
+                "h": 135
+            },
+            {
+                "name": "Mainland Southeast Asia",
+                "x": 1224,
+                "y": 1189,
+                "w": 80,
+                "h": 107
+            },
+            {
+                "name": "Indian subcontinent",
+                "x": 1113,
+                "y": 1156,
+                "w": 136,
+                "h": 137
+            },
+            {
+                "name": "North-East Archipelagos",
+                "x": 1373,
+                "y": 1110,
+                "w": 99,
+                "h": 68
+            },
+            {
+                "name": "East Asia",
+                "x": 1139,
+                "y": 1072,
+                "w": 283,
+                "h": 165
+            },
+            {
+                "name": "Central Asia",
+                "x": 1013,
+                "y": 1063,
+                "w": 189,
+                "h": 94
+            },
+            {
+                "name": "Eastern Middle East",
+                "x": 1001,
+                "y": 1126,
+                "w": 156,
+                "h": 84
+            },
+            {
+                "name": "Arabian Peninsula",
+                "x": 958,
+                "y": 1172,
+                "w": 116,
+                "h": 91
+            },
+            {
+                "name": "Middle East",
+                "x": 918,
+                "y": 1126,
+                "w": 105,
+                "h": 61
+            }
+        ]
+    },
+    {
+        "name": "America",
+        "x": 0,
+        "y": 935,
+        "w": 636,
+        "h": 641,
+        "children": [
+            {
+                "name": "Mercosur",
+                "x": 457,
+                "y": 1422,
+                "w": 94,
+                "h": 154
+            },
+            {
+                "name": "Great Chaco",
+                "x": 475,
+                "y": 1366,
+                "w": 72,
+                "h": 82
+            },
+            {
+                "name": "Southern Cone",
+                "x": 420,
+                "y": 1321,
+                "w": 67,
+                "h": 254
+            },
+            {
+                "name": "South Central",
+                "x": 455,
+                "y": 1297,
+                "w": 181,
+                "h": 181
+            },
+            {
+                "name": "South America North",
+                "x": 422,
+                "y": 1263,
+                "w": 136,
+                "h": 81
+            },
+            {
+                "name": "Central America and the Caribbean",
+                "x": 370,
+                "y": 1213,
+                "w": 123,
+                "h": 74
+            },
+            {
+                "name": "Mexico",
+                "x": 254,
+                "y": 1169,
+                "w": 141,
+                "h": 84
+            },
+            {
+                "name": "United States",
+                "x": 63,
+                "y": 1091,
+                "w": 424,
+                "h": 142
+            },
+            {
+                "name": "Canada",
+                "x": 144,
+                "y": 935,
+                "w": 410,
+                "h": 193
+            },
+            {
+                "name": "Alaska",
+                "x": 0,
+                "y": 990,
+                "w": 195,
+                "h": 84
+            }
+        ]
+    },
+    {
+        "name": "Africa",
+        "x": 716,
+        "y": 1148,
+        "w": 319,
+        "h": 335,
+        "children": [
+            {
+                "name": "Southern Africa",
+                "x": 852,
+                "y": 1393,
+                "w": 99,
+                "h": 90
+            },
+            {
+                "name": "Indian Ocean",
+                "x": 852,
+                "y": 1341,
+                "w": 180,
+                "h": 105
+            },
+            {
+                "name": "Congo Basin",
+                "x": 836,
+                "y": 1269,
+                "w": 107,
+                "h": 114
+            },
+            {
+                "name": "East Africa",
+                "x": 931,
+                "y": 1299,
+                "w": 60,
+                "h": 76
+            },
+            {
+                "name": "Horn of Africa",
+                "x": 950,
+                "y": 1237,
+                "w": 85,
+                "h": 93
+            },
+            {
+                "name": "Gulf of Guinea",
+                "x": 772,
+                "y": 1250,
+                "w": 100,
+                "h": 63
+            },
+            {
+                "name": "West Africa",
+                "x": 716,
+                "y": 1242,
+                "w": 69,
+                "h": 58
+            },
+            {
+                "name": "Sahel",
+                "x": 718,
+                "y": 1194,
+                "w": 191,
+                "h": 92
+            },
+            {
+                "name": "Nile Valley",
+                "x": 841,
+                "y": 1167,
+                "w": 136,
+                "h": 138
+            },
+            {
+                "name": "Maghreb",
+                "x": 718,
+                "y": 1148,
+                "w": 135,
+                "h": 85
+            }
+        ]
+    },
+    {
+        "name": "Europe",
+        "x": 461,
+        "y": 933,
+        "w": 1218,
+        "h": 226,
+        "children": [
+            {
+                "name": "Russia",
+                "x": 889,
+                "y": 961,
+                "w": 790,
+                "h": 169
+            },
+            {
+                "name": "Eurasia & Caucasus",
+                "x": 894,
+                "y": 1045,
+                "w": 120,
+                "h": 96
+            },
+            {
+                "name": "Eastern Europe",
+                "x": 854,
+                "y": 1067,
+                "w": 81,
+                "h": 63
+            },
+            {
+                "name": "Balkans & Greece",
+                "x": 859,
+                "y": 1103,
+                "w": 62,
+                "h": 56
+            },
+            {
+                "name": "Central Europe - Alpine",
+                "x": 825,
+                "y": 1066,
+                "w": 59,
+                "h": 85
+            },
+            {
+                "name": "Iberian Peninsula",
+                "x": 753,
+                "y": 1118,
+                "w": 59,
+                "h": 36
+            },
+            {
+                "name": "Western Europe",
+                "x": 775,
+                "y": 1073,
+                "w": 67,
+                "h": 56
+            },
+            {
+                "name": "Scandinavia",
+                "x": 820,
+                "y": 947,
+                "w": 123,
+                "h": 120
+            },
+            {
+                "name": "British Isles - Iceland",
+                "x": 685,
+                "y": 1012,
+                "w": 120,
+                "h": 77
+            },
+            {
+                "name": "Greenland",
+                "x": 461,
+                "y": 933,
+                "w": 278,
+                "h": 111
+            }
+        ]
+    }
+]
