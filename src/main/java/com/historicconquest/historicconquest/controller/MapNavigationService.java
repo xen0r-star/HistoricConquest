@@ -1,4 +1,4 @@
-package interfaceService;
+package com.historicconquest.historicconquest.controller;
 
 import javafx.scene.Group;
 import javafx.scene.layout.StackPane;

@@ -1,0 +1,43 @@
+.root {
+    -fx-background-color: radial-gradient(
+            center 50% 50%,
+            radius 70%,
+            #F1E0C7 79%,
+            #F2D3A5 100%
+    );
+
+    /*.mon-overlay {*/
+    /*    -fx-background-color: #1a1a1a; !* Ton fond *!*/
+    /*    -fx-background-image: url("noise.png");*/
+    /*    -fx-background-repeat: repeat;*/
+    /*    -fx-background-size: auto;*/
+    /*    !* On baisse l'opacité de l'image de bruit pour que ce soit subtil *!*/
+    /*    -fx-opacity: 0.8;*/
+    /*}*/
+}
+
+.map-overlay-inside {
+    -fx-border-color: #B79C7D;
+    -fx-border-width: 3;
+    -fx-background-color: transparent;
+}
+
+.map-overlay-middle {
+    -fx-border-color: #B79C7D;
+    -fx-border-width: 8;
+    -fx-border-style: segments(30, 30) line-join miter;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: transparent;
+}
+
+.map-overlay-outside {
+    -fx-border-color: #B79C7D;
+    -fx-border-width: 3;
+    -fx-background-color: transparent;
+}
+
+.map-grid {
+    -fx-background-color: transparent,
+        linear-gradient(from 0px 0px to 50px 0px, repeat, rgba(168, 122, 62, 0.24) 1%, transparent 1%),
+        linear-gradient(from 0px 0px to 0px 50px, repeat, rgba(168, 122, 62, 0.24) 1%, transparent 1%);
+}

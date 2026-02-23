@@ -7,4 +7,8 @@ module com.historicconquest.historicconquest {
 
     opens com.historicconquest.historicconquest to javafx.fxml, javafx.graphics;
     exports com.historicconquest.historicconquest;
+    exports com.historicconquest.historicconquest.map;
+    opens com.historicconquest.historicconquest.map to javafx.fxml, javafx.graphics;
+    exports com.historicconquest.historicconquest.questions;
+    opens com.historicconquest.historicconquest.questions to javafx.fxml, javafx.graphics;
 }

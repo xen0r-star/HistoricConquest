@@ -1,39 +1,77 @@
 package com.historicconquest.historicconquest;
 
-import interfaceService.MapNavigationService;
-import interfaceService.MapLoaderService; // Nouveau service
+import com.historicconquest.historicconquest.map.Map;
+import com.historicconquest.historicconquest.controller.MapNavigationService;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.Objects;
 
 public class MainApp extends Application {
-
-    private final Group plateauGlobal = new Group();
-    private final List<Zone> toutesLesZones = new ArrayList<>();
+    private final Group mapInterface = new Group();
+    private Map map;
 
     @Override
     public void start(Stage stage) {
         // 1. Chargement de la Map via le service dédié
-        MapLoaderService loader = new MapLoaderService();
-        loader.chargerMap("/com/historicconquest/historicconquest/zones/map_config.json", plateauGlobal, toutesLesZones);
+        map = new Map();
+        mapInterface.getChildren().addAll(map.getBlocs());
+
 
         // 2. Configuration du conteneur racine
-        StackPane root = new StackPane(plateauGlobal);
-        root.setAlignment(Pos.TOP_LEFT);
-        root.setStyle("-fx-background-color: #2b2b2b;");
+        StackPane root = new StackPane();
+        root.setAlignment(Pos.CENTER);
+
+        Region grid = new Region();
+        grid.getStyleClass().add("map-grid");
+        StackPane.setMargin(grid, new Insets(28, 28, 28, 28));
+        root.getChildren().add(grid);
+
+        root.getChildren().add(mapInterface);
+
+        // Border overlay
+        Region overlayInside = new Region();
+        overlayInside.getStyleClass().add("map-overlay-inside");
+        StackPane.setMargin(overlayInside, new Insets(20, 20, 20, 20));
+
+        Region overlayMiddle = new Region();
+        overlayMiddle.getStyleClass().add("map-overlay-middle");
+        StackPane.setMargin(overlayMiddle, new Insets(20, 20, 20, 20));
+
+        Region overlayOutside = new Region();
+        overlayOutside.getStyleClass().add("map-overlay-outside");
+        StackPane.setMargin(overlayOutside, new Insets(28, 28, 28, 28));
+
+        root.getChildren().add(overlayInside);
+        root.getChildren().add(overlayMiddle);
+        root.getChildren().add(overlayOutside);
+
 
         // 3. Activation de la navigation (Zoom & Pan)
         MapNavigationService navService = new MapNavigationService();
-        navService.attachNavigation(root, plateauGlobal);
+        navService.attachNavigation(root, mapInterface);
+
 
         // 4. Lancement de la fenêtre
-        Scene scene = new Scene(root, 1300, 850);
-        stage.setTitle("23/02/2026");
+        Scene scene = new Scene(root, 800, 800);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
+            "/com/historicconquest/historicconquest/styles/style.css"
+        )).toExternalForm());
+
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(
+            "/com/historicconquest/historicconquest/images/icon.png"
+        )));
+
+        stage.getIcons().add(icon);
+        stage.setTitle("Historic Conquest");
+        stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
     }
