@@ -1,12 +1,16 @@
 package com.historicconquest.historicconquest.map;
 
+import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.player.Pawn;
 import com.historicconquest.historicconquest.questions.TypeThemes;
+import javafx.geometry.Bounds;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
+import javafx.scene.transform.Scale;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -16,35 +20,50 @@ import java.io.InputStream;
 import java.util.List;
 
 public class Zone extends Group {
+    // Zone property
     private final String name;
     private final String blocName;
     private final TypeThemes themes;
     private int power;
     private List<Pawn> pawns;
 
-    private final double x, y;
-    private final ZoneIcon icon;
+    // Style property
+    private Color color;
+    private boolean isFocusedZone = false;
+
+    // SVG groups
+    private final Group zoneSVGGroup;
 
 
-    public Zone(String name, String blocName, TypeThemes themes, int power, double x, double y, ZoneIcon icon) {
+    public Zone(String name, String blocName, TypeThemes themes, int power, double x, double y, ZoneIcon icon, Color color) {
         this.name = name;
         this.blocName = blocName;
         this.themes = themes;
         this.power = power;
 
-        this.x = x;
-        this.y = y;
-        this.icon = icon;
+        this.color = color;
 
-        String zoneSVG = "/com/historicconquest/historicconquest/zones/" + blocName + "/" + name + ".svg";
-        Group zoneSVGGroup = loadSVG(
+        this.setCursor(Cursor.HAND);
+        this.setPickOnBounds(false);
+
+
+
+        String zoneSVG = Constant.PATH + "zones/" + blocName + "/" + name + ".svg";
+        zoneSVGGroup = loadSVG(
             zoneSVG,
             x, y,
             -1, -1,
-            Color.LIGHTGRAY
+            color
         );
 
-        String iconSVG = "/com/historicconquest/historicconquest/icons/" + themes + ".svg";
+        if (zoneSVGGroup == null) {
+            System.err.println("Failed to load zone SVG for: " + name);
+            return;
+        }
+
+
+
+        String iconSVG = Constant.PATH + "icons/" + themes + ".svg";
         Group iconSVGGroup = loadSVG(
             iconSVG,
             icon.x(), icon.y(),
@@ -52,8 +71,18 @@ public class Zone extends Group {
             Color.WHITE
         );
 
-        if (iconSVGGroup != null) iconSVGGroup.setOpacity(0.5);
+        if (iconSVGGroup == null) {
+            System.err.println("Failed to load icon SVG for theme: " + themes);
+            return;
+        }
 
+        iconSVGGroup.setOpacity(0.5);
+        iconSVGGroup.setMouseTransparent(true);
+
+
+
+        this.setOnMouseEntered(event -> setHovered(true));
+        this.setOnMouseExited(event -> setHovered(false));
 
         this.getChildren().addAll(zoneSVGGroup, iconSVGGroup);
     }
@@ -79,20 +108,16 @@ public class Zone extends Group {
             }
 
             if (width > 0 && height > 0) {
-                double originalWidth = svgGroup.getBoundsInLocal().getWidth();
-                double originalHeight = svgGroup.getBoundsInLocal().getHeight();
+                Bounds bounds = svgGroup.getLayoutBounds();
 
-                double scaleX = width / originalWidth;
-                double scaleY = height / originalHeight;
+                double scaleX = width / bounds.getWidth();
+                double scaleY = height / bounds.getHeight();
 
-                svgGroup.setScaleX(scaleX);
-                svgGroup.setScaleY(scaleY);
+                Scale scale = new Scale(scaleX, scaleY, 0, 0);
+                svgGroup.getTransforms().add(scale);
 
-                double deltaX = (originalWidth - (originalWidth * scaleX)) / 2;
-                double deltaY = (originalHeight - (originalHeight * scaleY)) / 2;
-
-                svgGroup.setLayoutX(x - deltaX);
-                svgGroup.setLayoutY(y - deltaY);
+                svgGroup.setTranslateX(x);
+                svgGroup.setTranslateY(y);
 
             } else {
                 svgGroup.setLayoutX(x);
@@ -116,7 +141,7 @@ public class Zone extends Group {
         if (!valF.isEmpty()) {
             p.setFill(fillColor);
         } else {
-            p.setFill(Color.TRANSPARENT);
+            p.setFill(null);
         }
 
         String valSW = el.getAttribute("stroke-width");
@@ -133,5 +158,48 @@ public class Zone extends Group {
     }
 
 
-    public static record ZoneIcon(double x, double y, double width, double height) {}
+    private void updateColor(Color newColor) {
+        if (zoneSVGGroup != null) {
+            zoneSVGGroup.getChildren().forEach(node -> {
+                if (node instanceof SVGPath svgPath) {
+                    if (svgPath.getFill() != null) {
+                        svgPath.setFill(newColor);
+                    }
+                }
+            });
+        }
+    }
+
+
+
+    public record ZoneIcon(double x, double y, double width, double height) {}
+
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public boolean isFocusedZone() {
+        return isFocusedZone;
+    }
+
+
+
+    public void setFocusedZone(boolean focused) {
+        isFocusedZone = focused;
+    }
+
+    private void setHovered(boolean hovered) {
+        if (hovered) updateColor(color.deriveColor(0, 1.0, 0.75, 1.0));
+        else         updateColor(color);
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+        updateColor(color);
+    }
 }

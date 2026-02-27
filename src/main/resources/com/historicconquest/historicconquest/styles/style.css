@@ -1,10 +1,12 @@
 .root {
-    -fx-background-color: radial-gradient(
-            center 50% 50%,
-            radius 70%,
-            #F1E0C7 79%,
-            #F2D3A5 100%
-    );
+    /*-fx-background-color: radial-gradient(*/
+    /*        center 50% 50%,*/
+    /*        radius 70%,*/
+    /*        #F1E0C7 79%,*/
+    /*        #F2D3A5 100%*/
+    /*);*/
+
+    -fx-background-color: #f3ebdf;
 
     /*.mon-overlay {*/
     /*    -fx-background-color: #1a1a1a; !* Ton fond *!*/
