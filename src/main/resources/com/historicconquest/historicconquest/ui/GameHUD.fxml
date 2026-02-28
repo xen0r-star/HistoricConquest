@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
 <StackPane fx:id="root" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.GameHUD">
    <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" styleClass="map-grid" stylesheets="@../styles/style.css">
@@ -14,7 +15,7 @@
          <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
       </StackPane.margin>
    </Pane>
-   <Region fx:id="border" mouseTransparent="true" prefHeight="400.0" prefWidth="290.0" style="-fx-border-style: solid, segments(15, 15) line-join miter, solid;" styleClass="HUD-border" StackPane.alignment="CENTER">
+   <Region mouseTransparent="true" prefHeight="400.0" prefWidth="290.0" styleClass="HUD-border" StackPane.alignment="CENTER">
       <StackPane.margin>
          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
       </StackPane.margin>
@@ -24,4 +25,24 @@
          <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
       </StackPane.margin>
    </StackPane>
+   <Rectangle arcWidth="5.0" fill="#907f66" height="35.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="35.0" StackPane.alignment="TOP_LEFT">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Rectangle>
+   <Rectangle arcWidth="5.0" fill="#907f66" height="35.0" layoutX="30.0" layoutY="30.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="35.0" StackPane.alignment="TOP_RIGHT">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Rectangle>
+   <Rectangle arcWidth="5.0" fill="#907f66" height="35.0" layoutX="163.0" layoutY="218.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="35.0" StackPane.alignment="BOTTOM_LEFT">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Rectangle>
+   <Rectangle arcWidth="5.0" fill="#907f66" height="35.0" layoutX="163.0" layoutY="218.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="35.0" StackPane.alignment="BOTTOM_RIGHT">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Rectangle>
 </StackPane>

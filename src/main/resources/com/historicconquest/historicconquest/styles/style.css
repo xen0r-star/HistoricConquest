@@ -3,9 +3,10 @@
 }
 
 .HUD-border {
-    -fx-border-color: #CBAD82A3,  #CBAD82A3,  #CBAD82A3;
+    -fx-border-color: #907f66,  #907f66,  #907f66;
     -fx-border-width: 2, 6, 2;
     -fx-border-insets: 0, 2, 8;
+    -fx-border-style: solid, segments(25, 25) line-join miter, solid;
 }
 
 .map-grid {

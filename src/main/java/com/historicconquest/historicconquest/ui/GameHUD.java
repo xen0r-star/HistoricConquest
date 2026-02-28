@@ -17,15 +17,10 @@ import java.util.Random;
 
 public class GameHUD {
     @FXML private StackPane root;
-    @FXML private Region border;
     @FXML private Pane mapViewport;
 
     @FXML
     public void initialize() {
-        root.widthProperty().addListener((obs, oldVal, newVal) -> updateDashedBorder());
-        root.heightProperty().addListener((obs, oldVal, newVal) -> updateDashedBorder());
-
-
         ImageView noiseLayer = new ImageView(generatePaperGrain(1920, 1080, 0.1));
 
         noiseLayer.setMouseTransparent(true);
@@ -39,23 +34,6 @@ public class GameHUD {
 
         root.getChildren().add(noiseLayer);
         noiseLayer.setViewOrder(-1.0);
-    }
-
-    private void updateDashedBorder() {
-        double width = root.getWidth();
-        double height = root.getHeight();
-        if (width <= 0 || height <= 0) return;
-
-        final double idealSegment = 23.0;
-        long nbSegmentsW = Math.round(width / (idealSegment * 2));
-        double adjustedSegmentW = width / (nbSegmentsW * 2);
-
-        border.setStyle(
-            String.format(
-                "-fx-border-style: solid, segments(%.2f, %.2f) line-join miter, solid;",
-                adjustedSegmentW, adjustedSegmentW
-            )
-        );
     }
 
     public void initializeMap(Group mapInterface) {
