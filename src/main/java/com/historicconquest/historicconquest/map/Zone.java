@@ -68,7 +68,7 @@ public class Zone extends Group {
             iconSVG,
             icon.x(), icon.y(),
             icon.width(), icon.height(),
-            Color.WHITE
+            Color.web("#635341")
         );
 
         if (iconSVGGroup == null) {
@@ -135,7 +135,7 @@ public class Zone extends Group {
     private static SVGPath getSvgPath(Color fillColor, Element el) {
         SVGPath p = new SVGPath();
         p.setContent(el.getAttribute("d"));
-        p.setStroke(Color.WHITE);
+        p.setStroke(Color.web("#635341"));
 
         String valF = el.getAttribute("fill");
         if (!valF.isEmpty()) {
@@ -149,7 +149,7 @@ public class Zone extends Group {
             p.setStrokeWidth(Double.parseDouble(valSW.replace("px", "")));
 
         } else {
-            p.setStrokeWidth(1.0);
+            p.setStrokeWidth(0.5);
         }
 
         p.setStrokeLineJoin(StrokeLineJoin.ROUND);
@@ -158,7 +158,7 @@ public class Zone extends Group {
     }
 
 
-    private void updateColor(Color newColor) {
+    public void updateColor(Color newColor) {
         if (zoneSVGGroup != null) {
             zoneSVGGroup.getChildren().forEach(node -> {
                 if (node instanceof SVGPath svgPath) {
@@ -183,6 +183,10 @@ public class Zone extends Group {
         return power;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     public boolean isFocusedZone() {
         return isFocusedZone;
     }
@@ -194,7 +198,9 @@ public class Zone extends Group {
     }
 
     private void setHovered(boolean hovered) {
-        if (hovered) updateColor(color.deriveColor(0, 1.0, 0.75, 1.0));
+        if (isFocusedZone) return;
+
+        if (hovered) updateColor(color.deriveColor(0, 1.0, 0.85, 1.0));
         else         updateColor(color);
     }
 

@@ -65,7 +65,7 @@ public class Map {
                         zoneNode.get("x").asDouble(),
                         zoneNode.get("y").asDouble(),
                         icon,
-                        Color.web("#8D8051")
+                        Color.web("#C0A57F")
                     );
 
                     bloc.addZone(zone);

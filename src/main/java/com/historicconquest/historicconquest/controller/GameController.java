@@ -55,7 +55,7 @@ public class GameController {
     private void selectZone(Zone zone) {
         selectedZone = zone;
         zone.setFocusedZone(true);
-        zone.setColor(Color.web("#D4AF37"));
+        zone.updateColor(Color.web("#D4AF37"));
 
         zoneInfoPanel.setData(zone.getName());
         zoneInfoPanel.show();
@@ -64,7 +64,7 @@ public class GameController {
     private void deselectZone() {
         if (selectedZone != null) {
             selectedZone.setFocusedZone(false);
-            selectedZone.setColor(Color.web("#8D8051"));
+            selectedZone.updateColor(selectedZone.getColor());
             selectedZone = null;
         }
 
