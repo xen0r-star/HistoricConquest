@@ -1,46 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Region nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent,        linear-gradient(from 0px 0px to 50px 0px, repeat, rgba(168, 122, 62, 0.24) 1%, transparent 1%),        linear-gradient(from 0px 0px to 0px 50px, repeat, rgba(168, 122, 62, 0.24) 1%, transparent 1%);;">
-         <StackPane.margin>
-            <Insets bottom="31.0" left="31.0" right="31.0" top="31.0" />
-         </StackPane.margin>
-      </Region>
-      <Pane fx:id="mapViewport" prefHeight="200.0" prefWidth="200.0">
-         <StackPane.margin>
-            <Insets bottom="31.0" left="31.0" right="31.0" top="31.0" />
-         </StackPane.margin>
-      </Pane>
-      <Region prefHeight="400.0" prefWidth="290.0" style="-fx-border-color: #B79C7D; -fx-border-width: 3;" StackPane.alignment="CENTER">
-         <StackPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </StackPane.margin></Region>
-      <Region prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #B79C7D; -fx-border-width: 8; -fx-border-style: segments(25, 25) line-join miter;" StackPane.alignment="CENTER">
-         <StackPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </StackPane.margin></Region>
-      <Region prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #B79C7D; -fx-border-width: 3;" StackPane.alignment="CENTER">
-         <StackPane.margin>
-            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
-         </StackPane.margin>
-      </Region>
-      <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
-         <StackPane.margin>
-            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
-         </StackPane.margin>
-         <image>
-            <Image url="@../images/compass.png" />
-         </image>
-      </ImageView>
-      <StackPane prefHeight="150.0" prefWidth="200.0" StackPane.alignment="CENTER">
-         <StackPane.margin>
-            <Insets bottom="31.0" left="31.0" right="31.0" top="31.0" />
-         </StackPane.margin>
-      </StackPane>
-   </children>
+<StackPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.GameHUD">
+   <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent, linear-gradient(from 0px 0px to 50px 0px, repeat, rgba(168, 122, 62, 0.24) 1%, transparent 1%), linear-gradient(from 0px 0px to 0px 50px, repeat, rgba(168, 122, 62, 0.24) 1%, transparent 1%);">
+      <StackPane.margin>
+         <Insets bottom="31.0" left="31.0" right="31.0" top="31.0" />
+      </StackPane.margin>
+   </Region>
+   <Pane fx:id="mapViewport" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent;">
+      <StackPane.margin>
+         <Insets bottom="31.0" left="31.0" right="31.0" top="31.0" />
+      </StackPane.margin>
+   </Pane>
+   <Region mouseTransparent="true" prefHeight="400.0" prefWidth="290.0" style="-fx-border-color: #B79C7D; -fx-border-width: 3;" StackPane.alignment="CENTER">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Region>
+   <Region mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #B79C7D; -fx-border-width: 8; -fx-border-style: segments(25, 25) line-join miter;" StackPane.alignment="CENTER">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Region>
+   <Region mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #B79C7D; -fx-border-width: 3;" StackPane.alignment="CENTER">
+      <StackPane.margin>
+         <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+      </StackPane.margin>
+   </Region>
+   <StackPane mouseTransparent="true" prefHeight="150.0" prefWidth="200.0" StackPane.alignment="CENTER">
+      <StackPane.margin>
+         <Insets bottom="31.0" left="31.0" right="31.0" top="31.0" />
+      </StackPane.margin>
+   </StackPane>
 </StackPane>

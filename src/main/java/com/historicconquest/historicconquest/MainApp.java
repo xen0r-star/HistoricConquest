@@ -1,7 +1,9 @@
 package com.historicconquest.historicconquest;
 
 import com.historicconquest.historicconquest.map.Map;
+import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
+import com.historicconquest.historicconquest.ui.GameHUD;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,108 +13,94 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class MainApp extends Application {
     private final Group mapInterface = new Group();
-    private Map map;
 
     @Override
-    public void start(Stage stage) {
-        // 0. Chargement du panneau d'informations de zone
-        ZoneInfoPanel zoneInfoPanel = null;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/zoneInfoPanel.fxml"));
-            loader.load();
-            zoneInfoPanel = loader.getController();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void start(Stage stage) throws Exception {
+        // 1. Charger les FXML
+        FXMLLoader loaderZoneInfo = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/zoneInfoPanel.fxml"));
+        loaderZoneInfo.load();
+        ZoneInfoPanel zoneInfoPanel = loaderZoneInfo.getController();
 
-        // 1. Chargement de la Map via le service dédié
-        map = new Map(zoneInfoPanel);
-        mapInterface.getChildren().addAll(map.getBlocs());
+        FXMLLoader loaderGameHUD = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/GameHUD.fxml"));
+        StackPane gameHUDRoot = loaderGameHUD.load();
+        GameHUD gameHUD = loaderGameHUD.getController();
 
+        // 2. Créer la logique métier
+        Map map = new Map();
 
-        // 2. Configuration du BorderPane principal
-        BorderPane mainLayout = new BorderPane();
+        // 3. Créer le contrôleur pour orchestrer tout
+        new GameController(
+            map,
+            zoneInfoPanel,
+            gameHUD,
+            mapInterface
+        );
 
-        // Centre : Map avec la grille et les overlays
-        StackPane mapContainer = new StackPane();
-        mapContainer.setAlignment(Pos.CENTER);
+        // 4. Construire l'interface
+        StackPane rootLayout = createLayout(gameHUDRoot, zoneInfoPanel);
 
-        Region grid = new Region();
-        grid.getStyleClass().add("map-grid");
-        StackPane.setMargin(grid, new Insets(28, 28, 28, 28));
-        mapContainer.getChildren().add(grid);
-
-        // Viewport avec clipping
-        Pane viewport = new Pane();
-        StackPane.setMargin(viewport, new Insets(28, 28, 28, 28));
-        viewport.getChildren().add(mapInterface);
-
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(viewport.widthProperty());
-        clip.heightProperty().bind(viewport.heightProperty());
-        viewport.setClip(clip);
-        mapContainer.getChildren().add(viewport);
-
-        // Overlays
-        Region overlayInside = new Region();
-        overlayInside.getStyleClass().add("map-overlay-inside");
-        overlayInside.setMouseTransparent(true);
-        StackPane.setMargin(overlayInside, new Insets(20, 20, 20, 20));
-
-        Region overlayMiddle = new Region();
-        overlayMiddle.getStyleClass().add("map-overlay-middle");
-        overlayMiddle.setMouseTransparent(true);
-        StackPane.setMargin(overlayMiddle, new Insets(20, 20, 20, 20));
-
-        Region overlayOutside = new Region();
-        overlayOutside.getStyleClass().add("map-overlay-outside");
-        overlayOutside.setMouseTransparent(true);
-        StackPane.setMargin(overlayOutside, new Insets(28, 28, 28, 28));
-
-        mapContainer.getChildren().addAll(overlayInside, overlayMiddle, overlayOutside);
-
-        mainLayout.setCenter(mapContainer);
-
-        // Droite : Panneau d'informations
-        if (zoneInfoPanel != null && zoneInfoPanel.getRoot() != null) {
-            mainLayout.setRight(zoneInfoPanel.getRoot());
-            BorderPane.setMargin(zoneInfoPanel.getRoot(), new Insets(28, 28, 28, 0));
-        }
-
-        // 3. Activation de la navigation (Zoom & Pan)
+        // 5. Activer la navigation (zoom & pan)
         MapNavigationService navService = new MapNavigationService();
-        navService.attachNavigation(mapContainer, mapInterface);
+        navService.attachNavigation(gameHUDRoot, mapInterface);
+
+        // 6. Créer la scène et afficher
+        Scene scene = createScene(rootLayout);
+        configureStage(stage, scene);
+        stage.show();
+    }
 
 
-        // 4. Lancement de la fenêtre
-        Scene scene = new Scene(mainLayout, 800, 800);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
-            Constant.PATH + "styles/style.css"
-        )).toExternalForm());
+    private StackPane createLayout(StackPane gameHUDRoot, ZoneInfoPanel zoneInfoPanel) {
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setCenter(gameHUDRoot);
 
+        StackPane rootLayout = new StackPane();
+        rootLayout.getChildren().add(mainLayout);
+
+        if (zoneInfoPanel != null && zoneInfoPanel.getRoot() != null) {
+            StackPane.setAlignment(zoneInfoPanel.getRoot(), Pos.TOP_RIGHT);
+            StackPane.setMargin(zoneInfoPanel.getRoot(), new Insets(28, 28, 28, 0));
+            rootLayout.getChildren().add(zoneInfoPanel.getRoot());
+        }
+
+        return rootLayout;
+    }
+
+
+    private Scene createScene(StackPane rootLayout) {
+        Scene scene = new Scene(rootLayout, 800, 800);
+        scene.getStylesheets().add(Objects.requireNonNull(
+            getClass().getResource(Constant.PATH + "styles/style.css")
+        ).toExternalForm());
+        return scene;
+    }
+
+    private void configureStage(Stage stage, Scene scene) {
         stage.getIcons().addAll(
-            new Image(Objects.requireNonNull(getClass().getResourceAsStream(Constant.PATH + "images/icon512.png"))),
-            new Image(Objects.requireNonNull(getClass().getResourceAsStream(Constant.PATH + "images/icon256.png"))),
-            new Image(Objects.requireNonNull(getClass().getResourceAsStream(Constant.PATH + "images/icon128.png"))),
-            new Image(Objects.requireNonNull(getClass().getResourceAsStream(Constant.PATH + "images/icon64.png"))),
-            new Image(Objects.requireNonNull(getClass().getResourceAsStream(Constant.PATH + "images/icon32.png")))
+            loadImage("images/icon512.png"),
+            loadImage("images/icon256.png"),
+            loadImage("images/icon128.png"),
+            loadImage("images/icon64.png"),
+            loadImage("images/icon32.png")
         );
         stage.setTitle("Historic Conquest");
         stage.setMaximized(true);
         stage.setScene(scene);
-        stage.show();
     }
+
+    private Image loadImage(String path) {
+        return new Image(Objects.requireNonNull(
+            getClass().getResourceAsStream(Constant.PATH + path)
+        ));
+    }
+
 
     public static void main(String[] args) {
         launch(args);
