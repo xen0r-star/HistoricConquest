@@ -14,10 +14,12 @@ public class Map {
     private final List<Bloc> blocs = new ArrayList<>();
     private final ObjectMapper mapper = new ObjectMapper();
     private JsonNode iconConfig;
+    private ZonePathfinder pathfinder;
 
     public Map() {
         loadIconConfig();
         loadMapConfig();
+        initializePathfinder();
     }
 
     private void loadIconConfig() {
@@ -92,6 +94,26 @@ public class Map {
         return null;
     }
 
+
+    private void initializePathfinder() {
+        List<Zone> allZones = getAllZones();
+        this.pathfinder = new ZonePathfinder(allZones);
+    }
+
+    private List<Zone> getAllZones() {
+        List<Zone> allZones = new ArrayList<>();
+        for (Bloc bloc : blocs) {
+            allZones.addAll(bloc.getZones());
+        }
+        return allZones;
+    }
+
+    public ZonePathfinder.PathResult findPath(Zone start, Zone end) {
+        if (pathfinder == null) {
+            throw new IllegalStateException("Pathfinder not initialised");
+        }
+        return pathfinder.findPath(start, end);
+    }
 
     public List<Bloc> getBlocs() {
         return blocs;

@@ -28,6 +28,8 @@ public class Zone extends Group {
     private List<Pawn> pawns;
 
     // Style property
+    private final double x;
+    private final double y;
     private Color color;
     private boolean isFocusedZone = false;
 
@@ -41,11 +43,12 @@ public class Zone extends Group {
         this.themes = themes;
         this.power = power;
 
+        this.x = x;
+        this.y = y;
         this.color = color;
 
         this.setCursor(Cursor.HAND);
         this.setPickOnBounds(false);
-
 
 
         String zoneSVG = Constant.PATH + "zones/" + blocName + "/" + name + ".svg";
@@ -191,7 +194,21 @@ public class Zone extends Group {
         return isFocusedZone;
     }
 
+    public double getX() {
+        return x;
+    }
 
+    public double getY() {
+        return y;
+    }
+
+    public Bounds getSVGBounds() {
+        if (zoneSVGGroup == null) {
+            return null;
+        }
+
+        return zoneSVGGroup.getBoundsInParent();
+    }
 
     public void setFocusedZone(boolean focused) {
         isFocusedZone = focused;
