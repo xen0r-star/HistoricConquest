@@ -10,16 +10,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Map {
+public class WorldMap {
     private final List<Bloc> blocs = new ArrayList<>();
     private final ObjectMapper mapper = new ObjectMapper();
     private JsonNode iconConfig;
-    private ZonePathfinder pathfinder;
 
-    public Map() {
+    public WorldMap() {
         loadIconConfig();
         loadMapConfig();
-        initializePathfinder();
+        initializeAdjacencies();
     }
 
     private void loadIconConfig() {
@@ -94,25 +93,42 @@ public class Map {
         return null;
     }
 
+    private void initializeAdjacencies() {
+        String path = Constant.PATH + "map/adjacency.json";
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is == null) return;
 
-    private void initializePathfinder() {
-        List<Zone> allZones = getAllZones();
-        this.pathfinder = new ZonePathfinder(allZones);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode adjacencyData = mapper.readTree(is);
+
+            List<Zone> allZones = getAllZones();
+            for (Zone zone : allZones) {
+                JsonNode zoneAdjacentNode = adjacencyData.get(zone.getName());
+
+                if (zoneAdjacentNode != null && zoneAdjacentNode.isArray()) {
+                    for (JsonNode adjacentName : zoneAdjacentNode) {
+                        String neighborName = adjacentName.asText();
+
+                        allZones.stream()
+                                .filter(z -> z.getName().equals(neighborName))
+                                .findFirst().ifPresent(zone::addAdjacentZones);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load adjacency data");
+        }
     }
 
-    private List<Zone> getAllZones() {
+
+
+    public List<Zone> getAllZones() {
         List<Zone> allZones = new ArrayList<>();
         for (Bloc bloc : blocs) {
             allZones.addAll(bloc.getZones());
         }
         return allZones;
-    }
-
-    public ZonePathfinder.PathResult findPath(Zone start, Zone end) {
-        if (pathfinder == null) {
-            throw new IllegalStateException("Pathfinder not initialised");
-        }
-        return pathfinder.findPath(start, end);
     }
 
     public List<Bloc> getBlocs() {

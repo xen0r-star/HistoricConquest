@@ -17,6 +17,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Zone extends Group {
@@ -26,10 +27,8 @@ public class Zone extends Group {
     private final TypeThemes themes;
     private int power;
     private List<Pawn> pawns;
+    private List<Zone> adjacentZones;
 
-    // Style property
-    private final double x;
-    private final double y;
     private Color color;
     private boolean isFocusedZone = false;
 
@@ -42,9 +41,9 @@ public class Zone extends Group {
         this.blocName = blocName;
         this.themes = themes;
         this.power = power;
+        this.adjacentZones = new ArrayList<>();
 
-        this.x = x;
-        this.y = y;
+        // Style property
         this.color = color;
 
         this.setCursor(Cursor.HAND);
@@ -182,33 +181,18 @@ public class Zone extends Group {
         return name;
     }
 
-    public int getPower() {
-        return power;
-    }
-
     public Color getColor() {
         return color;
     }
 
-    public boolean isFocusedZone() {
-        return isFocusedZone;
+    public Group getZoneSVGGroup() {
+        return zoneSVGGroup;
     }
 
-    public double getX() {
-        return x;
+    public List<Zone> getAdjacentZones() {
+        return adjacentZones;
     }
 
-    public double getY() {
-        return y;
-    }
-
-    public Bounds getSVGBounds() {
-        if (zoneSVGGroup == null) {
-            return null;
-        }
-
-        return zoneSVGGroup.getBoundsInParent();
-    }
 
     public void setFocusedZone(boolean focused) {
         isFocusedZone = focused;
@@ -224,5 +208,10 @@ public class Zone extends Group {
     public void setColor(Color color) {
         this.color = color;
         updateColor(color);
+    }
+
+    public void addAdjacentZones(Zone zone) {
+        if (adjacentZones.contains(zone)) return;
+        adjacentZones.add(zone);
     }
 }

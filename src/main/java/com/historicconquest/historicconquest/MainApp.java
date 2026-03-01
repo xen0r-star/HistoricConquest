@@ -1,6 +1,6 @@
 package com.historicconquest.historicconquest;
 
-import com.historicconquest.historicconquest.map.Map;
+import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
 import com.historicconquest.historicconquest.ui.GameHUD;
@@ -33,11 +33,11 @@ public class MainApp extends Application {
         GameHUD gameHUD = loaderGameHUD.getController();
 
         // 2. Créer la logique métier
-        Map map = new Map();
+        WorldMap worldMap = new WorldMap();
 
         // 3. Créer le contrôleur pour orchestrer tout
         new GameController(
-            map,
+            worldMap,
             zoneInfoPanel,
             gameHUD,
             mapInterface
