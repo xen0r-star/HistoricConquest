@@ -10,7 +10,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polyline;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.CubicCurveTo;
 
 import java.util.List;
 
@@ -140,59 +142,116 @@ public class GameController {
 
         Group root = new Group();
 
-        // Créer une polyline pour relier tous les points du chemin
-        Polyline polyline = new Polyline();
-        polyline.setStroke(Color.web("#FFD700"));
-        polyline.setStrokeWidth(5.0);
-        polyline.setOpacity(1.0);
-        polyline.getStrokeDashArray().addAll(15.0, 8.0);
-        polyline.setFill(null);
-        polyline.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
-        polyline.setStrokeLineJoin(javafx.scene.shape.StrokeLineJoin.ROUND);
+        // Récupérer tous les points du chemin
+        double[] xPoints = new double[path.size()];
+        double[] yPoints = new double[path.size()];
 
-        // Ajouter tous les points du chemin
-        for (Zone zone : path) {
-            Bounds bounds = zone.getZoneSVGGroup().getBoundsInParent();
-            if (bounds != null) {
-                polyline.getPoints().addAll(bounds.getCenterX(), bounds.getCenterY());
-            }
-        }
-
-        root.getChildren().add(polyline);
-
-        // Ajouter des cercles visibles sur chaque zone du chemin
         for (int i = 0; i < path.size(); i++) {
             Zone zone = path.get(i);
             Bounds bounds = zone.getZoneSVGGroup().getBoundsInParent();
-
             if (bounds != null) {
-                double x = bounds.getCenterX();
-                double y = bounds.getCenterY();
-
-                Circle circle = new Circle(x, y, 12.0);
-                circle.setFill(Color.web("#FFD700"));
-                circle.setOpacity(1.0);
-
-                // Marquer le départ et l'arrivée différemment
-                if (i == 0) {
-                    circle.setRadius(15.0);
-                    circle.setFill(Color.web("#00FF00"));  // Vert pour le départ
-                    circle.setStroke(Color.BLACK);
-                    circle.setStrokeWidth(2.0);
-                } else if (i == path.size() - 1) {
-                    circle.setRadius(15.0);
-                    circle.setFill(Color.web("#FF0000"));  // Rouge pour l'arrivée
-                    circle.setStroke(Color.BLACK);
-                    circle.setStrokeWidth(2.0);
-                } else {
-                    circle.setStroke(Color.web("#FFD700"));
-                    circle.setStrokeWidth(1.5);
-                }
-
-                root.getChildren().add(circle);
+                xPoints[i] = bounds.getCenterX();
+                yPoints[i] = bounds.getCenterY();
             }
         }
 
+        // Créer une courbe lisse (Catmull-Rom spline) qui passe par tous les points
+        Path smoothPath = createSmoothPath(xPoints, yPoints);
+        smoothPath.setStroke(Color.web("#FFD700"));
+        smoothPath.setStrokeWidth(5.0);
+        smoothPath.setOpacity(1.0);
+        smoothPath.getStrokeDashArray().addAll(15.0, 8.0);
+        smoothPath.setFill(null);
+        smoothPath.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+        smoothPath.setStrokeLineJoin(javafx.scene.shape.StrokeLineJoin.ROUND);
+
+        root.getChildren().add(smoothPath);
+
+        // Ajouter des cercles visibles sur chaque zone du chemin
+//        for (int i = 0; i < path.size(); i++) {
+//            Zone zone = path.get(i);
+//            Bounds bounds = zone.getZoneSVGGroup().getBoundsInParent();
+//
+//            if (bounds != null) {
+//                double x = bounds.getCenterX();
+//                double y = bounds.getCenterY();
+//
+//                Circle circle = new Circle(x, y, 12.0);
+//                circle.setFill(Color.web("#FFD700"));
+//                circle.setOpacity(1.0);
+//
+//                // Marquer le départ et l'arrivée différemment
+//                if (i == 0) {
+//                    circle.setRadius(15.0);
+//                    circle.setFill(Color.web("#00FF00"));  // Vert pour le départ
+//                    circle.setStroke(Color.BLACK);
+//                    circle.setStrokeWidth(2.0);
+//                } else if (i == path.size() - 1) {
+//                    circle.setRadius(15.0);
+//                    circle.setFill(Color.web("#FF0000"));  // Rouge pour l'arrivée
+//                    circle.setStroke(Color.BLACK);
+//                    circle.setStrokeWidth(2.0);
+//                } else {
+//                    circle.setStroke(Color.web("#FFD700"));
+//                    circle.setStrokeWidth(1.5);
+//                }
+//
+//                root.getChildren().add(circle);
+//            }
+//        }
+
         return root;
+    }
+
+    /**
+     * Crée une courbe Catmull-Rom lisse qui passe par tous les points
+     */
+    private Path createSmoothPath(double[] xPoints, double[] yPoints) {
+        Path path = new Path();
+
+        if (xPoints.length < 2) return path;
+
+        // Commencer au premier point
+        path.getElements().add(new MoveTo(xPoints[0], yPoints[0]));
+
+        // Si seulement 2 points, une ligne droite suffit
+        if (xPoints.length == 2) {
+            path.getElements().add(new CubicCurveTo(
+                xPoints[0], yPoints[0],
+                xPoints[1], yPoints[1],
+                xPoints[1], yPoints[1]
+            ));
+            return path;
+        }
+
+        // Pour chaque segment, créer une courbe de Bézier
+        for (int i = 0; i < xPoints.length - 1; i++) {
+            // Points de contrôle pour la courbe de Bézier
+            // Utiliser les points voisins pour créer une courbe lisse
+
+            double x0 = (i > 0) ? xPoints[i - 1] : xPoints[i];
+            double y0 = (i > 0) ? yPoints[i - 1] : yPoints[i];
+
+            double x1 = xPoints[i];
+            double y1 = yPoints[i];
+
+            double x2 = xPoints[i + 1];
+            double y2 = yPoints[i + 1];
+
+            double x3 = (i + 2 < xPoints.length) ? xPoints[i + 2] : xPoints[i + 1];
+            double y3 = (i + 2 < yPoints.length) ? yPoints[i + 2] : yPoints[i + 1];
+
+            // Calculer les points de contrôle (Catmull-Rom)
+            double cp1x = x1 + (x2 - x0) / 6.0;
+            double cp1y = y1 + (y2 - y0) / 6.0;
+
+            double cp2x = x2 - (x3 - x1) / 6.0;
+            double cp2y = y2 - (y3 - y1) / 6.0;
+
+            // Ajouter la courbe cubique
+            path.getElements().add(new CubicCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2));
+        }
+
+        return path;
     }
 }

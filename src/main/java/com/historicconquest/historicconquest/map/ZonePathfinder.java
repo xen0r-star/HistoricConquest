@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ZonePathfinder {
     private final static int MAX_PATH_LENGTH = 5;
-    private final static int MAX_SEARCH_DEPTH = 5;
+    private final static int MAX_SEARCH_DEPTH = 10;
 
     public static PathResult findPath(Zone start, Zone end) {
         if (start == end) {
