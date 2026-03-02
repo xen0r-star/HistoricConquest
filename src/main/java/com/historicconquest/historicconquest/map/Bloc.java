@@ -30,4 +30,13 @@ public class Bloc extends Group {
     public TypeBloc getName() {
         return name;
     }
+
+
+    @Override
+    public String toString() {
+        return "Bloc{" +
+                "zones=" + zones +
+                ", name=" + name +
+                '}';
+    }
 }

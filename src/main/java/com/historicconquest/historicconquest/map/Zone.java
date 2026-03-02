@@ -214,4 +214,16 @@ public class Zone extends Group {
         if (adjacentZones.contains(zone)) return;
         adjacentZones.add(zone);
     }
+
+
+    @Override
+    public String toString() {
+        return "Zone{" +
+                "name='" + name + '\'' +
+                ", blocName='" + blocName + '\'' +
+                ", themes=" + themes +
+                ", power=" + power +
+                ", color=" + color.toString() +
+                '}';
+    }
 }
