@@ -6,8 +6,8 @@ import javafx.scene.layout.StackPane;
 public class MapNavigationService {
 
     private static final double ZOOM_FACTOR = 1.1;
-    private static final double ZOOM_MIN = 0.2;
-    private static final double ZOOM_MAX = 5.0;
+    private static final double ZOOM_MIN = 0.80;
+    private static final double ZOOM_MAX = 10.0;
     private double mouseAnchorX, mouseAnchorY;
     private double translateAnchorX, translateAnchorY;
 
@@ -20,23 +20,26 @@ public class MapNavigationService {
             double oldScale = plateau.getScaleX();
             double newScale = oldScale * zoomFactor;
 
-            if (newScale >= ZOOM_MIN && newScale <= ZOOM_MAX) {
-                double mouseSceneX = event.getSceneX();
-                double mouseSceneY = event.getSceneY();
+            if (newScale < ZOOM_MIN) newScale = ZOOM_MIN;
+            else if (newScale > ZOOM_MAX) newScale = ZOOM_MAX;
 
-                javafx.geometry.Point2D mouseInMap = plateau.sceneToLocal(mouseSceneX, mouseSceneY);
 
-                plateau.setScaleX(newScale);
-                plateau.setScaleY(newScale);
+            double mouseSceneX = event.getSceneX();
+            double mouseSceneY = event.getSceneY();
 
-                javafx.geometry.Point2D mouseInSceneAfterZoom = plateau.localToScene(mouseInMap);
+            javafx.geometry.Point2D mouseInMap = plateau.sceneToLocal(mouseSceneX, mouseSceneY);
 
-                double errorX = mouseInSceneAfterZoom.getX() - mouseSceneX;
-                double errorY = mouseInSceneAfterZoom.getY() - mouseSceneY;
+            plateau.setScaleX(newScale);
+            plateau.setScaleY(newScale);
 
-                plateau.setTranslateX(plateau.getTranslateX() - errorX);
-                plateau.setTranslateY(plateau.getTranslateY() - errorY);
-            }
+            javafx.geometry.Point2D mouseInSceneAfterZoom = plateau.localToScene(mouseInMap);
+
+            double errorX = mouseInSceneAfterZoom.getX() - mouseSceneX;
+            double errorY = mouseInSceneAfterZoom.getY() - mouseSceneY;
+
+            plateau.setTranslateX(plateau.getTranslateX() - errorX);
+            plateau.setTranslateY(plateau.getTranslateY() - errorY);
+
             event.consume();
         });
 

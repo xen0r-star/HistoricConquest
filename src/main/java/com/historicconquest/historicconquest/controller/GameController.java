@@ -5,18 +5,26 @@ import com.historicconquest.historicconquest.map.Zone;
 import com.historicconquest.historicconquest.map.ZonePathfinder;
 import com.historicconquest.historicconquest.ui.GameHUD;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
+import javafx.animation.PathTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.CubicCurveTo;
+import javafx.util.Duration;
 
 import java.util.List;
 
 public class GameController {
+    /*
+    * =======================================================
+    *     CODE TEMPORAIRE POUR TESTER LE VISUEL DE LA MAP
+    * =======================================================
+    */
+
     private final WorldMap worldMap;
     private final ZoneInfoPanel zoneInfoPanel;
     private final GameHUD gameHUD;
@@ -142,30 +150,39 @@ public class GameController {
 
         Group root = new Group();
 
-        // Récupérer tous les points du chemin
-        double[] xPoints = new double[path.size()];
-        double[] yPoints = new double[path.size()];
+        // Créer une ligne droite simple entre chaque zone consécutive
+        Path directPath = new Path();
 
-        for (int i = 0; i < path.size(); i++) {
+        // Obtenir le premier point (centre de la première zone)
+        Zone firstZone = path.get(0);
+        Bounds firstBounds = firstZone.getZoneSVGGroup().getBoundsInParent();
+        double startX = firstBounds.getCenterX();
+        double startY = firstBounds.getCenterY();
+
+        directPath.getElements().add(new MoveTo(startX, startY));
+
+        // Ajouter des segments droits entre chaque zone successive
+        for (int i = 1; i < path.size(); i++) {
             Zone zone = path.get(i);
             Bounds bounds = zone.getZoneSVGGroup().getBoundsInParent();
-            if (bounds != null) {
-                xPoints[i] = bounds.getCenterX();
-                yPoints[i] = bounds.getCenterY();
-            }
+            directPath.getElements().add(new javafx.scene.shape.LineTo(bounds.getCenterX(), bounds.getCenterY()));
         }
 
-        // Créer une courbe lisse (Catmull-Rom spline) qui passe par tous les points
-        Path smoothPath = createSmoothPath(xPoints, yPoints);
-        smoothPath.setStroke(Color.web("#FFD700"));
-        smoothPath.setStrokeWidth(5.0);
-        smoothPath.setOpacity(1.0);
-        smoothPath.getStrokeDashArray().addAll(15.0, 8.0);
-        smoothPath.setFill(null);
-        smoothPath.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
-        smoothPath.setStrokeLineJoin(javafx.scene.shape.StrokeLineJoin.ROUND);
+        directPath.setStroke(Color.web("#FFD700"));
+        directPath.setStrokeWidth(2.0);
+        directPath.setOpacity(1.0);
+        directPath.getStrokeDashArray().addAll(15.0, 8.0);
+        directPath.setFill(null);
+        directPath.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+        directPath.setStrokeLineJoin(javafx.scene.shape.StrokeLineJoin.ROUND);
 
-        root.getChildren().add(smoothPath);
+        root.getChildren().add(directPath);
+
+        // Ajouter l'animation de la charrette
+        Node carriage = createCarriageAnimation(directPath, path.size());
+        if (carriage != null) {
+            root.getChildren().add(carriage);
+        }
 
         // Ajouter des cercles visibles sur chaque zone du chemin
 //        for (int i = 0; i < path.size(); i++) {
@@ -203,55 +220,44 @@ public class GameController {
         return root;
     }
 
-    /**
-     * Crée une courbe Catmull-Rom lisse qui passe par tous les points
-     */
-    private Path createSmoothPath(double[] xPoints, double[] yPoints) {
-        Path path = new Path();
 
-        if (xPoints.length < 2) return path;
 
-        // Commencer au premier point
-        path.getElements().add(new MoveTo(xPoints[0], yPoints[0]));
 
-        // Si seulement 2 points, une ligne droite suffit
-        if (xPoints.length == 2) {
-            path.getElements().add(new CubicCurveTo(
-                xPoints[0], yPoints[0],
-                xPoints[1], yPoints[1],
-                xPoints[1], yPoints[1]
-            ));
-            return path;
+    private Node createCarriageAnimation(Path path, int numberOfZones) {
+        try {
+            // Charger l'image SVG de la charrette
+            var inputStream = getClass().getResourceAsStream("/com/historicconquest/historicconquest/pawn/Horse-drawn1.png");
+            if (inputStream == null) {
+                System.err.println("Erreur: Le fichier Horse-drawn1.svg n'a pas pu être trouvé");
+                return null;
+            }
+
+            Image carriageImage = new Image(inputStream);
+
+            ImageView carriage = new ImageView(carriageImage);
+            carriage.setScaleX(0.05);
+            carriage.setScaleY(0.05);
+
+            // Créer un groupe pour contenir la charrette
+            Group carriageGroup = new Group();
+            carriageGroup.getChildren().add(carriage);
+
+            // Créer l'animation PathTransition
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.seconds(numberOfZones * 1.5)); // Durée proportionnelle au nombre de zones
+            pathTransition.setPath(path);
+            pathTransition.setNode(carriageGroup);
+            pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
+            pathTransition.setCycleCount(1);
+            pathTransition.setAutoReverse(false);
+
+            // Lancer l'animation
+            pathTransition.play();
+
+            return carriageGroup;
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de la charrette: " + e.getMessage());
+            return null;
         }
-
-        // Pour chaque segment, créer une courbe de Bézier
-        for (int i = 0; i < xPoints.length - 1; i++) {
-            // Points de contrôle pour la courbe de Bézier
-            // Utiliser les points voisins pour créer une courbe lisse
-
-            double x0 = (i > 0) ? xPoints[i - 1] : xPoints[i];
-            double y0 = (i > 0) ? yPoints[i - 1] : yPoints[i];
-
-            double x1 = xPoints[i];
-            double y1 = yPoints[i];
-
-            double x2 = xPoints[i + 1];
-            double y2 = yPoints[i + 1];
-
-            double x3 = (i + 2 < xPoints.length) ? xPoints[i + 2] : xPoints[i + 1];
-            double y3 = (i + 2 < yPoints.length) ? yPoints[i + 2] : yPoints[i + 1];
-
-            // Calculer les points de contrôle (Catmull-Rom)
-            double cp1x = x1 + (x2 - x0) / 6.0;
-            double cp1y = y1 + (y2 - y0) / 6.0;
-
-            double cp2x = x2 - (x3 - x1) / 6.0;
-            double cp2y = y2 - (y3 - y1) / 6.0;
-
-            // Ajouter la courbe cubique
-            path.getElements().add(new CubicCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2));
-        }
-
-        return path;
     }
 }
