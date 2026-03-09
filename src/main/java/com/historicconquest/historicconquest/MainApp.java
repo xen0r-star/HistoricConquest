@@ -1,11 +1,13 @@
 package com.historicconquest.historicconquest;
 
-import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
+import com.historicconquest.historicconquest.game.NewGameConfig;
+import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.ui.GameHUD;
-import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
 import com.historicconquest.historicconquest.ui.HomePage;
+import com.historicconquest.historicconquest.ui.NewGame;
+import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -24,20 +26,24 @@ public class MainApp extends Application {
     private final Group mapInterface = new Group();
 
     private Stage stage;
-    private StackPane appRoot;      // <-- root unique de l'app sinon en cree plusieurs
+    private StackPane appRoot;
 
     @Override
     public void start(Stage stage) {
         this.stage = stage;
 
-        configureStageIcons(stage);
+        stage.setTitle("Historic Conquest");
+        stage.getIcons().addAll(
+                loadImage("images/icon512.png"),
+                loadImage("images/icon256.png"),
+                loadImage("images/icon128.png"),
+                loadImage("images/icon64.png"),
+                loadImage("images/icon32.png")
+        );
 
-        // 1) Root et Scene créés UNE SEULE FOIS
         appRoot = new StackPane();
-        // <-- scene unique de l'app
         Scene scene = new Scene(appRoot, 1280, 720);
 
-        // CSS UNE SEULE FOIS
         scene.getStylesheets().add(Objects.requireNonNull(
                 getClass().getResource(Constant.PATH + "styles/style.css")
         ).toExternalForm());
@@ -46,25 +52,35 @@ public class MainApp extends Application {
         stage.setFullScreen(true);
         stage.show();
 
-        // 2) Afficher le menu en remplaçant le contenu du root
         showMenu();
     }
 
     public void showMenu() {
         HomePage menu = new HomePage();
-        StackPane menuRoot = menu.createView(this);   // <-- plus de stage ici
-        appRoot.getChildren().setAll(menuRoot);
+        appRoot.getChildren().setAll(menu.createView(this));
     }
 
-    public void startGame() {
+    public void showNewGame() {
+        NewGame page = new NewGame();
+        appRoot.getChildren().setAll(page.createView(this));
+    }
+
+    public void startGame(NewGameConfig config) {
         try {
-            FXMLLoader loaderZoneInfo = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/zoneInfoPanel.fxml"));
+            FXMLLoader loaderZoneInfo = new FXMLLoader(Objects.requireNonNull(
+                    getClass().getResource(Constant.PATH + "ui/zoneInfoPanel.fxml")
+            ));
             loaderZoneInfo.load();
             ZoneInfoPanel zoneInfoPanel = loaderZoneInfo.getController();
 
-            FXMLLoader loaderGameHUD = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/GameHUD.fxml"));
+            FXMLLoader loaderGameHUD = new FXMLLoader(Objects.requireNonNull(
+                    getClass().getResource(Constant.PATH + "ui/GameHUD.fxml")
+            ));
             StackPane gameHUDRoot = loaderGameHUD.load();
             GameHUD gameHUD = loaderGameHUD.getController();
+
+            // Tu peux utiliser config ici si tu veux
+            // ex: gameHUD.setPlayerName(config.getPlayerName());
 
             WorldMap worldMap = new WorldMap();
             new GameController(worldMap, zoneInfoPanel, gameHUD, mapInterface);
@@ -74,27 +90,21 @@ public class MainApp extends Application {
             MapNavigationService navService = new MapNavigationService();
             navService.attachNavigation(gameHUDRoot, mapInterface);
 
-            // IMPORTANT : on ne touche plus à stage.setScene(...)
             appRoot.getChildren().setAll(rootLayout);
-
-            // optionnel
-            stage.setFullScreen(true);
-            stage.setMaximized(true);
 
         } catch (Exception e) {
             e.printStackTrace();
+            showMenu();
         }
     }
 
-    private void configureStageIcons(Stage stage) {
-        stage.getIcons().addAll(
-                loadImage("images/icon512.png"),
-                loadImage("images/icon256.png"),
-                loadImage("images/icon128.png"),
-                loadImage("images/icon64.png"),
-                loadImage("images/icon32.png")
-        );
-        stage.setTitle("Historic Conquest");
+    // si tu veux garder un appel sans config
+    public void startGame() {
+        startGame(new NewGameConfig("Player", 1));
+    }
+
+    public void exit() {
+        stage.close();
     }
 
     private StackPane createLayout(StackPane gameHUDRoot, ZoneInfoPanel zoneInfoPanel) {

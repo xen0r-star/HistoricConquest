@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class HomePage {
 
-    public StackPane createView(MainApp mainApp) {
+    public StackPane createView(MainApp app) {
         // --- TITRE ---
         Label title = new Label("HISTORIC");
         Label title2 = new Label("CONQUEST");
@@ -31,12 +31,13 @@ public class HomePage {
         Button loadGame = createImageButton(Constant.PATH + "images/load.png");
         Button multiplayer = createImageButton(Constant.PATH + "images/multiplayer.png");
 
+        // NEW GAME -> ouvrir l'écran de configuration (nom, joueurs, etc.)
         newGame.setOnAction(e -> {
-            newGame.setDisable(true);
-            mainApp.startGame();
+            newGame.setDisable(true); // optionnel anti double clic
+            app.showNewGame();
         });
 
-        VBox mainBox = new VBox(-5, title,title2, newGame, loadGame, multiplayer);
+        VBox mainBox = new VBox(-5, title, title2, newGame, loadGame, multiplayer);
         mainBox.setAlignment(Pos.CENTER);
         mainBox.setPickOnBounds(false);
         mainBox.setPadding(new Insets(0, 0, 30, 0));
@@ -45,7 +46,7 @@ public class HomePage {
         Button settingsBtn = createIconButton(Constant.PATH + "images/settings.png");
         Button helpBtn = createIconButton(Constant.PATH + "images/help.png");
         Button exitBtn = createIconButton(Constant.PATH + "images/sortie.png");
-        exitBtn.setOnAction(e -> mainApp.getStage().close());
+        exitBtn.setOnAction(e -> app.exit());
 
         VBox iconBar = new VBox(-5, settingsBtn, helpBtn, exitBtn);
         iconBar.setAlignment(Pos.BOTTOM_CENTER);
@@ -63,10 +64,7 @@ public class HomePage {
         if (hudBackground != null) {
             // Important: le fond ne doit pas manger les clics
             hudBackground.setMouseTransparent(true);
-
-            // (optionnel) tu peux aussi désactiver le focus:
             hudBackground.setFocusTraversable(false);
-
             root.getChildren().add(hudBackground);
         }
 
@@ -78,9 +76,10 @@ public class HomePage {
 
     private Parent loadGameHudBackground() {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    Objects.requireNonNull(getClass().getResource(Constant.PATH + "ui/GameHUD.fxml"))
-            );
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
+                    getClass().getResource(Constant.PATH + "ui/GameHUD.fxml"),
+                    "FXML introuvable: " + Constant.PATH + "ui/GameHUD.fxml"
+            ));
             return loader.load();
         } catch (Exception e) {
             System.out.println("Erreur: impossible de charger " + Constant.PATH + "ui/GameHUD.fxml");
