@@ -16,10 +16,19 @@ public class WorldMap {
     private JsonNode iconConfig;
 
     public WorldMap() {
-        loadIconConfig();
-        loadMapConfig();
-        initializeAdjacencies();
+        this(
+            true, true, true,
+            Color.web("#C0A57F"),
+            Color.web("#635341")
+        );
     }
+
+    public WorldMap(boolean loadMapConfig, boolean loadIcon, boolean loadAdjacency, Color defaultZoneColor, Color defaultZoneBorderColor) {
+        if (loadIcon) loadIconConfig();
+        if (loadMapConfig) loadMapConfig(loadIcon, defaultZoneColor, defaultZoneBorderColor);
+        if (loadAdjacency) initializeAdjacencies();
+    }
+
 
     private void loadIconConfig() {
         String path = Constant.PATH + "icons/icon_config.json";
@@ -32,7 +41,7 @@ public class WorldMap {
         }
     }
 
-    private void loadMapConfig() {
+    private void loadMapConfig(boolean loadIcon, Color defaultZoneColor, Color defaultZoneBorderColor) {
         String path = Constant.PATH + "zones/map_config.json";
 
         try (InputStream is = getClass().getResourceAsStream(path)) {
@@ -47,27 +56,44 @@ public class WorldMap {
                 JsonNode children = blocNode.get("children");
                 for (JsonNode zoneNode : children) {
                     String zoneName = zoneNode.get("name").asText();
+                    Zone zone;
 
-                    JsonNode iconJson = searchIcon(blocName, zoneName);
-                    if (iconJson == null) continue;
+                    if (loadIcon) {
+                        JsonNode iconJson = searchIcon(blocName, zoneName);
+                        if (iconJson == null) continue;
 
-                    Zone.ZoneIcon icon = new Zone.ZoneIcon(
-                        iconJson.get("x").asDouble(),
-                        iconJson.get("y").asDouble(),
-                        iconJson.get("w").asDouble(),
-                        iconJson.get("h").asDouble()
-                    );
+                        Zone.ZoneIcon icon = new Zone.ZoneIcon(
+                            iconJson.get("x").asDouble(),
+                            iconJson.get("y").asDouble(),
+                            iconJson.get("w").asDouble(),
+                            iconJson.get("h").asDouble()
+                        );
 
-                    Zone zone = new Zone(
-                        zoneName,
-                        blocName,
-                        TypeThemes.getRandom(),
-                        0,
-                        zoneNode.get("x").asDouble(),
-                        zoneNode.get("y").asDouble(),
-                        icon,
-                        Color.web("#C0A57F")
-                    );
+                        zone = new Zone(
+                            zoneName,
+                            blocName,
+                            TypeThemes.getRandom(),
+                            0,
+                            zoneNode.get("x").asDouble(),
+                            zoneNode.get("y").asDouble(),
+                            icon,
+                            defaultZoneColor,
+                            defaultZoneBorderColor
+                        );
+
+                    } else {
+                        zone = new Zone(
+                            zoneName,
+                            blocName,
+                            0,
+                            zoneNode.get("x").asDouble(),
+                            zoneNode.get("y").asDouble(),
+                            defaultZoneColor,
+                            defaultZoneBorderColor
+                        );
+
+                        zone.setBlockHover(true);
+                    }
 
                     bloc.addZone(zone);
                 }

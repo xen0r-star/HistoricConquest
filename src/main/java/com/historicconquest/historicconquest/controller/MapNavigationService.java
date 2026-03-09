@@ -1,5 +1,6 @@
 package com.historicconquest.historicconquest.controller;
 
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.layout.StackPane;
 
@@ -27,12 +28,12 @@ public class MapNavigationService {
             double mouseSceneX = event.getSceneX();
             double mouseSceneY = event.getSceneY();
 
-            javafx.geometry.Point2D mouseInMap = plateau.sceneToLocal(mouseSceneX, mouseSceneY);
+            Point2D mouseInMap = plateau.sceneToLocal(mouseSceneX, mouseSceneY);
 
             plateau.setScaleX(newScale);
             plateau.setScaleY(newScale);
 
-            javafx.geometry.Point2D mouseInSceneAfterZoom = plateau.localToScene(mouseInMap);
+            Point2D mouseInSceneAfterZoom = plateau.localToScene(mouseInMap);
 
             double errorX = mouseInSceneAfterZoom.getX() - mouseSceneX;
             double errorY = mouseInSceneAfterZoom.getY() - mouseSceneY;

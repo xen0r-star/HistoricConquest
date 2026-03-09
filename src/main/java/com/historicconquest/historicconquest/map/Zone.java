@@ -31,12 +31,17 @@ public class Zone extends Group {
 
     private Color color;
     private boolean isFocusedZone = false;
+    private boolean blockHover = false;
 
     // SVG groups
     private final Group zoneSVGGroup;
 
 
-    public Zone(String name, String blocName, TypeThemes themes, int power, double x, double y, ZoneIcon icon, Color color) {
+    public Zone(String name, String blocName, int power, double x, double y, Color color, Color borderColor) {
+        this(name, blocName, TypeThemes.NONE, power, x, y, null, color, borderColor);
+    }
+
+    public Zone(String name, String blocName, TypeThemes themes, int power, double x, double y, ZoneIcon icon, Color color, Color borderColor) {
         this.name = name;
         this.blocName = blocName;
         this.themes = themes;
@@ -55,7 +60,8 @@ public class Zone extends Group {
             zoneSVG,
             x, y,
             -1, -1,
-            color
+            color,
+            borderColor
         );
 
         if (zoneSVGGroup == null) {
@@ -63,35 +69,39 @@ public class Zone extends Group {
             return;
         }
 
+        this.getChildren().add(zoneSVGGroup);
 
 
-        String iconSVG = Constant.PATH + "icons/" + themes + ".svg";
-        Group iconSVGGroup = loadSVG(
-            iconSVG,
-            icon.x(), icon.y(),
-            icon.width(), icon.height(),
-            Color.web("#635341")
-        );
 
-        if (iconSVGGroup == null) {
-            System.err.println("Failed to load icon SVG for theme: " + themes);
-            return;
+        if (icon != null) {
+            String iconSVG = Constant.PATH + "icons/" + themes + ".svg";
+            Group iconSVGGroup = loadSVG(
+                iconSVG,
+                icon.x(), icon.y(),
+                icon.width(), icon.height(),
+                Color.web("#635341"),
+                Color.web("#635341")
+            );
+
+            if (iconSVGGroup == null) {
+                System.err.println("Failed to load icon SVG for theme: " + themes);
+                return;
+            }
+
+            iconSVGGroup.setOpacity(0.5);
+            iconSVGGroup.setMouseTransparent(true);
+
+            this.getChildren().add(iconSVGGroup);
         }
-
-        iconSVGGroup.setOpacity(0.5);
-        iconSVGGroup.setMouseTransparent(true);
-
 
 
         this.setOnMouseEntered(event -> setHovered(true));
         this.setOnMouseExited(event -> setHovered(false));
-
-        this.getChildren().addAll(zoneSVGGroup, iconSVGGroup);
     }
 
 
 
-    private Group loadSVG(String resourcePath, double x, double y, double width, double height, Color fillColor) {
+    private Group loadSVG(String resourcePath, double x, double y, double width, double height, Color fillColor, Color borderColor) {
         try (InputStream svgStream = Zone.class.getResourceAsStream(resourcePath)) {
             if (svgStream == null) {
                 System.err.println("File not found: " + resourcePath);
@@ -104,7 +114,7 @@ public class Zone extends Group {
             Group svgGroup = new Group();
             for (int i = 0; i < paths.getLength(); i++) {
                 Element el = (Element) paths.item(i);
-                SVGPath p = getSvgPath(fillColor, el);
+                SVGPath p = getSvgPath(fillColor, borderColor, el);
 
                 svgGroup.getChildren().add(p);
             }
@@ -134,10 +144,10 @@ public class Zone extends Group {
         }
     }
 
-    private static SVGPath getSvgPath(Color fillColor, Element el) {
+    private static SVGPath getSvgPath(Color fillColor, Color borderColor, Element el) {
         SVGPath p = new SVGPath();
         p.setContent(el.getAttribute("d"));
-        p.setStroke(Color.web("#635341"));
+        p.setStroke(borderColor);
 
         String valF = el.getAttribute("fill");
         if (!valF.isEmpty()) {
@@ -199,10 +209,18 @@ public class Zone extends Group {
     }
 
     private void setHovered(boolean hovered) {
+        if (blockHover) return;
         if (isFocusedZone) return;
 
         if (hovered) updateColor(color.deriveColor(0, 1.0, 0.85, 1.0));
         else         updateColor(color);
+    }
+
+    public void setBlockHover(boolean blockHover) {
+        this.blockHover = blockHover;
+
+        if (blockHover) this.setCursor(Cursor.DEFAULT);
+        else            this.setCursor(Cursor.HAND);
     }
 
     public void setColor(Color color) {

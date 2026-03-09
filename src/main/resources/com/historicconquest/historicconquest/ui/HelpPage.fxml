@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<StackPane maxWidth="400.0" style="-fx-background-color: #E8D8C0; -fx-border-color: #A48157, #A48157; -fx-border-width: 2, 2; -fx-border-insets: 4, 8; -fx-border-radius: 10;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.HelpPage">
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox spacing="20" style="-fx-background-color: #E8D8C0;">
+            <padding>
+                <Insets bottom="25.0" left="30.0" right="30.0" />
+            </padding>
+
+            <VBox spacing="8">
+                <Label styleClass="page-title" text="Help &amp; Game Guide" textFill="#a48157">
+               <VBox.margin>
+                  <Insets bottom="-13.0" />
+               </VBox.margin></Label>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#a48157" height="2.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="300.0" />
+            </VBox>
+
+            <Label styleClass="help-text" text="Welcome to Historic Conquest. This game challenges players to conquer territories by answering questions from various themes." wrapText="true" />
+            <Label styleClass="help-text" text="Each correct answer allows you to expand your empire and capture new regions of the map." wrapText="true" />
+            <Label styleClass="help-text" text="Different themes include history, technology, tourism and entertainment. Each question tests your knowledge and strategic thinking." wrapText="true" />
+            <Label styleClass="help-text" text="Use your knowledge wisely and conquer the world one territory at a time." wrapText="true" />
+            <Label styleClass="help-text" text="Good luck and have fun conquering history." wrapText="true" />
+        </VBox>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+    </ScrollPane>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</StackPane>

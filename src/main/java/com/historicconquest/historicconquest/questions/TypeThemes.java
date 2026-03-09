@@ -6,12 +6,17 @@ public enum TypeThemes {
     DIVERTISSEMENT("Divertissement"),
     INFORMATIQUE("Informatique"),
     TOURISME("Tourisme"),
-    HISTOIRE("Histoire");
+    HISTOIRE("Histoire"),
+    NONE("None");
 
 
     TypeThemes(String label) { }
 
     public static TypeThemes getRandom() {
-        return values()[ThreadLocalRandom.current().nextInt(values().length)];
+        TypeThemes[] valid = java.util.Arrays.stream(values())
+                .filter(t -> t != NONE)
+                .toArray(TypeThemes[]::new);
+
+        return valid[ThreadLocalRandom.current().nextInt(valid.length)];
     }
 }

@@ -1,7 +1,6 @@
 package com.historicconquest.historicconquest.map;
 
 import java.util.*;
-import java.util.Map;
 
 public class ZonePathfinder {
     private final static int MAX_PATH_LENGTH = 5;

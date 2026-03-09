@@ -154,7 +154,7 @@ public class GameController {
         Path directPath = new Path();
 
         // Obtenir le premier point (centre de la première zone)
-        Zone firstZone = path.get(0);
+        Zone firstZone = path.getFirst();
         Bounds firstBounds = firstZone.getZoneSVGGroup().getBoundsInParent();
         double startX = firstBounds.getCenterX();
         double startY = firstBounds.getCenterY();
@@ -183,39 +183,6 @@ public class GameController {
         if (carriage != null) {
             root.getChildren().add(carriage);
         }
-
-        // Ajouter des cercles visibles sur chaque zone du chemin
-//        for (int i = 0; i < path.size(); i++) {
-//            Zone zone = path.get(i);
-//            Bounds bounds = zone.getZoneSVGGroup().getBoundsInParent();
-//
-//            if (bounds != null) {
-//                double x = bounds.getCenterX();
-//                double y = bounds.getCenterY();
-//
-//                Circle circle = new Circle(x, y, 12.0);
-//                circle.setFill(Color.web("#FFD700"));
-//                circle.setOpacity(1.0);
-//
-//                // Marquer le départ et l'arrivée différemment
-//                if (i == 0) {
-//                    circle.setRadius(15.0);
-//                    circle.setFill(Color.web("#00FF00"));  // Vert pour le départ
-//                    circle.setStroke(Color.BLACK);
-//                    circle.setStrokeWidth(2.0);
-//                } else if (i == path.size() - 1) {
-//                    circle.setRadius(15.0);
-//                    circle.setFill(Color.web("#FF0000"));  // Rouge pour l'arrivée
-//                    circle.setStroke(Color.BLACK);
-//                    circle.setStrokeWidth(2.0);
-//                } else {
-//                    circle.setStroke(Color.web("#FFD700"));
-//                    circle.setStrokeWidth(1.5);
-//                }
-//
-//                root.getChildren().add(circle);
-//            }
-//        }
 
         return root;
     }

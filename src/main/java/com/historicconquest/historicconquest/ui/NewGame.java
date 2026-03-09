@@ -22,6 +22,7 @@ import java.util.Objects;
 
 public class NewGame {
 
+    @SuppressWarnings("SpellCheckingInspection")
     public StackPane createView(MainApp app) {
         // 1. On crée le conteneur principal d'abord
         StackPane root = new StackPane();
@@ -40,7 +41,7 @@ public class NewGame {
         title.getStyleClass().add("title-label");
         title2.getStyleClass().add("title-label");
 
-// 1. Récupérer l'URL de ton image de fond (ex: une barre de saisie stylisée)
+// 1. Récupérer l'URL de ton image de fond (ex : une barre de saisie stylisée)
         String bgPath = Objects.requireNonNull(getClass().getResource("/com/historicconquest/historicconquest/images/textFieldNewGame.png")).toExternalForm();
 
 // 2. Créer le TextField (on le laisse totalement transparent)
@@ -69,11 +70,11 @@ public class NewGame {
         mainBox.setPickOnBounds(false);
         mainBox.setPadding(new Insets(0, 0, 30, 0));
 
-        // --- BARRE ICONES DROITE ---
+        // --- BARRE ICONS DROITE ---
         Button settingsBtn = createIconButton(Constant.PATH + "images/settings.png");
         Button helpBtn = createIconButton(Constant.PATH + "images/help.png");
         Button exitBtn = createIconButton(Constant.PATH + "images/sortie.png");
-        exitBtn.setOnAction(e -> app.exit());
+        exitBtn.setOnAction(e -> MainApp.getInstance().exit());
 
         VBox iconBar = new VBox(-5, settingsBtn, helpBtn, exitBtn);
         iconBar.setAlignment(Pos.BOTTOM_RIGHT); // Alignement interne à la VBox
@@ -98,8 +99,7 @@ public class NewGame {
             ));
             return loader.load();
         } catch (Exception e) {
-            System.out.println("Erreur: impossible de charger " + Constant.PATH + "ui/GameHUD.fxml");
-            e.printStackTrace();
+            System.err.println("Erreur: impossible de charger " + Constant.PATH + "ui/GameHUD.fxml");
             return null;
         }
     }

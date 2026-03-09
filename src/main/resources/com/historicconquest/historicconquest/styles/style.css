@@ -18,6 +18,15 @@
     -fx-background-position: center, center, center;
 }
 
+.map-grid-transparent {
+    -fx-background-color:
+            transparent,
+            linear-gradient(from 0px 0px to 50px 0px, repeat, rgba(168, 122, 62, 0.1) 3%, transparent 3%),
+            linear-gradient(from 0px 0px to 0px 50px, repeat, rgba(168, 122, 62, 0.1) 3%, transparent 3%);
+
+    -fx-background-position: center, center, center;
+}
+
 
 /* Style du titre */
 .title-label {
@@ -30,12 +39,97 @@
 }
 
 /* Conteneur principal pour centrer */
-.vbox {
-    -fx-alignment: center;
-    -fx-spacing: 10;
+
+
+.button-main {
+    -fx-pref-height: 60;
+    -fx-pref-width: 256;
+    -fx-max-height: 60;
+    -fx-max-width: 256;
+    -fx-cursor: hand;
+
+    -fx-border-width: 2, 2;
+    -fx-border-insets: 6, 11;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 0;
+
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+}
+
+.button-icon {
+    -fx-cursor: hand;
+
+    -fx-border-width: 0, 0;
+    -fx-border-insets: 6, 11;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 0;
+}
+
+.button-beige {
+    -fx-background-color: #EEDCBE;
+    -fx-border-color: #675932, #675932;
+    -fx-text-fill: #675932;
+}
+
+.button-green {
+    -fx-background-color: #635A2D;
+    -fx-border-color: #EEDCBE, #EEDCBE;
+    -fx-text-fill: #EEDCBE;
+}
+
+.button-blue {
+    -fx-background-color: #2D5763;
+    -fx-border-color: #EEDCBE, #EEDCBE;
+    -fx-text-fill: #EEDCBE;
+}
+
+.button-gray {
+    -fx-background-color: #535353;
+    -fx-border-color: #EEDCBE, #EEDCBE;
+    -fx-text-fill: #EEDCBE;
+}
+
+.button-red {
+    -fx-background-color: #632D2E;
+    -fx-border-color: #EEDCBE, #EEDCBE;
+    -fx-text-fill: #EEDCBE;
+}
+
+
+.button-beige:hover {
+    -fx-background-color: #fae9cc;
+}
+
+.button-green:hover {
+    -fx-background-color: #8d8043;
+}
+
+.button-blue:hover {
+    -fx-background-color: #3f7986;
+}
+
+.button-gray:hover {
+    -fx-background-color: #727272;
+}
+
+.button-red:hover {
+    -fx-background-color: #884142;
 }
 
 
 
 
+/* HELP PAGE */
+
+.page-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.help-text {
+    -fx-font-size: 14px;
+    -fx-line-spacing: 4px;
+}
 
