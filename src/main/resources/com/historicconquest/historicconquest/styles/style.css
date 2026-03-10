@@ -67,6 +67,19 @@
     -fx-border-radius: 0;
 }
 
+.button-small {
+    -fx-cursor: hand;
+
+    -fx-border-width: 0, 0;
+    -fx-border-insets: 0, 1;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 0;
+
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+}
+
 .button-beige {
     -fx-background-color: #EEDCBE;
     -fx-border-color: #675932, #675932;

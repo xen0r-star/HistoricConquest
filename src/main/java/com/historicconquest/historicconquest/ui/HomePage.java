@@ -31,7 +31,8 @@ public class HomePage {
         });
 
         multiplayerBtn.setOnAction(e -> {
-            System.out.println("Multiplayer mode");
+            multiplayerBtn.setDisable(true);
+            MainApp.getInstance().showMultiplayer();
         });
 
         settingsBtn.setOnAction(e -> {
@@ -44,11 +45,8 @@ public class HomePage {
 
 
         // Affichage de la map décoration en arrière-plan
-        MapBackgroundDisplay mapDisplay = new MapBackgroundDisplay(
-            root, mapViewport,
-            0.80, 0.80,
-            100
-        );
-        mapDisplay.initialize();
+        MapBackgroundDisplay mapDisplay = MapBackgroundDisplay.getInstance();
+        mapDisplay.setTransformations(0.8, 0.8, 100);
+        mapDisplay.display(root, mapViewport);
     }
 }

@@ -58,11 +58,11 @@ public class MainApp extends Application {
         stage.setScene(scene);
         // stage.setFullScreen(true);
         stage.setMaximized(true);
-        stage.show();
 
         showMenu();
-
         loadHelpPage();
+
+        stage.show();
     }
 
     public void showMenu() {
@@ -73,13 +73,25 @@ public class MainApp extends Application {
             appRoot.getChildren().setAll(homePageRoot);
 
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error loading home page");
         }
     }
 
     public void showNewGame() {
         NewGame page = new NewGame();
         appRoot.getChildren().setAll(page.createView(this));
+    }
+
+    public void showMultiplayer() {
+        try {
+            FXMLLoader loaderMultiplayerPage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/MultiplayerPage.fxml"));
+            StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
+
+            appRoot.getChildren().setAll(multiplayerPageRoot);
+
+        } catch (Exception e) {
+            System.err.println("Error loading multiplayer page");
+        }
     }
 
     public void startGame(NewGameConfig config) {
