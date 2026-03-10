@@ -133,6 +133,40 @@
 
 
 
+.button-beige.not-hover:hover {
+    -fx-background-color: #EEDCBE;
+}
+
+.button-green.not-hover:hover {
+    -fx-background-color: #635A2D;
+}
+
+.button-blue.not-hover:hover {
+    -fx-background-color: #2D5763;
+}
+
+.button-gray.not-hover:hover {
+    -fx-background-color: #535353;
+}
+
+.button-red.not-hover:hover {
+    -fx-background-color: #632D2E;
+}
+
+
+.code-field {
+    -fx-padding: 10;
+
+    -fx-background-color: #EEDCBE;
+    -fx-background-radius: 3;
+    -fx-border-width: 0;
+
+    -fx-font-family: "Consolas";
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+    -fx-text-fill: #675932;
+}
+
 
 /* HELP PAGE */
 
