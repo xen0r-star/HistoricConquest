@@ -1,7 +1,6 @@
 package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.MainApp;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -14,7 +13,7 @@ public class MultiplayerPage {
     public StackPane root;
     public Pane mapViewport;
 
-    public HBox SelectModePanel, JoinPanel;
+    public HBox SelectModePanel, JoinPanel, HostPanel;
 
     // SelectModePanel
     public Pane JoinPane;
@@ -26,13 +25,18 @@ public class MultiplayerPage {
     public TextField Code1, Code2, Code3, Code4, Code5, Code6;
     public Button JoinBtn;
 
+    // HostPanel
+    public Button StartGame;
+
     private static int panel = 1;
+
 
     @FXML
     public void initialize() {
         panel = 1;
         SelectModePanel.setVisible(true);
         JoinPanel.setVisible(false);
+        HostPanel.setVisible(false);
 
 
         // SelectModePanel
@@ -40,24 +44,30 @@ public class MultiplayerPage {
             panel = 2;
             SelectModePanel.setVisible(false);
             JoinPanel.setVisible(true);
+            HostPanel.setVisible(false);
 
             Code1.requestFocus();
         });
 
         HostPane.setOnMouseClicked(e -> {
-            System.out.println("Host button clicked");
+            panel = 3;
+            SelectModePanel.setVisible(false);
+            JoinPanel.setVisible(false);
+            HostPanel.setVisible(true);
         });
 
         BackBtn.setOnAction(e -> {
             if (panel == 1) {
                 MainApp.getInstance().showMenu();
 
-            } else if (panel == 2) {
+            } else {
                 panel = 1;
                 SelectModePanel.setVisible(true);
                 JoinPanel.setVisible(false);
+                HostPanel.setVisible(false);
             }
         });
+
 
 
         // JoinPanel
@@ -68,8 +78,7 @@ public class MultiplayerPage {
             );
         });
 
-
-        // Code Box - Join Game
+        // Code Box
         TextField[] fields = {Code1, Code2, Code3, Code4, Code5, Code6};
 
         for (int i = 0; i < fields.length; i++) {
@@ -101,6 +110,13 @@ public class MultiplayerPage {
                 }
             });
         }
+
+
+
+        // HostPanel
+        StartGame.setOnAction(e -> {
+            System.out.println("Start button clicked");
+        });
 
 
         // Affichage de la map décoration en arrière-plan
