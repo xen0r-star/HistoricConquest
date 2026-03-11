@@ -178,5 +178,6 @@
 .help-text {
     -fx-font-size: 14px;
     -fx-line-spacing: 4px;
+    -fx-text-fill: white;
 }
 
