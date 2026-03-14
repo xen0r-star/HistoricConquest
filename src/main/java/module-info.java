@@ -13,4 +13,5 @@ module com.historicconquest.historicconquest {
     opens com.historicconquest.historicconquest.questions to javafx.fxml, javafx.graphics;
     exports com.historicconquest.historicconquest.ui;
     opens com.historicconquest.historicconquest.ui to javafx.fxml, javafx.graphics;
+    opens com.historicconquest.historicconquest.ui.multiplayer to javafx.fxml, javafx.graphics;
 }
