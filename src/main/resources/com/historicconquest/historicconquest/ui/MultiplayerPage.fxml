@@ -112,12 +112,12 @@
             </font>
          </Label>
          <HBox fx:id="CodeBox" alignment="CENTER" layoutX="206.0" layoutY="163.0" spacing="10">
-            <TextField fx:id="Code1" alignment="CENTER" prefWidth="40" styleClass="code-field" />
-            <TextField fx:id="Code2" alignment="CENTER" prefWidth="40" styleClass="code-field" />
-            <TextField fx:id="Code3" alignment="CENTER" prefWidth="40" styleClass="code-field" />
-            <TextField fx:id="Code4" alignment="CENTER" prefWidth="40" styleClass="code-field" />
-            <TextField fx:id="Code5" alignment="CENTER" prefWidth="40" styleClass="code-field" />
-            <TextField fx:id="Code6" alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
          </HBox>
          <Button fx:id="JoinBtn" layoutX="222.0" layoutY="243.0" mnemonicParsing="false" text="JOIN">
             <styleClass>
@@ -131,7 +131,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -139,7 +139,7 @@
          <Insets top="25.0" />
       </padding>
       <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
-         <HBox layoutX="217.0" layoutY="62.0">
+         <HBox layoutX="217.0" layoutY="36.0">
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                <Image url="@../images/flash.png" />
             </ImageView>
@@ -149,23 +149,25 @@
                </font>
             </Label>
          </HBox>
-         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="91.0" layoutY="109.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="518.0" text="Create a new game lobby and share the game code with friends to join." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="91.0" layoutY="83.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="518.0" text="Create a new game lobby and share the game code with friends to join." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
             <font>
                <Font name="Georgia Bold" size="14.0" />
             </font>
          </Label>
-         <HBox layoutX="33.0" layoutY="144.0">
-            <Label style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1" />
-            <Label style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="/" />
-            <TextField maxWidth="39.5" minWidth="39.5" prefWidth="39.5" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="4" />
-         </HBox>
-         <Button fx:id="StartGame" layoutX="538.0" layoutY="144.0" mnemonicParsing="false" style="-fx-background-radius: 5;" text="Start Game">
+         <Label fx:id="NumberPlayer" layoutX="32.0" layoutY="118.0" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1 / 4" />
+         <Button fx:id="StartGame" layoutX="538.0" layoutY="118.0" mnemonicParsing="false" style="-fx-background-radius: 5;" text="Start Game">
             <styleClass>
                <String fx:value="button-small" />
                <String fx:value="button-beige" />
             </styleClass>
          </Button>
-         <Label layoutX="429.0" layoutY="144.0" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="ABC DEF" />
+         <VBox fx:id="PlayerContainer" layoutX="32.0" layoutY="163.0" prefWidth="636.0" spacing="6.0">
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+         </VBox>
+         <Label fx:id="CodeGame" layoutX="429.0" layoutY="118.0" style="-fx-text-fill: #443b20; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #faefd9; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand" text="ABC DEF" />
          <styleClass>
             <String fx:value="button-green" />
             <String fx:value="not-hover" />

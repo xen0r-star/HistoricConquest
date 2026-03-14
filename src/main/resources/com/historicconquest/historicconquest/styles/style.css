@@ -80,6 +80,18 @@
     -fx-font-family: "Georgia";
 }
 
+.button-light {
+    -fx-background-color: #EEDCBE88;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button-light:hover {
+    -fx-background-color: rgba(238, 220, 190, 0.65);
+    -fx-background-radius: 5;
+}
+
+
 .button-beige {
     -fx-background-color: #EEDCBE;
     -fx-border-color: #675932, #675932;
@@ -165,6 +177,10 @@
     -fx-font-weight: bold;
     -fx-font-size: 24;
     -fx-text-fill: #675932;
+}
+
+.radius-small {
+    -fx-background-radius: 5;
 }
 
 
