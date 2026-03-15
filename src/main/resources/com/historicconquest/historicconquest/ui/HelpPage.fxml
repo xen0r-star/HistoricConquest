@@ -1,41 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<StackPane maxHeight="500.0" maxWidth="600.0" minHeight="500.0" minWidth="600.0" prefHeight="500.0" prefWidth="600.0" style="-fx-background-radius: 3; -fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.HelpPage">
-    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: #535353;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <VBox spacing="20" style="-fx-background-color: #535353;">
-            <padding>
-                <Insets bottom="25.0" left="30.0" right="30.0" />
-            </padding>
-
-            <VBox spacing="8">
-                <Label styleClass="page-title" text="Help &amp; Game Guide" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="-13.0" />
-               </VBox.margin></Label>
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="2.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="474.0" />
-            </VBox>
-
-            <Label styleClass="help-text" text="Welcome to Historic Conquest. This game challenges players to conquer territories by answering questions from various themes." wrapText="true" />
-            <Label styleClass="help-text" text="Each correct answer allows you to expand your empire and capture new regions of the map." wrapText="true" />
-            <Label styleClass="help-text" text="Different themes include history, technology, tourism and entertainment. Each question tests your knowledge and strategic thinking." wrapText="true" />
-            <Label styleClass="help-text" text="Use your knowledge wisely and conquer the world one territory at a time." wrapText="true" />
-            <Label styleClass="help-text" text="Good luck and have fun conquering history." wrapText="true" />
-        </VBox>
-      <padding>
-         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-      </padding>
-    </ScrollPane>
-   <padding>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-   </padding>
-   <styleClass>
-      <String fx:value="button-gray" />
-      <String fx:value="button-main" />
-   </styleClass>
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="503.0" prefWidth="345.0" style="-fx-background-color: #b6915a; -fx-border-width: 2px;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.HelpController">
+   <children>
+      <Button fx:id="button_return" alignment="CENTER" mnemonicParsing="false" onAction="#return_main" prefHeight="9.0" prefWidth="22.0" style="-fx-background-color: #911616;" text="X" textAlignment="CENTER" textFill="#070707" StackPane.alignment="TOP_RIGHT">
+         <font>
+            <Font name="Vollkorn Regular" size="10.0" />
+         </font>
+         <StackPane.margin>
+            <Insets right="5.0" top="5.0" />
+         </StackPane.margin>
+      </Button>
+      <TextArea id="text_area_rules" editable="false" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="422.0" prefWidth="345.0" style="-fx-control-inner-background: #b6915a; -fx-border-color: black; -fx-border-width: 2;" text="I. General Concept&#10;&#10;Historic Conquest is a game of territorial strategy and general knowledge. Knowledge is used to build an empire, move armies and conquer nations. The board represents a simplified world where every intellectual achievement translates into a geopolitical advance.&#10;&#10;&#10;II. Basic Mechanics (TTMC adaptation)&#10;&#10;The game is based on self-assessment derived from the TTMC rules (Tu te mets combien).&#10;&#10;The Questions :&#10;&#10;For each question, the player chooses a score from 1 to 4 representing their estimated level of knowledge. A high score yields more benefits than a low score. Once the score is chosen, the player must answer the corresponding question.&#10;&#10;Correct answer: the action is validated.&#10;Incorrect answer: the action is cancelled and the turn passes to the next player.&#10;&#10;&#10;&#10;III. Custom rules: the conquest system&#10;&#10;Board layout and setup :&#10;The world is divided into 4 geographical blocks (Europe, America, Africa, Asia/Oceania), each containing 10 zones. A zone comprises several countries.At the start of the game, each zone is assigned a random theme from four: entertainment, IT, tourism, history. Each player chooses a starting zone of their choice. This zone starts with a power of 4. &#10;&#10;Player Actions&#10;&#10;1) Increasing a zone’s power :&#10;If you control a zone, you can answer a question related to its theme. The level achieved (1 to 4) is added to the zone’s power.  A zone cannot exceed 8 power points.&#10;&#10;2) Moving :&#10;To move around the map, the player must answer a question correctly on the theme of their current zone.&#10;Level 1: move to an adjacent zone (distance 1).&#10;Level 2: move distance 2.&#10;Level 3: move distance 3.&#10;Level 4: move distance 4 or inter-zone jump (to any zone). Inter-zone jumps take 2 turns instead of an immediate move.&#10;When moving, a token is placed on the zone. Until a player has conquered the zone they are in, their token remains there and is vulnerable to attacks from the owner. This token has a power equal to the level of the question answered correctly.&#10;&#10;3) Attacking (zone containing a token)&#10;Capturing a neutral zone : &#10;The zone is unoccupied; the player must pass a question (level 1 to 4) to occupy it. The initial power is equal to the level passed.&#10;Attack (siege): to take an opponent’s zone, the attacker answers questions. Each success reduces the power of the opponent’s zone by the value of the chosen level.&#10;Example: a zone with a power of 6 is subjected to a successful level 4 attack. Its power drops to 2.&#10;Once the enemy’s power has been reduced to 0, if the attacker answers another question correctly, they take possession of the zone.&#10;&#10;4) Defend :&#10;The owner of a zone may attempt to eliminate an enemy token present on their territory. If they succeed in the random roll, the opposing token is eliminated.&#10;&#10;&#10;&#10;IV. Further information&#10;&#10;Alliances :&#10;Alliances are permitted, but limited to half the number of players present (e.g. a maximum of 2 allies in a 4-player game).&#10;&#10;Bonuses and penalties :&#10;A player who answers 3 consecutive questions correctly wins a bonus. Conversely, if they fail 3 consecutive questions, they receive a penalty.&#10;&#10;End-of-game conditions :&#10;The game ends immediately if:&#10;A player (or an alliance) controls more than 50% of the 40 zones (i.e. 21 zones).&#10;All opponents forfeit.Only one player (or alliance) remains on the map." wrapText="true" StackPane.alignment="CENTER">
+         <font>
+            <Font name="Vollkorn Regular" size="15.0" />
+         </font>
+         <StackPane.margin>
+            <Insets top="80.0" />
+         </StackPane.margin>
+      </TextArea>
+      <Label text="Rules of the game " StackPane.alignment="TOP_LEFT">
+         <font>
+            <Font name="Vollkorn Black" size="28.0" />
+         </font>
+         <StackPane.margin>
+            <Insets left="40.0" top="20.0" />
+         </StackPane.margin>
+      </Label>
+   </children>
 </StackPane>

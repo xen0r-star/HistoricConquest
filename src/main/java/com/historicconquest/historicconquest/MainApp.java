@@ -5,7 +5,7 @@ import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
 import com.historicconquest.historicconquest.game.NewGameConfig;
 import com.historicconquest.historicconquest.ui.GameHUD;
-import com.historicconquest.historicconquest.ui.Help;
+import com.historicconquest.historicconquest.ui.HelpPage;
 import com.historicconquest.historicconquest.ui.NewGame;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
 import javafx.application.Application;
@@ -149,13 +149,13 @@ public class MainApp extends Application {
 
     private void loadHelpPage() {
         try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/Help.fxml"));
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HelpPage.fxml"));
 //            helpPageRoot = loader.load();
 //
 //            helpPageRoot.setVisible(false);
 //            helpPageRoot.setManaged(false);
 
-            helpPageRoot = Help.getHelpStackPane();
+            helpPageRoot = HelpPage.getHelpStackPane();
             appRoot.setAlignment(helpPageRoot, Pos.TOP_RIGHT);
             appRoot.setMargin(helpPageRoot, new Insets(30, 30, 0, 0));
             appRoot.getChildren().add(helpPageRoot);
