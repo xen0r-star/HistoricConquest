@@ -1,6 +1,5 @@
-package com.historicconquest.historicconquest.controller;
+package com.historicconquest.historicconquest.ui;
 
-import com.historicconquest.historicconquest.ui.HelpPage;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
