@@ -5,6 +5,7 @@ import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
 import com.historicconquest.historicconquest.game.NewGameConfig;
 import com.historicconquest.historicconquest.ui.GameHUD;
+import com.historicconquest.historicconquest.ui.Help;
 import com.historicconquest.historicconquest.ui.NewGame;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
 import javafx.application.Application;
@@ -148,12 +149,15 @@ public class MainApp extends Application {
 
     private void loadHelpPage() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/Help.fxml"));
-            helpPageRoot = loader.load();
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/Help.fxml"));
+//            helpPageRoot = loader.load();
+//
+//            helpPageRoot.setVisible(false);
+//            helpPageRoot.setManaged(false);
 
-            helpPageRoot.setVisible(false);
-            helpPageRoot.setManaged(false);
-
+            helpPageRoot = Help.getHelpStackPane();
+            appRoot.setAlignment(helpPageRoot, Pos.TOP_RIGHT);
+            appRoot.setMargin(helpPageRoot, new Insets(30, 30, 0, 0));
             appRoot.getChildren().add(helpPageRoot);
 
         } catch (Exception e) {
@@ -162,7 +166,7 @@ public class MainApp extends Application {
     }
 
     public void showHelp(boolean show) {
-        if (helpPageRoot == null) loadHelpPage();
+       if (helpPageRoot == null) loadHelpPage();
         helpPageRoot.setVisible(show);
         helpPageRoot.setManaged(show);
     }

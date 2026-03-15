@@ -11,15 +11,17 @@ import java.io.IOException;
 public class Help {
 
     private static StackPane help_stackPane;
-    public Help(StackPane stackPane) throws IOException {
+    public Help(StackPane stackPane) {
+    }
 
-        FXMLLoader helpLoader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/Help.fxml"));
+    public static StackPane getHelpStackPane() throws IOException{
+        FXMLLoader helpLoader = new FXMLLoader(Help.class.getResource(Constant.PATH + "ui/Help.fxml"));
         help_stackPane = helpLoader.load();
-        stackPane.setAlignment(help_stackPane, Pos.TOP_RIGHT);
-        stackPane.setMargin(help_stackPane, new Insets(30, 30, 0, 0));
+//        stackPane.setAlignment(help_stackPane, Pos.TOP_RIGHT);
+//        stackPane.setMargin(help_stackPane, new Insets(30, 30, 0, 0));
         help_stackPane.setVisible(false);
         help_stackPane.setManaged(false);
-        stackPane.getChildren().add(help_stackPane);
+        return help_stackPane;
     }
 
     public static void toShow(){
