@@ -43,7 +43,6 @@ public class PingController {
     }
 
 
-    // Broadcast of pings from all players in each room
     @Scheduled(fixedRate = 2000)
     public void broadcastPings() {
         for(Room room : roomService.getAllRooms()) {

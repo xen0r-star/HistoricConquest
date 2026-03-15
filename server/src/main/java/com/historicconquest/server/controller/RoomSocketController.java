@@ -1,14 +1,15 @@
 package com.historicconquest.server.controller;
 
+import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.model.Room;
 import com.historicconquest.server.model.Player;
 import com.historicconquest.server.service.RoomService;
-import com.historicconquest.server.service.JwtService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.Map;
 
 
@@ -25,33 +26,33 @@ public class RoomSocketController {
 
 
     @MessageMapping("/update")
-    public void updateData(@Payload Map<String, String> message) {
-        String type = message.get("type");
-        String token = message.get("token");
-        String data = message.get("data");
+    public void updateData(@Payload Map<String, String> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
 
-        Map<String,String> info = JwtService.verifyToken(token);
-        if (info == null) return;
+        String type = payload.get("type");
+        String data = payload.get("data");
 
-        Room room = roomService.getRoom(info.get("roomCode"));
-        Player player = room.getPlayerById(info.get("playerId"));
+        Room room = roomService.getRoom(roomCode);
+        Player player = room.getPlayerById(playerId);
 
         switch (type) {
             case "PLAYER_COLOR_CHANGE":
-                player.setColor(info.get("color"));
+                player.setColor(data);
                 break;
 
             case "PLAYER_PSEUDO_CHANGE":
-                player.setPseudo(info.get("pseudo"));
+                player.setPseudo(data);
                 break;
         }
 
 
         messagingTemplate.convertAndSend(
-            "/topic/room-" + info.get("roomCode"),
+            "/topic/room-" + roomCode,
             (Object) Map.of(
                 "type", type,
-                "playerId", info.get("playerId"),
+                "playerId", playerId,
                 "data", data
             )
         );
@@ -59,41 +60,39 @@ public class RoomSocketController {
 
 
     @MessageMapping("/quit")
-    public void quitRoom(@Payload Map<String, String> message) {
-        String token = message.get("token");
+    public void quitRoom(Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
 
-        Map<String,String> info = JwtService.verifyToken(token);
-        if (info == null) return;
-
-        roomService.removePlayer(info.get("roomCode"), info.get("playerId"));
+        roomService.removePlayer(roomCode, playerId);
 
 
         messagingTemplate.convertAndSend(
-            "/topic/room-" + info.get("roomCode"),
+            "/topic/room-" + roomCode,
             (Object) Map.of(
                 "type", "PLAYER_QUIT",
-                "playerId", info.get("playerId")
+                "playerId", playerId
             )
         );
     }
 
 
     @MessageMapping("/delete")
-    public void deleteRoom(@Payload Map<String, String> message) {
-        String token = message.get("token");
+    public void deleteRoom(Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
 
-        Map<String,String> info = JwtService.verifyToken(token);
-        if (info == null) return;
-
-        Room room = roomService.getRoom(info.get("roomCode"));
-        Player player = room.getPlayerById(info.get("playerId"));
+        Room room = roomService.getRoom(roomCode);
+        Player player = room.getPlayerById(playerId);
 
         if (!room.isHost(player.getId())) return;
 
-        roomService.deleteRoom(info.get("roomCode"));
+        roomService.deleteRoom(roomCode);
 
         messagingTemplate.convertAndSend(
-            "/topic/room-" + info.get("roomCode"),
+            "/topic/room-" + roomCode,
             (Object) Map.of(
                 "type", "ROOM_DELETED"
             )
