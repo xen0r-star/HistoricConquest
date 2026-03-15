@@ -1,0 +1,33 @@
+package com.historicconquest.historicconquest.ui;
+
+import com.historicconquest.historicconquest.Constant;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.layout.StackPane;
+
+import java.io.IOException;
+
+public class Help {
+
+    private static StackPane help_stackPane;
+    public Help(StackPane stackPane) throws IOException {
+
+        FXMLLoader helpLoader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/Help.fxml"));
+        help_stackPane = helpLoader.load();
+        stackPane.setAlignment(help_stackPane, Pos.TOP_RIGHT);
+        stackPane.setMargin(help_stackPane, new Insets(30, 30, 0, 0));
+        help_stackPane.setVisible(false);
+        help_stackPane.setManaged(false);
+        stackPane.getChildren().add(help_stackPane);
+    }
+
+    public static void toShow(){
+        help_stackPane.setVisible(true);
+    }
+
+    public static void return_main(){
+        help_stackPane.setVisible(false);
+    }
+
+}

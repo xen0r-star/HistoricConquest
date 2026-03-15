@@ -148,7 +148,7 @@ public class MainApp extends Application {
 
     private void loadHelpPage() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HelpPage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/Help.fxml"));
             helpPageRoot = loader.load();
 
             helpPageRoot.setVisible(false);
