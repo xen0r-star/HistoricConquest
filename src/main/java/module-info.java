@@ -5,6 +5,7 @@ module com.historicconquest.historicconquest {
     requires java.net.http;
     requires com.fasterxml.jackson.databind;
     requires java.xml;
+    requires org.java_websocket;
 
     opens com.historicconquest.historicconquest to javafx.fxml, javafx.graphics;
     exports com.historicconquest.historicconquest;
@@ -15,4 +16,5 @@ module com.historicconquest.historicconquest {
     exports com.historicconquest.historicconquest.ui;
     opens com.historicconquest.historicconquest.ui to javafx.fxml, javafx.graphics;
     opens com.historicconquest.historicconquest.ui.multiplayer to javafx.fxml, javafx.graphics;
+    opens com.historicconquest.historicconquest.network to com.fasterxml.jackson.databind;
 }

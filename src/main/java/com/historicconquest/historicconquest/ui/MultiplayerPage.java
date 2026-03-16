@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
+import com.historicconquest.historicconquest.network.ApiService;
 import com.historicconquest.historicconquest.ui.multiplayer.PlayerInfo;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +25,7 @@ public class MultiplayerPage {
     @FXML private StackPane root;
     @FXML private Pane mapViewport;
 
-    @FXML private HBox SelectModePanel, JoinPanel, HostPanel;
+    @FXML private HBox SelectModePanel, JoinPanel, JoinPanel2, HostPanel;
 
     // SelectModePanel
     @FXML private Pane JoinPane;
@@ -34,6 +35,10 @@ public class MultiplayerPage {
     // JoinPanel
     @FXML private HBox CodeBox;
     @FXML private Button JoinBtn;
+
+    // JoinPanel2
+    @FXML private Button ViewRoomBtn;
+    @FXML private TextField UsernameTF;
 
     // HostPanel
     @FXML private Button StartGame;
@@ -48,18 +53,12 @@ public class MultiplayerPage {
 
     @FXML
     public void initialize() {
-        panel = 1;
-        SelectModePanel.setVisible(true);
-        JoinPanel.setVisible(false);
-        HostPanel.setVisible(false);
+        setPanel(1);
 
 
         // SelectModePanel
         JoinPane.setOnMouseClicked(e -> {
-            panel = 2;
-            SelectModePanel.setVisible(false);
-            JoinPanel.setVisible(true);
-            HostPanel.setVisible(false);
+            setPanel(2);
 
             for (var node : CodeBox.getChildren()) {
                 if (node instanceof TextField textField) {
@@ -70,10 +69,15 @@ public class MultiplayerPage {
         });
 
         HostPane.setOnMouseClicked(e -> {
-            panel = 3;
-            SelectModePanel.setVisible(false);
-            JoinPanel.setVisible(false);
-            HostPanel.setVisible(true);
+            ApiService.request(
+                ApiService.createRoom("Host"),
+                ApiService.CreateRoomResponse.class,
+                response -> {
+                    CodeGame.setText(response.roomCode());
+                }
+            );
+
+            setPanel(4);
         });
 
         BackBtn.setOnAction(e -> {
@@ -81,10 +85,7 @@ public class MultiplayerPage {
                 MainApp.getInstance().showMenu();
 
             } else {
-                panel = 1;
-                SelectModePanel.setVisible(true);
-                JoinPanel.setVisible(false);
-                HostPanel.setVisible(false);
+                setPanel(1);
             }
         });
 
@@ -99,15 +100,16 @@ public class MultiplayerPage {
                 }
             }
 
-            System.out.println(
-                "Join button clicked " +
-                code
+            ApiService.request(
+                ApiService.checkRoom(code.toString()),
+                ApiService.CheckRoomResponse.class,
+                response -> {
+                    if (response.exists()) setPanel(3);
+                }
             );
         });
 
         CodeGame.setOnMouseClicked(e -> {
-            System.out.println("Code copied: " + CodeGame.getText());
-
             ClipboardContent content = new ClipboardContent();
             content.putString(CodeGame.getText());
             Clipboard.getSystemClipboard().setContent(content);
@@ -144,6 +146,28 @@ public class MultiplayerPage {
                 }
             });
         }
+
+
+
+        // JoinPanel2
+        ViewRoomBtn.setOnAction(event -> {
+            StringBuilder code = new StringBuilder();
+            for (var node : CodeBox.getChildren()) {
+                if (node instanceof TextField textField) {
+                    code.append(textField.getText());
+                }
+            }
+
+            ApiService.request(
+                ApiService.joinRoom(code.toString(), UsernameTF.getText()),
+                ApiService.JoinRoomResponse.class,
+                response -> {
+                    System.out.println(response.id());
+                    System.out.println(response.token());
+                    System.out.println(response.players());
+                }
+            );
+        });
 
 
 
@@ -255,5 +279,15 @@ public class MultiplayerPage {
 
     private void updateNumberPlayer() {
         NumberPlayer.setText(players.size() + " / 4");
+    }
+
+
+    private void setPanel(int panel) {
+        MultiplayerPage.panel = panel;
+
+        SelectModePanel.setVisible(panel == 1);
+        JoinPanel.setVisible(panel == 2);
+        JoinPanel2.setVisible(panel == 3);
+        HostPanel.setVisible(panel == 4);
     }
 }

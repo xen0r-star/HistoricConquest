@@ -131,7 +131,43 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+   <HBox fx:id="JoinPanel2" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox layoutX="217.0" layoutY="62.0">
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/globe-outline.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="116.0" layoutY="109.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="469.0" text="Choose a username that other players will see in the game." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <TextField fx:id="UsernameTF" alignment="CENTER" layoutX="150.0" layoutY="163.0" prefWidth="400.0" styleClass="code-field" />
+         <Button fx:id="ViewRoomBtn" layoutX="222.0" layoutY="243.0" mnemonicParsing="false" text="VIEW ROOM">
+            <styleClass>
+               <String fx:value="button-main" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>

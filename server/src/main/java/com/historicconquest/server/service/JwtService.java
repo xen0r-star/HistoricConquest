@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JwtService {
-    private static final String SECRET_KEY = "I LOVE PIGS";
+    private static final String SECRET_KEY = "I LOVE EATING PIGS, THEY'RE SO DELICIOUS";
     private static final long VALIDITY_TIME = 2 * 60 * 60 * 1000; // 2 hours
 
 

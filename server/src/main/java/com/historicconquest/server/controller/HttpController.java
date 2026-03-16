@@ -9,18 +9,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/gameroom")
-public class RoomHttpController {
+@RequestMapping("/api")
+public class HttpController {
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public RoomHttpController(RoomService roomService, SimpMessagingTemplate messagingTemplate) {
+    public HttpController(RoomService roomService, SimpMessagingTemplate messagingTemplate) {
         this.roomService = roomService;
         this.messagingTemplate = messagingTemplate;
     }
 
 
-    @GetMapping("/check")
+
+    @GetMapping("/gameroom/check")
     public Map<String, Object> checkRoom(@RequestParam String roomCode) {
         boolean exists = roomService.getRoom(roomCode) != null;
 
@@ -30,7 +31,7 @@ public class RoomHttpController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping("/gameroom/create")
     public Map<String, Object> createRoom(@RequestParam String playerName) {
         Room room = roomService.createRoom();
         Player player = new Player(playerName, "player", room.getCode());
@@ -51,7 +52,7 @@ public class RoomHttpController {
         );
     }
 
-    @PostMapping("/join")
+    @PostMapping("/gameroom/join")
     public Map<String, Object> joinRoom(@RequestParam String roomCode,
                                         @RequestParam String playerName) {
         Room room = roomService.getRoom(roomCode);
