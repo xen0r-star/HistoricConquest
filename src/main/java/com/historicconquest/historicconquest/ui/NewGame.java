@@ -51,7 +51,7 @@ public class NewGame {
 
             if (btnSettings != null) {
                 btnSettings.setOnAction(e -> {
-                    System.out.println("Settings opened from New Game");
+                    MainApp.getInstance().showSettings(true , root);
 
                 }); }
 

@@ -8,6 +8,8 @@ import com.historicconquest.historicconquest.ui.GameHUD;
 import com.historicconquest.historicconquest.ui.HelpPage;
 import com.historicconquest.historicconquest.ui.NewGame;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
+import com.historicconquest.historicconquest.ui.PageSettings;
+import com.historicconquest.historicconquest.ui.PageSettingsController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -29,6 +31,7 @@ public class MainApp extends Application {
     private Stage stage;
     private StackPane appRoot;
     private Parent helpPageRoot;
+    private Parent settingsPageRoot ;
     private static MainApp instance;
 
 
@@ -174,6 +177,58 @@ public class MainApp extends Application {
 
         helpPageRoot.setVisible(show);
         helpPageRoot.setManaged(show);
+    }
+
+
+    private Parent loadSettingsPage() {
+        // On appelle ta classe PageSettings qui charge le FXML
+        return PageSettings.getSettingsStackPane();
+    }
+
+
+    public void showSettings(boolean show, StackPane currentRoot) {
+        // 1. Charger les paramètres s'ils ne le sont pas encore
+        if (settingsPageRoot == null) {
+            settingsPageRoot = loadSettingsPage();
+        }
+
+        if (show && settingsPageRoot != null && currentRoot != null) {
+            // 2. Nettoyer le parent précédent (si on change de vue)
+            if (settingsPageRoot.getParent() != null && settingsPageRoot.getParent() != currentRoot) {
+                ((StackPane) settingsPageRoot.getParent()).getChildren().remove(settingsPageRoot);
+            }
+
+            // 3. Ajouter au root actuel s'il n'y est pas
+            if (!currentRoot.getChildren().contains(settingsPageRoot)) {
+                currentRoot.getChildren().add(settingsPageRoot);
+            }
+
+            // 4. Mettre tout devant
+            settingsPageRoot.toFront();
+        }
+
+        // 5. Afficher ou masquer
+        if (settingsPageRoot != null) {
+            settingsPageRoot.setVisible(show);
+            settingsPageRoot.setManaged(show);
+        }
+    }
+
+
+    public static StackPane getSettingsStackPane() {
+        try {
+            FXMLLoader loader = new FXMLLoader(PageSettings.class.getResource("/com/historicconquest/historicconquest/ui/SettingsPage.fxml"));
+            StackPane root = loader.load();
+
+            // Récupérer le contrôleur pour lui donner le Stage principal
+            PageSettingsController controller = loader.getController();
+            controller.setStage(MainApp.getInstance().getStage());
+
+            return root;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StackPane();
+        }
     }
 
     public Stage getStage() {

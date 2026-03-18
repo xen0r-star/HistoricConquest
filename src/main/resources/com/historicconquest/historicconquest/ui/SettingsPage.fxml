@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.historicconquest.historicconquest.ui.PageSettingsController"
+           prefWidth="1280" prefHeight="720"
+           styleClass="settings-root">
+
+    <!-- BACKGROUND -->
+    <ImageView fx:id="background" mouseTransparent="true"
+               preserveRatio="false"
+               fitWidth="1280" fitHeight="720"/>
+
+    <!-- OVERLAY SOMBRE -->
+    <StackPane styleClass="settings-overlay" mouseTransparent="true"/>
+
+    <!-- PANNEAU PRINCIPAL -->
+    <VBox alignment="CENTER" spacing="0" maxWidth="750" maxHeight="600"
+          styleClass="settings-panel">
+
+        <!-- TITRE DU PANNEAU -->
+        <HBox alignment="CENTER_LEFT" styleClass="settings-header">
+            <Label text="PARAMÈTRES" styleClass="settings-title"/>
+        </HBox>
+
+        <!-- CONTENU SCROLLABLE -->
+        <VBox spacing="25" styleClass="settings-content">
+            <padding>
+                <Insets top="30" right="40" bottom="30" left="40"/>
+            </padding>
+
+            <!-- SECTION : AUDIO -->
+            <Label text="— AUDIO" styleClass="settings-section-title"/>
+
+            <GridPane hgap="20" vgap="18" styleClass="settings-grid">
+                <!-- Musique -->
+                <Label text="Musique" styleClass="settings-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <Slider fx:id="musicSlider" min="0" max="100" value="80"
+                        styleClass="settings-slider"
+                        GridPane.columnIndex="1" GridPane.rowIndex="0"
+                        prefWidth="320"/>
+                <Label fx:id="musicValueLabel" text="80%" styleClass="settings-value"
+                       GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+
+                <!-- Effets sonores -->
+                <Label text="Effets sonores" styleClass="settings-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Slider fx:id="sfxSlider" min="0" max="100" value="70"
+                        styleClass="settings-slider"
+                        GridPane.columnIndex="1" GridPane.rowIndex="1"
+                        prefWidth="320"/>
+                <Label fx:id="sfxValueLabel" text="70%" styleClass="settings-value"
+                       GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+
+                <!-- Muet -->
+                <Label text="Muet" styleClass="settings-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <CheckBox fx:id="muteCheck" styleClass="settings-checkbox"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
+
+            <!-- SÉPARATEUR -->
+            <HBox styleClass="settings-separator"/>
+
+            <!-- SECTION : AFFICHAGE -->
+            <Label text="— AFFICHAGE" styleClass="settings-section-title"/>
+
+            <GridPane hgap="20" vgap="18" styleClass="settings-grid">
+                <!-- Résolution -->
+                <Label text="Résolution" styleClass="settings-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <ComboBox fx:id="resolutionCombo" styleClass="settings-combo"
+                          GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200"/>
+
+                <!-- Plein écran -->
+                <Label text="Plein écran" styleClass="settings-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <CheckBox fx:id="fullscreenCheck" styleClass="settings-checkbox"
+                          GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <!-- Langue -->
+                <Label text="Langue" styleClass="settings-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="langCombo" styleClass="settings-combo"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="200"/>
+            </GridPane>
+
+        </VBox>
+
+        <!-- BOUTONS BAS -->
+        <HBox alignment="CENTER_RIGHT" spacing="15" styleClass="settings-footer">
+            <padding>
+                <Insets top="15" right="30" bottom="20" left="30"/>
+            </padding>
+            <Button fx:id="cancelBtn" text="ANNULER" styleClass="settings-btn-cancel"
+                    onAction="#onCancel"/>
+            <Button fx:id="saveBtn" text="SAUVEGARDER" styleClass="settings-btn-save"
+                    onAction="#onSave"/>
+        </HBox>
+
+    </VBox>
+
+</StackPane>

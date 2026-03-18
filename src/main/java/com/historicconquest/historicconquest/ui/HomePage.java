@@ -40,7 +40,8 @@ public class HomePage {
 
 
         settingsBtn.setOnAction(e -> {
-            System.out.println("Load game mode");
+            MainApp.getInstance().showSettings(true , root);
+
         });
 
         helpBtn.setOnAction(e -> {

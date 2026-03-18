@@ -67,9 +67,6 @@
             <String fx:value="button-main" />
             <String fx:value="button-blue" />
          </styleClass>
-         <VBox.margin>
-            <Insets top="30.0" />
-         </VBox.margin>
       </Button>
       <StackPane.margin>
          <Insets top="50.0" />
