@@ -149,11 +149,6 @@ public class MainApp extends Application {
 
     private void loadHelpPage() {
         try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HelpPage.fxml"));
-//            helpPageRoot = loader.load();
-//
-//            helpPageRoot.setVisible(false);
-//            helpPageRoot.setManaged(false);
 
             helpPageRoot = HelpPage.getHelpStackPane();
             appRoot.setAlignment(helpPageRoot, Pos.TOP_RIGHT);
@@ -165,8 +160,18 @@ public class MainApp extends Application {
         }
     }
 
-    public void showHelp(boolean show) {
-       if (helpPageRoot == null) loadHelpPage();
+    // Dans MainApp.java
+    public void showHelp(boolean show, StackPane currentRoot) {
+        if (helpPageRoot == null) loadHelpPage();
+
+        if (show) {
+            //pour afficher dans le root newgame et pas dans le root homepage
+            if (!currentRoot.getChildren().contains(helpPageRoot)) {
+                currentRoot.getChildren().add(helpPageRoot);
+            }
+            helpPageRoot.toFront(); // On la met tout devant
+        }
+
         helpPageRoot.setVisible(show);
         helpPageRoot.setManaged(show);
     }

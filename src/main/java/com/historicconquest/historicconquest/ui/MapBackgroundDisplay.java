@@ -3,6 +3,8 @@ package com.historicconquest.historicconquest.ui;
 import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.util.MapBackgroundManager;
 import com.historicconquest.historicconquest.util.TextureUtils;
+import javafx.beans.InvalidationListener;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -10,21 +12,46 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 public class MapBackgroundDisplay {
+
     private final StackPane root;
     private final Pane mapViewport;
-    private final double scaleX;
-    private final double scaleY;
+
+    /**
+     * Décalage en pixels.
+     * translateX négatif => vers la gauche
+     * translateY négatif => vers le haut
+     */
+    private final double translateX;
     private final double translateY;
 
+    /**
+     * Petit biais de centrage "visuel" basé sur la largeur de la map.
+     * 0.0 = centrage mathématique
+     * négatif = un peu plus à gauche, positif = un peu plus à droite
+     */
+    private final double centerBiasX;
 
+    private Group mapInterface;
+
+    // Constructeur compatibilité (ancien appel: (root, viewport, scaleX, scaleY, translateY))
     public MapBackgroundDisplay(StackPane root, Pane mapViewport, double scaleX, double scaleY, double translateY) {
-        this.root = root;
-        this.mapViewport = mapViewport;
-        this.scaleX = scaleX;
-        this.scaleY = scaleY;
-        this.translateY = translateY;
+        this(root, mapViewport, scaleX, scaleY, 0.0, translateY, -0.03);
     }
 
+    // Constructeur complet recommandé
+    public MapBackgroundDisplay(StackPane root,
+                                Pane mapViewport,
+                                double scaleX,
+                                double scaleY,
+                                double translateX,
+                                double translateY,
+                                double centerBiasX) {
+        this.root = root;
+        this.mapViewport = mapViewport;
+        this.translateX = translateX;
+        this.translateY = translateY;
+        this.centerBiasX = centerBiasX;
+    }
 
     public void initialize() {
         // Couche de bruit (papier grain)
@@ -34,14 +61,14 @@ public class MapBackgroundDisplay {
         root.getChildren().add(noiseLayer);
         noiseLayer.setViewOrder(-1.0);
 
-        // Récupère la map mise en cache (singleton)
+        // Récupère la map (singleton)
         WorldMap worldMap = MapBackgroundManager.getBackgroundMap();
 
-        // Crée le groupe d'affichage de la map
-        Group mapInterface = new Group();
-        mapInterface.getChildren().addAll(worldMap.getBlocs());
+        // Groupe d'affichage
+        mapInterface = new Group();
+        mapInterface.getChildren().setAll(worldMap.getBlocs());
 
-        // Ajoute la map au viewport avec clipping
+        // Ajoute au viewport + clip
         if (mapViewport != null) {
             mapViewport.getChildren().add(mapInterface);
 
@@ -51,14 +78,54 @@ public class MapBackgroundDisplay {
             mapViewport.setClip(clip);
         }
 
-        // Applique les transformations (échelle et position)
-        mapInterface.setScaleX(scaleX);
-        mapInterface.setScaleY(scaleY);
+        // Re-layout dynamique (resize / bounds)
+        InvalidationListener relayout = obs -> layoutMapContainCentered();
+        root.widthProperty().addListener(relayout);
+        root.heightProperty().addListener(relayout);
 
-        mapInterface.setTranslateX(
-            -(root.getPrefWidth() / 2 - mapInterface.getLayoutBounds().getWidth() / 2)
-        );
-        mapInterface.setTranslateY(translateY);
+        if (mapViewport != null) {
+            mapViewport.widthProperty().addListener(relayout);
+            mapViewport.heightProperty().addListener(relayout);
+        }
+
+        mapInterface.layoutBoundsProperty().addListener(relayout);
+
+        // Premier layout
+        layoutMapContainCentered();
+    }
+
+    /**
+     * Fit "contain" + centrage dans mapViewport (responsive).
+     */
+    private void layoutMapContainCentered() {
+        if (mapViewport == null || mapInterface == null) return;
+
+        double vw = mapViewport.getWidth();
+        double vh = mapViewport.getHeight();
+        if (vw <= 0 || vh <= 0) return;
+
+        Bounds b = mapInterface.getLayoutBounds();
+        double mapW = b.getWidth();
+        double mapH = b.getHeight();
+        if (mapW <= 0 || mapH <= 0) return;
+
+        // scale "contain" => toute la map visible
+        double scale = Math.min(vw / mapW, vh / mapH);
+
+        mapInterface.setScaleX(scale);
+        mapInterface.setScaleY(scale);
+
+        double scaledW = mapW * scale;
+        double scaledH = mapH * scale;
+
+        // biais visuel basé sur la largeur de la map
+        double biasPixels = (mapW * centerBiasX) * scale;
+
+        // centre + offsets
+        double x = (vw - scaledW) / 2.0 - b.getMinX() * scale + biasPixels + translateX;
+        double y = (vh - scaledH) / 2.0 - b.getMinY() * scale + translateY;
+
+        mapInterface.setTranslateX(x);
+        mapInterface.setTranslateY(y);
     }
 }
-
