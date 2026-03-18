@@ -1,5 +1,6 @@
 package com.historicconquest.historicconquest.ui;
 
+import com.historicconquest.historicconquest.MainApp;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -31,16 +32,20 @@ public class PageSettingsController implements Initializable {
     @FXML private Button saveBtn;
 
     // Pour revenir à la page précédente
-    private Stage stage;
-    private Runnable onBack;
+    private static Stage stage;
+    private static Runnable onBack;
 
     public void setStage(Stage stage) {
-        this.stage = stage;
+        stage = stage;
     }
 
     public void setOnBack(Runnable onBack) {
-        this.onBack = onBack;
+        onBack = onBack;
     }
+
+    public static Stage getStage(){ return stage;}
+
+    public static Runnable getRunnable() { return onBack;}
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -97,12 +102,10 @@ public class PageSettingsController implements Initializable {
 
     @FXML
     private void onCancel() {
-        goBack();
+        Back.back();
     }
 
     private void goBack() {
-        if (onBack != null) {
-            onBack.run();
-        }
+        Back.back();
     }
 }

@@ -29,7 +29,7 @@ public class MainApp extends Application {
     private final Group mapInterface = new Group();
 
     private Stage stage;
-    private StackPane appRoot;
+    private static StackPane appRoot;
     private Parent helpPageRoot;
     private Parent settingsPageRoot ;
     private static MainApp instance;
@@ -69,9 +69,9 @@ public class MainApp extends Application {
         loadHelpPage();
     }
 
-    public void showMenu() {
+    public static void showMenu() {
         try {
-            FXMLLoader loaderHomePage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HomePage.fxml"));
+            FXMLLoader loaderHomePage = new FXMLLoader(MainApp.class.getResource(Constant.PATH + "ui/HomePage.fxml"));
             StackPane homePageRoot = loaderHomePage.load();
 
             appRoot.getChildren().setAll(homePageRoot);

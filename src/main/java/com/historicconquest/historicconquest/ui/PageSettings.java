@@ -3,9 +3,14 @@ package com.historicconquest.historicconquest.ui;
 import com.historicconquest.historicconquest.MainApp; // Vérifie bien cet import
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
 import java.util.Objects;
 
 public class PageSettings {
+
+    private Stage stage;
+    private Runnable onBack;
 
     // On rend la méthode STATIC pour que MainApp puisse l'appeler facilement
     public static StackPane getSettingsStackPane() {
