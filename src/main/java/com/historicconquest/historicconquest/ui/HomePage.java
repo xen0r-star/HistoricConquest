@@ -39,6 +39,19 @@ public class HomePage {
         });
 
 
+        settingsBtn.setOnAction(e -> {
+            System.out.println("Load game mode");
+        });
+
+        helpBtn.setOnAction(e -> {
+            MainApp.getInstance().showHelp(true, root);
+        });
+
+        exitBtn.setOnAction(e -> {
+             MainApp.getInstance().exit();
+        });
+
+
 
 
 
