@@ -1,40 +1,53 @@
 package com.historicconquest.server.controller;
 
 import com.historicconquest.server.model.Room;
+import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.service.RoomService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.Map;
 
 @Controller
 public class PingController {
 
-    private final SimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public PingController(SimpMessagingTemplate messagingTemplate, RoomService roomService) {
-        this.messagingTemplate = messagingTemplate;
         this.roomService = roomService;
+        this.messagingTemplate = messagingTemplate;
     }
 
 
 
-    @MessageMapping("/pingRequest")
-    @SendToUser("/queue/pong")
-    public Map<String, Object> handlePingRequest(@Payload Map<String, Object> message) {
-        return Map.of("timestamp", message.get("timestamp"));
+    @MessageMapping("/ping")
+    public void handlePingRequest(@Payload Map<String, Object> message, Principal principal) {
+        if (!(principal instanceof StompPrincipal sp)) return;
+
+        messagingTemplate.convertAndSend(
+            "/topic/ping-" + sp.getName(),
+            (Object) Map.of(
+                "type", "PING",
+                "timestamp", message.get("timestamp")
+            )
+        );
     }
 
     @MessageMapping("/updatePing")
-    public void updatePing(@Payload Map<String, Object> message) {
-        String roomCode = (String) message.get("roomCode");
-        String playerId = (String) message.get("playerId");
-        int ping = (Integer) message.get("ping");
+    public void updatePing(@Payload Map<String, Object> message, Principal principal) {
+        if (!(principal instanceof StompPrincipal sp)) return;
+
+        String roomCode = sp.getRoomCode();
+        String playerId = sp.getName();
+
+        Object pingValue = message.get("ping");
+        if (!(pingValue instanceof Number pingNumber)) return;
+        int ping = pingNumber.intValue();
 
         Room room = roomService.getRoom(roomCode);
         if(room == null) return;

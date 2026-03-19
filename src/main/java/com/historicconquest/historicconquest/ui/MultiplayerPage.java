@@ -3,7 +3,10 @@ package com.historicconquest.historicconquest.ui;
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
 import com.historicconquest.historicconquest.network.ApiService;
+import com.historicconquest.historicconquest.network.RoomService;
+import com.historicconquest.historicconquest.network.SocketClient;
 import com.historicconquest.historicconquest.ui.multiplayer.PlayerInfo;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -49,12 +52,12 @@ public class MultiplayerPage {
 
 
     private final List<String> players = new ArrayList<>();
+    private SocketClient socketClient;
 
 
     @FXML
     public void initialize() {
         setPanel(1);
-
 
         // SelectModePanel
         JoinPane.setOnMouseClicked(e -> {
@@ -74,6 +77,7 @@ public class MultiplayerPage {
                 ApiService.CreateRoomResponse.class,
                 response -> {
                     CodeGame.setText(response.roomCode());
+                    RoomService.getInstance().init(response.id(), response.token());
                 }
             );
 

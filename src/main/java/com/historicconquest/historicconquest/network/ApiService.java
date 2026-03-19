@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.network;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 
