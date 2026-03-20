@@ -47,7 +47,6 @@ public class HttpController {
 
         return Map.of(
             "roomCode", room.getCode(),
-            "id", player.getId(),
             "token", player.getToken()
         );
     }
@@ -79,7 +78,6 @@ public class HttpController {
         );
 
         return Map.of(
-            "id", player.getId(),
             "token", player.getToken(),
             "players", room.getPlayers()
         );

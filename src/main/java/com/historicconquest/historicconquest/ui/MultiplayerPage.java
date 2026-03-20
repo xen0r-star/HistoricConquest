@@ -3,8 +3,8 @@ package com.historicconquest.historicconquest.ui;
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
 import com.historicconquest.historicconquest.network.ApiService;
+import com.historicconquest.historicconquest.network.RoomEventListener;
 import com.historicconquest.historicconquest.network.RoomService;
-import com.historicconquest.historicconquest.network.SocketClient;
 import com.historicconquest.historicconquest.ui.multiplayer.PlayerInfo;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -20,6 +20,7 @@ import javafx.scene.layout.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MultiplayerPage {
     private static final String PLAYER_ICON = Constant.PATH + "images/person.png";
@@ -28,7 +29,7 @@ public class MultiplayerPage {
     @FXML private StackPane root;
     @FXML private Pane mapViewport;
 
-    @FXML private HBox SelectModePanel, JoinPanel, JoinPanel2, HostPanel;
+    @FXML private HBox SelectModePanel, JoinPanel, JoinPanel2, JoinPanel3, HostPanel;
 
     // SelectModePanel
     @FXML private Pane JoinPane;
@@ -43,16 +44,20 @@ public class MultiplayerPage {
     @FXML private Button ViewRoomBtn;
     @FXML private TextField UsernameTF;
 
+    // JoinPanel3
+    @FXML private Button StatusJoin;
+    @FXML private Label NumberPlayerJoin;
+    @FXML private VBox PlayerContainerJoin;
+
     // HostPanel
-    @FXML private Button StartGame;
-    @FXML private Label NumberPlayer, CodeGame;
-    @FXML private VBox PlayerContainer;
+    @FXML private Button StartGameHost;
+    @FXML private Label NumberPlayerHost, CodeGameHost;
+    @FXML private VBox PlayerContainerHost;
 
     private static int panel = 1;
 
-
     private final List<String> players = new ArrayList<>();
-    private SocketClient socketClient;
+    private RoomService roomService;
 
 
     @FXML
@@ -76,17 +81,67 @@ public class MultiplayerPage {
                 ApiService.createRoom("Host"),
                 ApiService.CreateRoomResponse.class,
                 response -> {
-                    CodeGame.setText(response.roomCode());
-                    RoomService.getInstance().init(response.id(), response.token());
+                    String code = response.roomCode().substring(0, 3) + " " + response.roomCode().substring(3, 6);
+                    CodeGameHost.setText(code);
+
+                    this.roomService = new RoomService(response.token());
+                    roomService.setListener(new RoomEventListener() {
+                        @Override
+                        public void onPlayerJoin() {
+                            Platform.runLater(() -> {
+                                System.out.println("UI: Player joined");
+                            });
+                        }
+
+                        @Override
+                        public void onPlayerQuit() {
+                            Platform.runLater(() -> {
+                                System.out.println("UI: Player quit");
+                            });
+                        }
+
+                        @Override
+                        public void onPlayerColorChange() {
+
+                        }
+
+                        @Override
+                        public void onPlayerPseudoChange() {
+
+                        }
+
+                        @Override
+                        public void onPlayerPings() {
+
+                        }
+
+                        @Override
+                        public void onRoomDeleted() {
+                            Platform.runLater(() -> {
+                                System.out.println("Room deleted");
+                                setPanel(1);
+                            });
+                        }
+                    });
                 }
             );
 
-            setPanel(4);
+            setPanel(5);
         });
 
         BackBtn.setOnAction(e -> {
             if (panel == 1) {
                 MainApp.getInstance().showMenu();
+
+            } else if (panel == 4) {
+                roomService.sendNoData("/app/quit");
+                roomService.disconnect();
+                setPanel(1);
+
+            } else if (panel == 5) {
+                roomService.sendNoData("/app/delete");
+                roomService.disconnect();
+                setPanel(1);
 
             } else {
                 setPanel(1);
@@ -113,9 +168,9 @@ public class MultiplayerPage {
             );
         });
 
-        CodeGame.setOnMouseClicked(e -> {
+        CodeGameHost.setOnMouseClicked(e -> {
             ClipboardContent content = new ClipboardContent();
-            content.putString(CodeGame.getText());
+            content.putString(CodeGameHost.getText().replace(" ", ""));
             Clipboard.getSystemClipboard().setContent(content);
         });
 
@@ -166,9 +221,61 @@ public class MultiplayerPage {
                 ApiService.joinRoom(code.toString(), UsernameTF.getText()),
                 ApiService.JoinRoomResponse.class,
                 response -> {
-                    System.out.println(response.id());
-                    System.out.println(response.token());
-                    System.out.println(response.players());
+                    this.roomService = new RoomService(response.token());
+                    roomService.setListener(new RoomEventListener() {
+                        @Override
+                        public void onPlayerJoin() {
+                            Platform.runLater(() -> {
+                                System.out.println("UI: Player joined");
+                            });
+                        }
+
+                        @Override
+                        public void onPlayerQuit() {
+                            Platform.runLater(() -> {
+                                System.out.println("UI: Player quit");
+                            });
+                        }
+
+                        @Override
+                        public void onPlayerColorChange() {
+
+                        }
+
+                        @Override
+                        public void onPlayerPseudoChange() {
+
+                        }
+
+                        @Override
+                        public void onPlayerPings() {
+
+                        }
+
+                        @Override
+                        public void onRoomDeleted() {
+                            Platform.runLater(() -> {
+                                System.out.println("Room deleted");
+                                setPanel(1);
+                            });
+                        }
+                    });
+
+                    setPanel(4);
+
+                    NumberPlayerJoin.setText(response.players().size() + " / 4");
+
+                    List<Pane> areas = getPlayerAreas(PlayerContainerJoin);
+                    for(ApiService.Player player : response.players()) {
+                        players.add(player.id());
+                        addPlayer(
+                            areas,
+                            player.pseudo(),
+                            "Waiting",
+                            String.valueOf(player.ping()),
+                            Objects.equals(player.type(), "player") ? PLAYER_ICON : ROBOT_ICON
+                        );
+                    }
                 }
             );
         });
@@ -176,11 +283,11 @@ public class MultiplayerPage {
 
 
         // HostPanel
-        StartGame.setOnAction(e -> {
+        StartGameHost.setOnAction(e -> {
             System.out.println("Start button clicked");
         });
 
-        List<Pane> areas = getPlayerAreas();
+        List<Pane> areas = getPlayerAreas(PlayerContainerHost);
         players.add("Host");
         populatePlayerArea(areas.getFirst(), "Host", areas, false);
         updateNumberPlayer();
@@ -205,9 +312,9 @@ public class MultiplayerPage {
         return fields;
     }
 
-    private List<Pane> getPlayerAreas() {
+    private List<Pane> getPlayerAreas(VBox container) {
         List<Pane> areas = new ArrayList<>();
-        for (var node : PlayerContainer.getChildren()) {
+        for (var node : container.getChildren()) {
             if (node instanceof Pane pane) {
                 areas.add(pane);
             }
@@ -255,6 +362,35 @@ public class MultiplayerPage {
         }
     }
 
+    private void addPlayer(List<Pane> allAreas, String playerName, String status, String ping, String type) {
+        for (Pane area : allAreas) {
+            if (area.getChildren().isEmpty()) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/multiplayer/PlayerInfo.fxml"));
+                    Pane node = loader.load();
+                    PlayerInfo playerInfo = loader.getController();
+
+                    if (playerInfo != null) {
+                        playerInfo.setPlayerName(playerName);
+                        playerInfo.setPlayerStatus(status);
+                        playerInfo.setPlayerPing(ping);
+                        playerInfo.setPlayerIcon(type);
+                    }
+
+                    node.setLayoutX(14.0);
+                    node.setLayoutY(6.0);
+                    area.getChildren().add(node);
+                    area.setStyle("-fx-background-color: #EEDCBEDC");
+
+                } catch (IOException e) {
+                    System.err.println("Error loading PlayerInfo FXML");
+                }
+
+                return;
+            }
+        }
+    }
+
     private void addRobotButton(List<Pane> allAreas) {
         for (Pane area : allAreas) {
             if (area.getChildren().isEmpty()) {
@@ -282,7 +418,7 @@ public class MultiplayerPage {
     }
 
     private void updateNumberPlayer() {
-        NumberPlayer.setText(players.size() + " / 4");
+        NumberPlayerHost.setText(players.size() + " / 4");
     }
 
 
@@ -292,6 +428,7 @@ public class MultiplayerPage {
         SelectModePanel.setVisible(panel == 1);
         JoinPanel.setVisible(panel == 2);
         JoinPanel2.setVisible(panel == 3);
-        HostPanel.setVisible(panel == 4);
+        JoinPanel3.setVisible(panel == 4);
+        HostPanel.setVisible(panel == 5);
     }
 }

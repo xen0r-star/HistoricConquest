@@ -1,7 +1,7 @@
 package com.historicconquest.historicconquest.ui.multiplayer;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -64,6 +64,13 @@ public class PlayerInfo {
                     onClose.run();
                 }
             });
+        }
+    }
+
+    public void setOnNameClick(Runnable onNameClick) {
+        if (PlayerName != null && onNameClick != null) {
+            PlayerName.setCursor(Cursor.HAND);
+            PlayerName.setOnMouseClicked(event -> onNameClick.run());
         }
     }
 

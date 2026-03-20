@@ -1,33 +1,85 @@
 package com.historicconquest.historicconquest.network;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum RoomInfo {
-    PLAYER_JOIN("PLAYER_JOIN"),
-    PLAYER_QUIT("PLAYER_QUIT"),
-    PLAYER_COLOR_CHANGE("PLAYER_COLOR_CHANGE"),
-    PLAYER_PSEUDO_CHANGE("PLAYER_PSEUDO_CHANGE"),
-    PLAYER_PINGS("PLAYER_PINGS"),
-
-    ROOM_DELETED("ROOM_DELETED");
-
-    private final String label;
-
-    RoomInfo(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public static RoomInfo getRoomInfo(String label) {
-        if (label == null) return null;
-
-        for (RoomInfo info : RoomInfo.values()) {
-            if (info.label.equalsIgnoreCase(label)) {
-                return info;
+    PLAYER_JOIN {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            if (listener != null) {
+                listener.onPlayerJoin();
             }
         }
+    },
 
-        return null;
+    PLAYER_QUIT {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            if (listener != null) {
+                listener.onPlayerQuit();
+            }
+        }
+    },
+
+    PLAYER_COLOR_CHANGE {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            if (listener != null) {
+                listener.onPlayerColorChange();
+            }
+        }
+    },
+
+    PLAYER_PSEUDO_CHANGE {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            if (listener != null) {
+                listener.onPlayerPseudoChange();
+            }
+        }
+    },
+
+    PLAYER_PINGS {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            if (listener != null) {
+                listener.onPlayerPings();
+            }
+        }
+    },
+
+    ROOM_DELETED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            if (listener != null) {
+                listener.onRoomDeleted();
+            }
+        }
+    },
+
+    UNKNOWN {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            System.out.println("Unknown event: " + node);
+        }
+    };
+
+    public abstract void handle(JsonNode node, RoomEventListener listener);
+
+
+    private static final Map<String, RoomInfo> MAP = new HashMap<>();
+
+    static {
+        for (RoomInfo info : values()) {
+            MAP.put(info.name(), info);
+        }
+    }
+
+    public static RoomInfo from(String type) {
+        if (type == null) return UNKNOWN;
+        return MAP.getOrDefault(type.toUpperCase(), UNKNOWN);
     }
 }

@@ -6,6 +6,7 @@ module com.historicconquest.historicconquest {
     requires com.fasterxml.jackson.databind;
     requires java.xml;
     requires org.java_websocket;
+    requires jjwt.api;
 
     opens com.historicconquest.historicconquest to javafx.fxml, javafx.graphics;
     exports com.historicconquest.historicconquest;

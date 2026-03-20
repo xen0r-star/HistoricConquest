@@ -1,5 +1,6 @@
 package com.historicconquest.historicconquest.network;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 
@@ -15,32 +16,6 @@ public class ApiService {
 
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final ObjectMapper mapper = new ObjectMapper();
-
-
-    public record CheckRoomResponse(
-        boolean exists
-    ) {}
-
-    public record CreateRoomResponse(
-        String roomCode,
-        String id,
-        String token
-    ) {}
-
-
-    public record Player(
-        String id,
-        String pseudo,
-        String color,
-        String type,
-        int ping
-    ) {}
-
-    public record JoinRoomResponse(
-        String id,
-        String token,
-        Collection<Player> players
-    ) {}
 
 
 
@@ -89,4 +64,33 @@ public class ApiService {
                   Platform.runLater(() -> callback.accept(result))
               );
     }
+
+
+
+    // RECORD ------------------------------------------------------------
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record CheckRoomResponse(
+        boolean exists
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record CreateRoomResponse(
+        String roomCode,
+        String token
+    ) {}
+
+
+    public record Player(
+        String id,
+        String pseudo,
+        String color,
+        String type,
+        int ping
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record JoinRoomResponse(
+        String token,
+        Collection<Player> players
+    ) {}
 }

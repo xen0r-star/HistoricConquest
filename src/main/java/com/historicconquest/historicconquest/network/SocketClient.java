@@ -15,64 +15,38 @@ import java.util.Queue;
 
 
 public class SocketClient extends WebSocketClient {
-    private static final String WEBSOCKET_LINK = "ws://localhost:8080/ws";
-    private static final char STOMP_END = '\u0000';
+    private static final String DEFAULT_WEBSOCKET_LINK = "ws://localhost:8080/ws";
 
-    private static SocketClient instance;
-    public static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Queue<String> messageQueue = new LinkedList<>();
-    private static final List<StompListener> listeners = new ArrayList<>();
-    private static boolean isConnected = false;
-    private static String authorizationToken;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final Queue<String> messageQueue = new LinkedList<>();
+    private final List<StompListener> listeners = new ArrayList<>();
+    private final String authorizationToken;
+    private boolean isConnected = false;
 
-    public interface StompListener {
-        default void onConnected() {}
-        default void onHeartbeat() {}
-        default void onMessage(String destination, String rawMessage) {}
+
+
+    public SocketClient(String authorizationToken) {
+        this(DEFAULT_WEBSOCKET_LINK, authorizationToken);
     }
 
-    private SocketClient() {
-        super(createUri());
+    public SocketClient(String websocketUrl, String authorizationToken) {
+        super(createUri(websocketUrl));
+
+        this.authorizationToken = authorizationToken;
     }
 
-    private static URI createUri() {
+    private static URI createUri(String websocketUrl) {
         try {
-            return new URI(WEBSOCKET_LINK);
+            return new URI(websocketUrl);
 
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("URL WebSocket invalide : " + WEBSOCKET_LINK);
+            throw new IllegalArgumentException("URL WebSocket invalide : " + websocketUrl);
         }
     }
 
 
 
-    public JsonNode getJson(String message) throws JsonProcessingException {
-        int index = message.indexOf("{");
-
-        if (index != -1) {
-            String json = message.substring(index).replace("\u0000", "");
-            return MAPPER.readTree(json);
-        }
-
-        return null;
-    }
-
-    public String getHeaderValue(String message, String headerName) {
-        String prefix = headerName + ":";
-
-        for (String line : message.split("\\n")) {
-            if (line.startsWith(prefix)) {
-                return line.substring(prefix.length()).trim();
-            }
-        }
-
-        return null;
-    }
-
-    public static void setAuthorizationToken(String token) {
-        authorizationToken = token;
-    }
-
+    // LISTENER ----------------------------------------------------------
     public void addListener(StompListener listener) {
         if (listener != null && !listeners.contains(listener)) {
             listeners.add(listener);
@@ -84,14 +58,7 @@ public class SocketClient extends WebSocketClient {
     }
 
 
-
-
-    @Override
-    public void onOpen(ServerHandshake handshakeData) {
-        System.out.println(buildConnectFrame());
-        send(buildConnectFrame());
-    }
-
+    // SUBSCRIBE AND SEND ------------------------------------------------
     public void subscribe(String id, String destination) {
         sendSafe(buildFrame("SUBSCRIBE", List.of(
             "id:" + id,
@@ -106,15 +73,22 @@ public class SocketClient extends WebSocketClient {
         ), jsonBody));
     }
 
+    public void sendNoData(String destination) {
+        sendSafe(buildFrame("SEND", List.of(
+            "destination:" + destination
+        ), null));
+    }
+
     public void sendSafe(String message) {
         if (isConnected) send(message);
         else messageQueue.add(message);
     }
 
+
+
+    // OVERRIDE ----------------------------------------------------------
     @Override
     public void onMessage(String message) {
-        System.out.println("RAW: " + message);
-
         if (message.startsWith("CONNECTED")) {
             isConnected = true;
 
@@ -149,27 +123,7 @@ public class SocketClient extends WebSocketClient {
     }
 
     @Override
-    public void onClose(int code, String reason, boolean remote) {
-        isConnected = false;
-        System.out.println("Déconnecté");
-    }
-
-    @Override
-    public void onError(Exception ex) {
-        System.err.println("Erreur : " + ex.getMessage());
-    }
-
-
-    public static SocketClient getInstance() {
-        if  (instance == null) {
-            instance = new SocketClient();
-            instance.connect();
-        }
-
-        return instance;
-    }
-
-    private String buildConnectFrame() {
+    public void onOpen(ServerHandshake handshakeData) {
         List<String> headers = new ArrayList<>();
         headers.add("accept-version:1.2");
         headers.add("host:localhost");
@@ -179,9 +133,23 @@ public class SocketClient extends WebSocketClient {
             headers.add("Authorization:Bearer " + authorizationToken);
         }
 
-        return buildFrame("CONNECT", headers, null);
+        send(buildFrame("CONNECT", headers, null));
     }
 
+    @Override
+    public void onClose(int code, String reason, boolean remote) {
+        isConnected = false;
+        System.out.println("Déconnecté");
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        System.err.println("Error : " + ex.getMessage());
+    }
+
+
+
+    // BUILD AND GET -----------------------------------------------------
     private String buildFrame(String command, List<String> headers, String body) {
         StringBuilder frame = new StringBuilder();
         frame.append(command).append('\n');
@@ -196,7 +164,37 @@ public class SocketClient extends WebSocketClient {
             frame.append(body);
         }
 
-        frame.append(STOMP_END);
+        frame.append('\u0000');
         return frame.toString();
+    }
+
+
+    public JsonNode getJson(String message) {
+        int index = message.indexOf("{");
+
+        if (index != -1) {
+            String json = message.substring(index).replace("\u0000", "");
+
+            try {
+                return MAPPER.readTree(json);
+
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public String getHeaderValue(String message, String headerName) {
+        String prefix = headerName + ":";
+
+        for (String line : message.split("\\n")) {
+            if (line.startsWith(prefix)) {
+                return line.substring(prefix.length()).trim();
+            }
+        }
+
+        return null;
     }
 }

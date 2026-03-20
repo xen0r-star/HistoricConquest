@@ -1,48 +1,46 @@
 package com.historicconquest.historicconquest.network;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.historicconquest.historicconquest.util.KeyLoaderUtils;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+
+import java.security.PublicKey;
+
 public class RoomService {
-    private String playerId = null;
-    private String token = null;
+    private final String playerId;
+    private final String roomCode;
     private long pingTime = 0;
 
-    private SocketClient socketClient;
-    private SocketClient.StompListener pingListener;
-    private static RoomService instance;
+    private final SocketClient socketClient;
+    private final StompListener pingListener;
+    private final StompListener roomListener;
 
-    private RoomService() { }
-
-    private String getPingDestination() {
-        return "/topic/ping-" + playerId;
-    }
-
-    private void subscribeToPing() {
-        socketClient.subscribe("sub-ping", getPingDestination());
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public String getPlayerId() {
-        return playerId;
-    }
+    private RoomEventListener listener;
 
 
-    public static RoomService getInstance() {
-        if (instance == null) {
-            instance = new RoomService();
+
+    public RoomService(String token) {
+        try {
+            PublicKey publicKey = KeyLoaderUtils.loadPublicKey();
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(publicKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            this.playerId = claims.getSubject();
+            this.roomCode = claims.get("roomCode",  String.class);
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JWT token", e);
         }
-        return instance;
-    }
 
-    public void init(String playerId, String token) {
-        this.playerId = playerId;
-        this.token = token;
 
-        SocketClient.setAuthorizationToken(token);
-        this.socketClient = SocketClient.getInstance();
 
-        this.pingListener = new SocketClient.StompListener() {
+        this.socketClient = new SocketClient(token);
+
+        this.pingListener = new StompListener() {
             @Override
             public void onHeartbeat() {
                 pingTime = System.currentTimeMillis();
@@ -58,7 +56,57 @@ public class RoomService {
             }
         };
 
+        this.roomListener = new StompListener() {
+            @Override
+            public void onMessage(String destination, String rawMessage) {
+                if (!getRoomDestination().equals(destination)) return;
+
+                JsonNode node = socketClient.getJson(rawMessage);
+
+                RoomInfo.from(node.get("type").asText())
+                        .handle(node, listener);
+            }
+        };
+
         this.socketClient.addListener(this.pingListener);
+        this.socketClient.addListener(this.roomListener);
+        this.socketClient.connect();
+
         subscribeToPing();
+        subscribeToRoom();
+    }
+
+
+    public void sendNoData(String destination) {
+        socketClient.sendNoData(destination);
+    }
+
+
+    private String getPingDestination() {
+        return "/topic/ping-" + playerId;
+    }
+
+    private String getRoomDestination() {
+        return "/topic/room-" + roomCode;
+    }
+
+    private void subscribeToPing() {
+        socketClient.subscribe("sub-ping", getPingDestination());
+    }
+
+    private void subscribeToRoom() {
+        socketClient.subscribe("sub-room", getRoomDestination());
+    }
+
+    public void setListener(RoomEventListener listener) {
+        this.listener = listener;
+    }
+
+    public void disconnect() {
+        if (socketClient != null) {
+            socketClient.removeListener(pingListener);
+            socketClient.removeListener(roomListener);
+            socketClient.close();
+        }
     }
 }
