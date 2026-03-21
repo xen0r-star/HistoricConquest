@@ -45,6 +45,10 @@ public class RoomSocketController {
             case "PLAYER_PSEUDO_CHANGE":
                 player.setPseudo(data);
                 break;
+
+            case "PLAYER_STATUS_CHANGE":
+                player.setStatus(data);
+                break;
         }
 
 
@@ -73,6 +77,31 @@ public class RoomSocketController {
             (Object) Map.of(
                 "type", "PLAYER_QUIT",
                 "playerId", playerId
+            )
+        );
+    }
+
+
+    @MessageMapping("/kick")
+    public void kickRoom(@Payload Map<String, String> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        Player player = room.getPlayerById(playerId);
+
+        if (!room.isHost(player.getId())) return;
+
+
+        String playerIdToKick = payload.get("playerId");
+        roomService.removePlayer(roomCode, playerIdToKick);
+
+        messagingTemplate.convertAndSend(
+            "/topic/room-" + roomCode,
+            (Object) Map.of(
+                "type", "PLAYER_KICK",
+                "playerId", playerIdToKick
             )
         );
     }

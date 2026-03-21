@@ -26,14 +26,16 @@
         </Label>
     </HBox>
     <HBox alignment="CENTER_RIGHT" layoutX="408.0" prefHeight="25.0" prefWidth="200.0" spacing="5.0">
-        <Label fx:id="PlayerPing" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" prefHeight="25.0" prefWidth="56.0" style="-fx-text-fill: #ffffff;" text="19" textAlignment="RIGHT" textFill="WHITE">
-            <font>
-                <Font size="15.0" />
-            </font>
-        </Label>
-        <ImageView fitHeight="25.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../../images/cellular.png" />
-        </ImageView>
+        <HBox fx:id="pingContainer" alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+            <Label fx:id="PlayerPing" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" prefHeight="25.0" prefWidth="56.0" style="-fx-text-fill: #ffffff;" text="0ms" textAlignment="RIGHT" textFill="WHITE">
+                <font>
+                    <Font size="15.0" />
+                </font>
+            </Label>
+            <ImageView fitHeight="25.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@../../images/cellular.png" />
+            </ImageView>
+        </HBox>
         <ImageView fx:id="RemoveBtn" fitHeight="25.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
             <Image url="@../../images/close.png" />
         </ImageView>

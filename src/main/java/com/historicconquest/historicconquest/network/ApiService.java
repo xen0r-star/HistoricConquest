@@ -85,6 +85,7 @@ public class ApiService {
         String pseudo,
         String color,
         String type,
+        String status,
         int ping
     ) {}
 

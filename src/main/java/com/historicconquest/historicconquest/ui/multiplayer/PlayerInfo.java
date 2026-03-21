@@ -1,10 +1,10 @@
 package com.historicconquest.historicconquest.ui.multiplayer;
 
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import java.net.URL;
@@ -15,6 +15,7 @@ public class PlayerInfo {
     @FXML private Label PlayerStatus;
     @FXML private Label PlayerPing;
     @FXML private ImageView PlayerIcon;
+    @FXML private HBox pingContainer;
     @FXML private ImageView RemoveBtn;
 
 
@@ -57,20 +58,18 @@ public class PlayerInfo {
         }
     }
 
-    public void setOnClose(Runnable onClose) {
+    public void showPing(boolean show) {
+        pingContainer.setVisible(show);
+        pingContainer.setManaged(show);
+    }
+
+    public void setOnRemove(Runnable onClose) {
         if (RemoveBtn != null) {
             RemoveBtn.setOnMouseClicked(event -> {
                 if (onClose != null) {
                     onClose.run();
                 }
             });
-        }
-    }
-
-    public void setOnNameClick(Runnable onNameClick) {
-        if (PlayerName != null && onNameClick != null) {
-            PlayerName.setCursor(Cursor.HAND);
-            PlayerName.setOnMouseClicked(event -> onNameClick.run());
         }
     }
 

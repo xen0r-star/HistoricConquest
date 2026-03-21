@@ -8,10 +8,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 
 public class SocketClient extends WebSocketClient {
@@ -60,23 +57,35 @@ public class SocketClient extends WebSocketClient {
 
     // SUBSCRIBE AND SEND ------------------------------------------------
     public void subscribe(String id, String destination) {
-        sendSafe(buildFrame("SUBSCRIBE", List.of(
-            "id:" + id,
-            "destination:" + destination
-        ), null));
+        sendSafe(buildFrame(
+            "SUBSCRIBE",
+            List.of(
+                "id:" + id,
+                "destination:" + destination
+            ),
+            null
+        ));
     }
 
-    public void sendJson(String destination, String jsonBody) {
-        sendSafe(buildFrame("SEND", List.of(
-            "destination:" + destination,
-            "content-type:application/json"
-        ), jsonBody));
+    public void sendJson(String destination, Map<String, Object> jsonBody) throws JsonProcessingException {
+        sendSafe(buildFrame(
+            "SEND",
+            List.of(
+                "destination:" + destination,
+                "content-type:application/json"
+            ),
+            MAPPER.writeValueAsString(jsonBody)
+        ));
     }
 
     public void sendNoData(String destination) {
-        sendSafe(buildFrame("SEND", List.of(
-            "destination:" + destination
-        ), null));
+        sendSafe(buildFrame(
+            "SEND",
+            List.of(
+                "destination:" + destination
+            ),
+            null
+        ));
     }
 
     public void sendSafe(String message) {
