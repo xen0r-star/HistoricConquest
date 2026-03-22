@@ -17,6 +17,8 @@ public class SocketClient extends WebSocketClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final Queue<String> messageQueue = new LinkedList<>();
     private final List<StompListener> listeners = new ArrayList<>();
+    private final Map<String, StompListener> subscriptionListeners = new HashMap<>();
+    private final Map<String, StompListener> destinationListeners = new HashMap<>();
     private final String authorizationToken;
     private boolean isConnected = false;
 
@@ -65,6 +67,16 @@ public class SocketClient extends WebSocketClient {
             ),
             null
         ));
+    }
+
+    public void subscribe(String id, String destination, StompListener listener) {
+        if (listener != null) {
+            subscriptionListeners.put(id, listener);
+            destinationListeners.put(destination, listener);
+            addListener(listener);
+        }
+
+        subscribe(id, destination);
     }
 
     public void sendJson(String destination, Map<String, Object> jsonBody) throws JsonProcessingException {
@@ -120,8 +132,17 @@ public class SocketClient extends WebSocketClient {
 
         if (message.startsWith("MESSAGE")) {
             String destination = getHeaderValue(message, "destination");
+            String subscriptionId = getHeaderValue(message, "subscription");
 
-            for (StompListener listener : List.copyOf(listeners)) {
+            StompListener listener = null;
+            if (subscriptionId != null) {
+                listener = subscriptionListeners.get(subscriptionId);
+            }
+            if (listener == null && destination != null) {
+                listener = destinationListeners.get(destination);
+            }
+
+            if (listener != null) {
                 listener.onMessage(destination, message);
             }
             return;

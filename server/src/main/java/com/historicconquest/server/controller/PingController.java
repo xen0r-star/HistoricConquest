@@ -29,12 +29,10 @@ public class PingController {
     public void handlePingRequest(@Payload Map<String, Object> message, Principal principal) {
         if (!(principal instanceof StompPrincipal sp)) return;
 
-        messagingTemplate.convertAndSend(
-            "/topic/ping-" + sp.getName(),
-            (Object) Map.of(
-                "type", "PING",
-                "timestamp", message.get("timestamp")
-            )
+        messagingTemplate.convertAndSendToUser(
+            sp.getName(),
+            "/queue/ping",
+            Map.of("timestamp", message.get("timestamp"))
         );
     }
 

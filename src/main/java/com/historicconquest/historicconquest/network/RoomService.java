@@ -22,8 +22,9 @@ public class RoomService {
     private final SocketClient socketClient;
     private final StompListener pingListener;
     private final StompListener roomListener;
-    private ScheduledExecutorService pingScheduler;
+    private final StompListener errorListener;
 
+    private ScheduledExecutorService pingScheduler;
     private RoomEventListener listener;
 
 
@@ -56,8 +57,8 @@ public class RoomService {
 
             @Override
             public void onMessage(String destination, String rawMessage) {
-                if (!getPingDestination().equals(destination)) return;
                 if (pingTime == 0) return;
+                if (pingTime != socketClient.getJson(rawMessage).get("timestamp").asLong()) return;
 
                 try {
                     long measuredPing = System.currentTimeMillis() - pingTime;
@@ -75,8 +76,6 @@ public class RoomService {
         this.roomListener = new StompListener() {
             @Override
             public void onMessage(String destination, String rawMessage) {
-                if (!getRoomDestination().equals(destination)) return;
-
                 JsonNode node = socketClient.getJson(rawMessage);
 
                 RoomInfo.from(node.get("type").asText())
@@ -84,30 +83,35 @@ public class RoomService {
             }
         };
 
-        this.socketClient.addListener(this.pingListener);
-        this.socketClient.addListener(this.roomListener);
+        this.errorListener = new StompListener() {
+            @Override
+            public void onMessage(String destination, String rawMessage) {
+                System.out.println("Received message on destination: " + destination);
+                System.out.println("Error received: " + rawMessage);
+            }
+        };
+
+        subscribeAll();
         this.socketClient.connect();
-
-        subscribeToPing();
-        subscribeToRoom();
     }
 
 
 
-    private String getPingDestination() {
-        return "/topic/ping-" + playerId;
-    }
+    private void subscribeAll() {
+        socketClient.subscribe(
+            "sub-ping", "/user/queue/ping",
+            pingListener
+        );
 
-    private String getRoomDestination() {
-        return "/topic/room-" + roomCode;
-    }
+        socketClient.subscribe(
+            "sub-room", "/topic/room-" + roomCode,
+            roomListener
+        );
 
-    private void subscribeToPing() {
-        socketClient.subscribe("sub-ping", getPingDestination());
-    }
-
-    private void subscribeToRoom() {
-        socketClient.subscribe("sub-room", getRoomDestination());
+        socketClient.subscribe(
+            "sub-error", "/user/queue/errors",
+            errorListener
+        );
     }
 
     public void setListener(RoomEventListener listener) {
@@ -119,9 +123,11 @@ public class RoomService {
             stopPingScheduler();
             socketClient.removeListener(pingListener);
             socketClient.removeListener(roomListener);
+            socketClient.removeListener(errorListener);
             socketClient.close();
         }
     }
+
 
 
 
@@ -156,6 +162,16 @@ public class RoomService {
         }
     }
 
+
+
+    public void addBot() {
+        try {
+            socketClient.sendNoData("/app/addBot");
+
+        } catch (Exception e) {
+            System.err.println("Failed to add bot: " + e.getMessage());
+        }
+    }
 
     public void switchStatus() {
         if (status.equals("Waiting")) status = "Ready";

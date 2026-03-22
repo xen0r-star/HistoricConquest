@@ -255,6 +255,8 @@ public class MultiplayerPage {
 
                 refreshHostUI();
             }
+
+            roomService.addBot();
         });
     }
 

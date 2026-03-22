@@ -25,6 +25,48 @@ public class RoomSocketController {
     }
 
 
+
+    @MessageMapping("/addBot")
+    public void addBot(Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        Player player = room.getPlayerById(playerId);
+
+        if (!room.isHost(player.getId())) return;
+
+
+//        Player newBot = new Player("Bot", "bot", room.getCode());
+//
+//        try {
+//            roomService.addPlayer(room.getCode(),  newBot);
+//
+//        } catch (Exception e) {
+//
+//        }
+
+        messagingTemplate.convertAndSendToUser(
+            playerId,
+            "/queue/errors",
+            Map.of(
+                "type", "ERROR",
+                "message", "Not implemented yet"
+            )
+        );
+
+
+//        messagingTemplate.convertAndSend(
+//            "/topic/room-" + roomCode,
+//            (Object) Map.of(
+//                    "type", "PLAYER_JOIN",
+//                    "player", player
+//            )
+//        );
+    }
+
+
     @MessageMapping("/update")
     public void updateData(@Payload Map<String, String> payload, Principal principal) {
         StompPrincipal sp = (StompPrincipal) principal;
