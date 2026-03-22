@@ -25,8 +25,14 @@ public class HttpController {
     public Map<String, Object> checkRoom(@RequestParam String roomCode) {
         boolean exists = roomService.getRoom(roomCode) != null;
 
+        if (!exists || !roomService.getRoom(roomCode).isPossibleAddPlayer()) {
+            return Map.of(
+                "exists", false
+            );
+        }
+
         return Map.of(
-            "exists", exists
+            "exists", true
         );
     }
 

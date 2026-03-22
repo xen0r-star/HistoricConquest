@@ -161,6 +161,9 @@ public class MultiplayerPage {
             response -> {
                 if (response.exists()) {
                     setPanel(PanelState.JOIN_USERNAME);
+
+                } else {
+                    System.err.println("Impossible to join this room.");
                 }
             }
         ));
@@ -212,8 +215,10 @@ public class MultiplayerPage {
 
                 for (NetworkPlayer player : response.players()) {
                     roomPlayers.add(new RoomPlayer(
-                        player.id(), player.pseudo(), player.color(),
-                        false, 0, player.status(), false
+                        player.id(),     player.pseudo(),
+                        player.color(), !player.type().equals("player"),
+                        player.ping(),   player.status(),
+                        false
                     ));
                 }
 
@@ -246,18 +251,11 @@ public class MultiplayerPage {
 
         AddBotHost.setOnAction(e -> {
             if (roomPlayers.size() < MAX_PLAYERS) {
-                roomPlayers.add(new RoomPlayer(
-                    "ID_BOT_"+ (roomPlayers.size()),
-                    "Bot " + (roomPlayers.size()),
-                    "#FF0000",
-                    true, 0,
-                    "Ready", true
-                ));
+                roomService.addBot();
 
-                refreshHostUI();
+            } else {
+                System.err.println("Too many players");
             }
-
-            roomService.addBot();
         });
     }
 
@@ -293,53 +291,33 @@ public class MultiplayerPage {
                         ));
 
                         refreshHostUI();
+
+                        if (roomPlayers.size() >= MAX_PLAYERS) {
+                            AddBotHost.setDisable(true);
+                        }
                     }
                 });
             }
 
             @Override
             public void onPlayerQuit(String playerId) {
-                Platform.runLater(() -> {
-                    for (RoomPlayer player : roomPlayers) {
-                        if (player.getId().equals(playerId)) {
-                            roomPlayers.remove(player);
-                            break;
-                        }
-                    }
-
-                    if (currentPanel == PanelState.JOIN_ROOM)      refreshJoinUI();
-                    else if (currentPanel == PanelState.HOST_ROOM) refreshHostUI();
-                });
+                Platform.runLater(() -> removePlayerAndRefreshUi(playerId));
             }
 
             @Override
             public void onPlayerKick(String playerId) {
                 Platform.runLater(() -> {
                     if (Objects.equals(playerId, roomService.getPlayerId())) {
-                        roomService.quitRoom();
-                        roomService.disconnect();
-
-                        if (currentPanel == PanelState.JOIN_ROOM) {
-                            clearPlayerAreas(PlayerContainerJoin);
-
-                        } else if (currentPanel == PanelState.HOST_ROOM) {
-                            clearPlayerAreas(PlayerContainerHost);
-                        }
-
-                        roomService.quitRoom();
-                        roomService.disconnect();
                         setPanel(PanelState.SELECT_MODE);
 
-                    } else {
-                        for (RoomPlayer player : roomPlayers) {
-                            if (player.getId().equals(playerId)) {
-                                roomPlayers.remove(player);
-                                break;
-                            }
-                        }
+                        clearPlayerAreas(PlayerContainerJoin);
+                        clearPlayerAreas(PlayerContainerHost);
 
-                        if (currentPanel == PanelState.JOIN_ROOM)      refreshJoinUI();
-                        else if (currentPanel == PanelState.HOST_ROOM) refreshHostUI();
+                        roomService.quitRoom();
+                        roomService.disconnect();
+
+                    } else {
+                        removePlayerAndRefreshUi(playerId);
                     }
                 });
             }
@@ -410,6 +388,7 @@ public class MultiplayerPage {
 
                     } else if (currentPanel == PanelState.HOST_ROOM) {
                         clearPlayerAreas(PlayerContainerHost);
+                        AddBotHost.setDisable(false);
                     }
 
                     roomService.quitRoom();
@@ -420,7 +399,25 @@ public class MultiplayerPage {
         };
     }
 
+    private void removePlayerAndRefreshUi(String playerId) {
+        for (RoomPlayer player : roomPlayers) {
+            if (player.getId().equals(playerId)) {
+                roomPlayers.remove(player);
+                break;
+            }
+        }
 
+        if (currentPanel == PanelState.JOIN_ROOM) {
+            refreshJoinUI();
+
+        } else if (currentPanel == PanelState.HOST_ROOM) {
+            refreshHostUI();
+
+            if (roomPlayers.size() < MAX_PLAYERS) {
+                AddBotHost.setDisable(false);
+            }
+        }
+    }
 
 
     private void renderPlayerAreas(VBox container, boolean isHost) {

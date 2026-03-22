@@ -1,4 +1,4 @@
-package com.historicconquest.server.service;
+package com.historicconquest.server.util;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -9,9 +9,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class KeyLoader {
+public class KeyLoaderUtil {
     public static PrivateKey loadPrivateKey() throws Exception {
-        InputStream is = KeyLoader.class
+        InputStream is = KeyLoaderUtil.class
                 .getClassLoader()
                 .getResourceAsStream("keys/private.pem");
 
@@ -32,7 +32,7 @@ public class KeyLoader {
     }
 
     public static PublicKey loadPublicKey() throws Exception {
-        InputStream is = KeyLoader.class
+        InputStream is = KeyLoaderUtil.class
                 .getClassLoader()
                 .getResourceAsStream("keys/public.pem");
 

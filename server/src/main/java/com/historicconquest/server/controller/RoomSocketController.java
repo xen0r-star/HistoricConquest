@@ -4,6 +4,7 @@ import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.model.Room;
 import com.historicconquest.server.model.Player;
 import com.historicconquest.server.service.RoomService;
+import com.historicconquest.server.util.NameGeneratorUtil;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -38,32 +39,29 @@ public class RoomSocketController {
         if (!room.isHost(player.getId())) return;
 
 
-//        Player newBot = new Player("Bot", "bot", room.getCode());
-//
-//        try {
-//            roomService.addPlayer(room.getCode(),  newBot);
-//
-//        } catch (Exception e) {
-//
-//        }
+        Player newBot = new Player(NameGeneratorUtil.get(), "bot", room.getCode());
 
-        messagingTemplate.convertAndSendToUser(
-            playerId,
-            "/queue/errors",
-            Map.of(
-                "type", "ERROR",
-                "message", "Not implemented yet"
+        try {
+            roomService.addPlayer(room.getCode(),  newBot);
+
+        } catch (Exception e) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "ADD_BOT",
+                    "message", e.getMessage()
+                )
+            );
+        }
+
+        messagingTemplate.convertAndSend(
+            "/topic/room-" + roomCode,
+            (Object) Map.of(
+                "type", "PLAYER_JOIN",
+                "player", newBot
             )
         );
-
-
-//        messagingTemplate.convertAndSend(
-//            "/topic/room-" + roomCode,
-//            (Object) Map.of(
-//                    "type", "PLAYER_JOIN",
-//                    "player", player
-//            )
-//        );
     }
 
 

@@ -1,4 +1,4 @@
-package com.historicconquest.server.service;
+package com.historicconquest.server.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JwtService {
+public class JwtServiceUtil {
     private static final long VALIDITY_TIME = 2 * 60 * 60 * 1000; // 2 hours
     private static final PrivateKey privateKey;
     private static final PublicKey publicKey;
@@ -18,8 +18,8 @@ public class JwtService {
 
     static {
         try {
-            privateKey = KeyLoader.loadPrivateKey();
-            publicKey = KeyLoader.loadPublicKey();
+            privateKey = KeyLoaderUtil.loadPrivateKey();
+            publicKey = KeyLoaderUtil.loadPublicKey();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load keys", e);

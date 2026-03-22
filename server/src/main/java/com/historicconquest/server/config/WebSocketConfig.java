@@ -1,7 +1,7 @@
 package com.historicconquest.server.config;
 
 import com.historicconquest.server.security.StompPrincipal;
-import com.historicconquest.server.service.JwtService;
+import com.historicconquest.server.util.JwtServiceUtil;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,7 +67,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                     if (authHeader != null && authHeader.startsWith("Bearer ")) {
                         String token = authHeader.substring(7);
-                        Map<String, String> info = JwtService.verifyToken(token);
+                        Map<String, String> info = JwtServiceUtil.verifyToken(token);
 
                         if (info != null) {
                             String playerId = info.get("playerId");

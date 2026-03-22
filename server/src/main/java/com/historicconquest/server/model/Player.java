@@ -2,7 +2,7 @@ package com.historicconquest.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.historicconquest.server.service.JwtService;
+import com.historicconquest.server.util.JwtServiceUtil;
 import java.util.UUID;
 
 public class Player {
@@ -19,7 +19,7 @@ public class Player {
 
     public Player(String pseudo, String type, String roomCode) {
         this.id = UUID.randomUUID().toString();
-        this.token = JwtService.generateToken(id, roomCode);
+        this.token = JwtServiceUtil.generateToken(id, roomCode);
         this.pseudo = pseudo;
         this.type = type;
         this.status = "Waiting";

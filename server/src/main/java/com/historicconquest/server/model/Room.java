@@ -22,6 +22,11 @@ public class Room {
         return hostId != null && hostId.equals(playerId);
     }
 
+
+    public boolean isPossibleAddPlayer() {
+        return players.size() < MAX_PLAYER;
+    }
+
     public void addPlayer(Player player) throws Exception {
         if (players.containsKey(player.getId())) throw new Exception("Player already in the room");
         if (players.size() >= MAX_PLAYER) throw new Exception("Room is full");

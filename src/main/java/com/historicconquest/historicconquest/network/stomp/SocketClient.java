@@ -95,7 +95,8 @@ public class SocketClient extends WebSocketClient {
     }
 
     public void allUnsubscribe() {
-        for (String id : subscriptionListeners.keySet()) {
+        List<String> subscriptionIds = new ArrayList<>(subscriptionListeners.keySet());
+        for (String id : subscriptionIds) {
             unsubscribe(id);
         }
 

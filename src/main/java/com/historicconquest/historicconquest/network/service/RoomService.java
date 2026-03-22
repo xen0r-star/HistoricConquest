@@ -11,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 
 import java.security.PublicKey;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -112,8 +113,16 @@ public class RoomService {
         return new StompListener() {
             @Override
             public void onMessage(String destination, String rawMessage) {
-//                System.out.println("Received message on destination: " + destination);
-//                System.out.println("Error received: " + rawMessage);
+                JsonNode payload = socketClient.getJson(rawMessage);
+                String type = payload.get("type").asText();
+                String message = payload.get("message").asText();
+
+                if (Objects.equals(type, "ADD_BOT")) {
+                    System.err.println("Error add bot: " + message);
+
+                } else {
+                    System.err.println("Error: " + message);
+                }
             }
         };
     }
