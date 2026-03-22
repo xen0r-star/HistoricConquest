@@ -2,10 +2,11 @@ package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
-import com.historicconquest.historicconquest.network.ApiService;
-import com.historicconquest.historicconquest.network.RoomEventListener;
-import com.historicconquest.historicconquest.network.RoomPlayer;
-import com.historicconquest.historicconquest.network.RoomService;
+import com.historicconquest.historicconquest.network.api.ApiService;
+import com.historicconquest.historicconquest.network.model.NetworkPlayer;
+import com.historicconquest.historicconquest.network.event.RoomEventListener;
+import com.historicconquest.historicconquest.network.model.RoomPlayer;
+import com.historicconquest.historicconquest.network.service.RoomService;
 import com.historicconquest.historicconquest.ui.multiplayer.PlayerInfo;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -209,7 +210,7 @@ public class MultiplayerPage {
                 this.roomService = new RoomService(response.token());
                 roomService.setListener(createRoomListener());
 
-                for (ApiService.Player player : response.players()) {
+                for (NetworkPlayer player : response.players()) {
                     roomPlayers.add(new RoomPlayer(
                         player.id(), player.pseudo(), player.color(),
                         false, 0, player.status(), false
@@ -271,7 +272,7 @@ public class MultiplayerPage {
     private RoomEventListener createRoomListener() {
         return new RoomEventListener() {
             @Override
-            public void onPlayerJoin(ApiService.Player newPlayer) {
+            public void onPlayerJoin(NetworkPlayer newPlayer) {
                 Platform.runLater(() -> {
                     if (currentPanel == PanelState.JOIN_ROOM) {
                         roomPlayers.add(new RoomPlayer(

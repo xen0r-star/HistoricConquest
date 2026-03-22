@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.network;
+package com.historicconquest.historicconquest.network.stomp;
 
 public interface StompListener {
     default void onConnected() {}

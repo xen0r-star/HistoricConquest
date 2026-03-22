@@ -1,6 +1,10 @@
-package com.historicconquest.historicconquest.network;
+package com.historicconquest.historicconquest.network.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.historicconquest.historicconquest.network.event.RoomEventListener;
+import com.historicconquest.historicconquest.network.event.RoomInfo;
+import com.historicconquest.historicconquest.network.stomp.SocketClient;
+import com.historicconquest.historicconquest.network.stomp.StompListener;
 import com.historicconquest.historicconquest.util.KeyLoaderUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -13,11 +17,13 @@ import java.util.concurrent.TimeUnit;
 
 public class RoomService {
     private static final long PING_INTERVAL_MS = 2000;
+    private static final String STATUS_WAITING = "Waiting";
+    private static final String STATUS_READY = "Ready";
 
     private final String playerId;
     private final String roomCode;
-    private long pingTime = 0;
-    private String status = "Waiting";
+    private long pingTime;
+    private String status = STATUS_WAITING;
 
     private final SocketClient socketClient;
     private final StompListener pingListener;
@@ -30,26 +36,38 @@ public class RoomService {
 
 
     public RoomService(String token) {
+        JwtRoomClaims claims = parseToken(token);
+        this.playerId = claims.playerId();
+        this.roomCode = claims.roomCode();
+        this.socketClient = new SocketClient(token);
+        this.pingListener = buildPingListener();
+        this.roomListener = buildRoomListener();
+        this.errorListener = buildErrorListener();
+
+        subscribeAll();
+        socketClient.connect();
+    }
+
+    private JwtRoomClaims parseToken(String token) {
         try {
             PublicKey publicKey = KeyLoaderUtils.loadPublicKey();
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(publicKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                .setSigningKey(publicKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
-            this.playerId = claims.getSubject();
-            this.roomCode = claims.get("roomCode",  String.class);
+            return new JwtRoomClaims(claims.getSubject(), claims.get("roomCode", String.class));
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid JWT token", e);
         }
+    }
 
 
 
-        this.socketClient = new SocketClient(token);
-
-        this.pingListener = new StompListener() {
+    private StompListener buildPingListener() {
+        return new StompListener() {
             @Override
             public void onConnected() {
                 startPingScheduler();
@@ -58,41 +76,46 @@ public class RoomService {
             @Override
             public void onMessage(String destination, String rawMessage) {
                 if (pingTime == 0) return;
-                if (pingTime != socketClient.getJson(rawMessage).get("timestamp").asLong()) return;
+
+                JsonNode payload = socketClient.getJson(rawMessage);
+                JsonNode timestamp = payload.get("timestamp");
+                if (timestamp == null || timestamp.isNull()) return;
+                if (pingTime != timestamp.asLong()) return;
 
                 try {
                     long measuredPing = System.currentTimeMillis() - pingTime;
-                    socketClient.sendJson(
-                        "/app/updatePing",
-                        Map.of("ping", measuredPing)
-                    );
+                    socketClient.sendJson("/app/updatePing", Map.of("ping", measuredPing));
 
                 } catch (Exception e) {
-                    System.out.println("Error sending ping");
+                    System.err.println("Failed to send ping update: " + e.getMessage());
                 }
             }
         };
+    }
 
-        this.roomListener = new StompListener() {
+    private StompListener buildRoomListener() {
+        return new StompListener() {
             @Override
             public void onMessage(String destination, String rawMessage) {
-                JsonNode node = socketClient.getJson(rawMessage);
+                JsonNode payload = socketClient.getJson(rawMessage);
+                JsonNode type = payload.get("type");
+                if (type == null || type.isNull()) {
+                    return;
+                }
 
-                RoomInfo.from(node.get("type").asText())
-                        .handle(node, listener);
+                RoomInfo.from(type.asText()).handle(payload, listener);
             }
         };
+    }
 
-        this.errorListener = new StompListener() {
+    private StompListener buildErrorListener() {
+        return new StompListener() {
             @Override
             public void onMessage(String destination, String rawMessage) {
-                System.out.println("Received message on destination: " + destination);
-                System.out.println("Error received: " + rawMessage);
+//                System.out.println("Received message on destination: " + destination);
+//                System.out.println("Error received: " + rawMessage);
             }
         };
-
-        subscribeAll();
-        this.socketClient.connect();
     }
 
 
@@ -119,13 +142,9 @@ public class RoomService {
     }
 
     public void disconnect() {
-        if (socketClient != null) {
-            stopPingScheduler();
-            socketClient.removeListener(pingListener);
-            socketClient.removeListener(roomListener);
-            socketClient.removeListener(errorListener);
-            socketClient.close();
-        }
+        stopPingScheduler();
+        socketClient.allUnsubscribe();
+        socketClient.close();
     }
 
 
@@ -174,8 +193,7 @@ public class RoomService {
     }
 
     public void switchStatus() {
-        if (status.equals("Waiting")) status = "Ready";
-        else status = "Waiting";
+        status = status.equals(STATUS_WAITING) ? STATUS_READY : STATUS_WAITING;
 
         try {
             socketClient.sendJson(
@@ -215,4 +233,6 @@ public class RoomService {
     public String getPlayerId() {
         return playerId;
     }
+
+    private record JwtRoomClaims(String playerId, String roomCode) { }
 }

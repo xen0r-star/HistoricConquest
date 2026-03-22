@@ -1,9 +1,11 @@
-package com.historicconquest.historicconquest.network;
+package com.historicconquest.historicconquest.network.event;
+
+import com.historicconquest.historicconquest.network.model.NetworkPlayer;
 
 import java.util.Map;
 
 public interface RoomEventListener {
-    void onPlayerJoin(ApiService.Player newPlayer);
+    void onPlayerJoin(NetworkPlayer newPlayer);
     void onPlayerQuit(String playerId);
     void onPlayerKick(String playerId);
     void onPlayerColorChange(String playerId, String newColor);

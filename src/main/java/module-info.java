@@ -17,5 +17,9 @@ module com.historicconquest.historicconquest {
     exports com.historicconquest.historicconquest.ui;
     opens com.historicconquest.historicconquest.ui to javafx.fxml, javafx.graphics;
     opens com.historicconquest.historicconquest.ui.multiplayer to javafx.fxml, javafx.graphics;
-    opens com.historicconquest.historicconquest.network to com.fasterxml.jackson.databind;
+    opens com.historicconquest.historicconquest.network.api to com.fasterxml.jackson.databind;
+    opens com.historicconquest.historicconquest.network.stomp to com.fasterxml.jackson.databind;
+    opens com.historicconquest.historicconquest.network.model to com.fasterxml.jackson.databind;
+    opens com.historicconquest.historicconquest.network.event to com.fasterxml.jackson.databind;
+    opens com.historicconquest.historicconquest.network.service to com.fasterxml.jackson.databind;
 }

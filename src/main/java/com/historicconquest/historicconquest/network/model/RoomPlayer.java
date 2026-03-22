@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.network;
+package com.historicconquest.historicconquest.network.model;
 
 public class RoomPlayer {
     private String id;
@@ -12,6 +12,7 @@ public class RoomPlayer {
     public RoomPlayer(String id, String name, String color, boolean isRobot, int ping, String status, boolean isRemovable) {
         this.id = id;
         this.name = name;
+        this.color = color;
         this.isRobot = isRobot;
         this.ping = ping;
         this.status = status;

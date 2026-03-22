@@ -1,8 +1,9 @@
-package com.historicconquest.historicconquest.network;
+package com.historicconquest.historicconquest.network.stomp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -12,7 +13,7 @@ import java.util.*;
 
 
 public class SocketClient extends WebSocketClient {
-    private static final String DEFAULT_WEBSOCKET_LINK = "ws://localhost:8080/ws";
+    private static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:8080/ws";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final Queue<String> messageQueue = new LinkedList<>();
@@ -25,7 +26,7 @@ public class SocketClient extends WebSocketClient {
 
 
     public SocketClient(String authorizationToken) {
-        this(DEFAULT_WEBSOCKET_LINK, authorizationToken);
+        this(DEFAULT_WEBSOCKET_URL, authorizationToken);
     }
 
     public SocketClient(String websocketUrl, String authorizationToken) {
@@ -46,13 +47,13 @@ public class SocketClient extends WebSocketClient {
 
 
     // LISTENER ----------------------------------------------------------
-    public void addListener(StompListener listener) {
+    private void addListener(StompListener listener) {
         if (listener != null && !listeners.contains(listener)) {
             listeners.add(listener);
         }
     }
 
-    public void removeListener(StompListener listener) {
+    private void removeListener(StompListener listener) {
         listeners.remove(listener);
     }
 
@@ -78,6 +79,32 @@ public class SocketClient extends WebSocketClient {
 
         subscribe(id, destination);
     }
+
+    public void unsubscribe(String id) {
+        sendSafe(buildFrame(
+            "UNSUBSCRIBE",
+            List.of("id:" + id),
+            null
+        ));
+
+        StompListener listener = subscriptionListeners.remove(id);
+        if (listener != null) {
+            destinationListeners.values().remove(listener);
+            removeListener(listener);
+        }
+    }
+
+    public void allUnsubscribe() {
+        for (String id : subscriptionListeners.keySet()) {
+            unsubscribe(id);
+        }
+
+        subscriptionListeners.clear();
+        destinationListeners.clear();
+        listeners.clear();
+    }
+
+
 
     public void sendJson(String destination, Map<String, Object> jsonBody) throws JsonProcessingException {
         sendSafe(buildFrame(
@@ -146,7 +173,11 @@ public class SocketClient extends WebSocketClient {
                 listener.onMessage(destination, message);
             }
             return;
+        }
 
+        if (message.startsWith("ERROR")) {
+            System.err.println("Error received: " + getBody(message));
+            return;
         }
 
         System.out.println("Request inconnue: " + message);
@@ -209,8 +240,19 @@ public class SocketClient extends WebSocketClient {
                 return MAPPER.readTree(json);
 
             } catch (Exception e) {
-                return null;
+                System.err.println("Invalid JSON payload: " + e.getMessage());
+                return NullNode.getInstance();
             }
+        }
+
+        return NullNode.getInstance();
+    }
+
+    public String getBody(String message) {
+        String[] parts = message.split("\n\n", 2);
+
+        if (parts.length > 1) {
+            return parts[1].replace("\u0000", "").trim();
         }
 
         return null;
