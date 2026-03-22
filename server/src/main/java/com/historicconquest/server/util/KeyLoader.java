@@ -9,9 +9,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class KeyLoaderUtil {
+public class KeyLoader {
     public static PrivateKey loadPrivateKey() throws Exception {
-        InputStream is = KeyLoaderUtil.class
+        InputStream is = KeyLoader.class
                 .getClassLoader()
                 .getResourceAsStream("keys/private.pem");
 
@@ -32,7 +32,7 @@ public class KeyLoaderUtil {
     }
 
     public static PublicKey loadPublicKey() throws Exception {
-        InputStream is = KeyLoaderUtil.class
+        InputStream is = KeyLoader.class
                 .getClassLoader()
                 .getResourceAsStream("keys/public.pem");
 

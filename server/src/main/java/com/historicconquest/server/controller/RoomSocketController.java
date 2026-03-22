@@ -4,7 +4,7 @@ import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.model.Room;
 import com.historicconquest.server.model.Player;
 import com.historicconquest.server.service.RoomService;
-import com.historicconquest.server.util.NameGeneratorUtil;
+import com.historicconquest.server.util.NameGenerator;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -39,7 +39,7 @@ public class RoomSocketController {
         if (!room.isHost(player.getId())) return;
 
 
-        Player newBot = new Player(NameGeneratorUtil.get(), "bot", room.getCode());
+        Player newBot = new Player(NameGenerator.get(), "bot", room.getCode());
 
         try {
             roomService.addPlayer(room.getCode(),  newBot);

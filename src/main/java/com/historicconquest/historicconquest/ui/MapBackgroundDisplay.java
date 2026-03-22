@@ -1,7 +1,7 @@
 package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.map.WorldMap;
-import com.historicconquest.historicconquest.util.TextureUtils;
+import com.historicconquest.historicconquest.util.Texture;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -29,7 +29,7 @@ public class MapBackgroundDisplay {
 
 
         // Texture
-        noiseLayer = TextureUtils.generatePaperGrain(1920, 1080, 0.1);
+        noiseLayer = Texture.generatePaperGrain(1920, 1080, 0.1);
         noiseLayer.setViewOrder(-1.0);
     }
 

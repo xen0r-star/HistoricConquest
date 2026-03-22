@@ -9,9 +9,9 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class KeyLoaderUtils {
+public class KeyLoader {
     public static PublicKey loadPublicKey() throws Exception {
-        InputStream is = KeyLoaderUtils.class.getResourceAsStream(Constant.PATH + "keys/public.pem");
+        InputStream is = KeyLoader.class.getResourceAsStream(Constant.PATH + "keys/public.pem");
         if (is == null) {
             throw new RuntimeException("public.pem not found");
         }

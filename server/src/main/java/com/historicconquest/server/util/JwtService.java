@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JwtServiceUtil {
+public class JwtService {
     private static final long VALIDITY_TIME = 2 * 60 * 60 * 1000; // 2 hours
     private static final PrivateKey privateKey;
     private static final PublicKey publicKey;
@@ -18,8 +18,8 @@ public class JwtServiceUtil {
 
     static {
         try {
-            privateKey = KeyLoaderUtil.loadPrivateKey();
-            publicKey = KeyLoaderUtil.loadPublicKey();
+            privateKey = KeyLoader.loadPrivateKey();
+            publicKey = KeyLoader.loadPublicKey();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load keys", e);

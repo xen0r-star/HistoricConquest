@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 
 import java.util.Random;
 
-public class TextureUtils {
+public class Texture {
     public static ImageView generatePaperGrain(int width, int height, double strength) {
         WritableImage img = new WritableImage(width, height);
         PixelWriter writer = img.getPixelWriter();

@@ -2,7 +2,7 @@ package com.historicconquest.server.util;
 
 import java.util.Random;
 
-public class NameGeneratorUtil {
+public class NameGenerator {
     private static final String[] ADJECTIVES = {
         "Swift", "Crazy", "Silent", "Dark", "Lucky", "Wild", "Fuzzy", "Brave"
     };

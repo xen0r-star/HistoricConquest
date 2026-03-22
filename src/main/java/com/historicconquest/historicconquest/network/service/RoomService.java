@@ -5,7 +5,7 @@ import com.historicconquest.historicconquest.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.network.event.RoomInfo;
 import com.historicconquest.historicconquest.network.stomp.SocketClient;
 import com.historicconquest.historicconquest.network.stomp.StompListener;
-import com.historicconquest.historicconquest.util.KeyLoaderUtils;
+import com.historicconquest.historicconquest.util.KeyLoader;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
@@ -51,7 +51,7 @@ public class RoomService {
 
     private JwtRoomClaims parseToken(String token) {
         try {
-            PublicKey publicKey = KeyLoaderUtils.loadPublicKey();
+            PublicKey publicKey = KeyLoader.loadPublicKey();
             Claims claims = Jwts.parserBuilder()
                 .setSigningKey(publicKey)
                 .build()
