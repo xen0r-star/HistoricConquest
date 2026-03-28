@@ -15,8 +15,6 @@ public class HelpPage {
     public static StackPane getHelpStackPane() throws IOException{
         FXMLLoader helpLoader = new FXMLLoader(HelpPage.class.getResource(Constant.PATH + "ui/HelpPage.fxml"));
         help_stackPane = helpLoader.load();
-//        stackPane.setAlignment(help_stackPane, Pos.TOP_RIGHT);
-//        stackPane.setMargin(help_stackPane, new Insets(30, 30, 0, 0));
         help_stackPane.setVisible(false);
         help_stackPane.setManaged(false);
         return help_stackPane;
