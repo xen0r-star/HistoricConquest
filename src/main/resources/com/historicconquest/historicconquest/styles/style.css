@@ -122,6 +122,12 @@
     -fx-text-fill: #EEDCBE;
 }
 
+.button-yellow {
+    -fx-background-color: #A99235;
+    -fx-border-color: #EEDCBE, #EEDCBE;
+    -fx-text-fill: #EEDCBE;
+}
+
 
 .button-beige:hover {
     -fx-background-color: #fae9cc;
@@ -143,6 +149,9 @@
     -fx-background-color: #884142;
 }
 
+.button-yellow:hover {
+    -fx-background-color: #887741;
+}
 
 
 .button-beige.not-hover:hover {
@@ -163,6 +172,49 @@
 
 .button-red.not-hover:hover {
     -fx-background-color: #632D2E;
+}
+
+
+.code-field {
+    -fx-padding: 10;
+
+    -fx-background-color: #EEDCBE;
+    -fx-background-radius: 3;
+    -fx-border-width: 0;
+
+    -fx-font-family: "Consolas";
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+    -fx-text-fill: #675932;
+}
+
+.radius-small {
+    -fx-background-radius: 5;
+}
+
+
+.button-beige.not-hover:hover {
+    -fx-background-color: #EEDCBE;
+}
+
+.button-green.not-hover:hover {
+    -fx-background-color: #635A2D;
+}
+
+.button-blue.not-hover:hover {
+    -fx-background-color: #2D5763;
+}
+
+.button-gray.not-hover:hover {
+    -fx-background-color: #535353;
+}
+
+.button-red.not-hover:hover {
+    -fx-background-color: #632D2E;
+}
+
+.button-yellow.not-hover:hover {
+    -fx-background-color: #A99235;
 }
 
 

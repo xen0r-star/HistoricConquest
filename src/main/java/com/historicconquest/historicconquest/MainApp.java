@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest;
 import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
+import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.game.NewGameConfig;
 import com.historicconquest.historicconquest.ui.GameHUD;
 import com.historicconquest.historicconquest.ui.NewGame;
@@ -15,8 +16,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -55,13 +55,15 @@ public class MainApp extends Application {
             getClass().getResource(Constant.PATH + "styles/style.css")
         ).toExternalForm());
 
-        stage.setScene(scene);
-        // stage.setFullScreen(true);
-        stage.setMaximized(true);
+
+        loadHelpPage();
+        NotificationController.initialize();
 
         showMenu();
-        loadHelpPage();
 
+
+        stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
@@ -71,6 +73,7 @@ public class MainApp extends Application {
             StackPane homePageRoot = loaderHomePage.load();
 
             appRoot.getChildren().setAll(homePageRoot);
+            showNotification();
 
         } catch (Exception e) {
             System.err.println("Error loading home page");
@@ -80,6 +83,7 @@ public class MainApp extends Application {
     public void showNewGame() {
         NewGame page = new NewGame();
         appRoot.getChildren().setAll(page.createView(this));
+        showNotification();
     }
 
     public void showMultiplayer() {
@@ -88,6 +92,7 @@ public class MainApp extends Application {
             StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
 
             appRoot.getChildren().setAll(multiplayerPageRoot);
+            showNotification();
 
         } catch (Exception e) {
             System.err.println("Error loading multiplayer page");
@@ -120,6 +125,7 @@ public class MainApp extends Application {
             navService.attachNavigation(gameHUDRoot, mapInterface);
 
             appRoot.getChildren().setAll(rootLayout);
+            showNotification();
 
         } catch (Exception e) {
             System.err.println("Error start game");
@@ -154,7 +160,7 @@ public class MainApp extends Application {
 
     private Image loadImage(String path) {
         return new Image(Objects.requireNonNull(
-                getClass().getResourceAsStream(Constant.PATH + path)
+            getClass().getResourceAsStream(Constant.PATH + path)
         ));
     }
 
@@ -177,6 +183,10 @@ public class MainApp extends Application {
         if (helpPageRoot == null) loadHelpPage();
         helpPageRoot.setVisible(show);
         helpPageRoot.setManaged(show);
+    }
+
+    public void showNotification() {
+        appRoot.getChildren().add(NotificationController.getNotificationsHost());
     }
 
     public Stage getStage() {
