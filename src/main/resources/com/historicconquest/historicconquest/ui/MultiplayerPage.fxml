@@ -298,7 +298,7 @@
                <Font name="Georgia Bold" size="14.0" />
             </font>
          </Label>
-         <Button fx:id="RefreshBtn" layoutX="251.0" layoutY="287.0" mnemonicParsing="false" onAction="#initialize" style="-fx-background-radius: 5; -fx-text-fill: #000000CC;" text="Refresh">
+         <Button layoutX="251.0" layoutY="287.0" mnemonicParsing="false" onAction="#initialize" style="-fx-background-radius: 5; -fx-text-fill: #000000CC;" text="Refresh">
             <styleClass>
                <String fx:value="button-small" />
                <String fx:value="button-beige" />
