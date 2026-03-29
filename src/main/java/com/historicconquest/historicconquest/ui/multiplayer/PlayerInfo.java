@@ -8,10 +8,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import java.net.URL;
+import java.util.Objects;
 
 public class PlayerInfo {
     @FXML private Pane root;
     @FXML private Label PlayerName;
+    @FXML private Label Annotation;
     @FXML private Label PlayerStatus;
     @FXML private Label PlayerPing;
     @FXML private ImageView PlayerIcon;
@@ -26,6 +28,12 @@ public class PlayerInfo {
     public void setPlayerName(String name) {
         if (PlayerName != null && name != null) {
             PlayerName.setText(name);
+        }
+    }
+
+    public void setAnnotation(String annotation) {
+        if (Annotation != null) {
+            Annotation.setText(Objects.requireNonNullElse(annotation, ""));
         }
     }
 

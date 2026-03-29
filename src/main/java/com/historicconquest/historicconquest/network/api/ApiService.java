@@ -2,13 +2,16 @@ package com.historicconquest.historicconquest.network.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.historicconquest.historicconquest.network.model.ErrorRequest;
 import com.historicconquest.historicconquest.network.model.NetworkPlayer;
 import javafx.application.Platform;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -20,26 +23,35 @@ public class ApiService {
 
 
 
-    public static HttpRequest checkRoom(String roomCode) {
-        return buildGet("/gameroom/check?roomCode=%s".formatted(roomCode));
+
+    public static boolean serverIsUp() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_BASE_URL + "/health"))
+                .GET()
+                .build();
+
+            HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+            return response.statusCode() == 200;
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
+
     public static HttpRequest createRoom(String playerName) {
+        playerName = URLEncoder.encode(playerName, StandardCharsets.UTF_8);
         return buildPost("/gameroom/create?playerName=%s".formatted(playerName));
     }
 
-    public static HttpRequest joinRoom(String roomCode, String playerName) {
-        return buildPost("/gameroom/join?roomCode=%s&playerName=%s".formatted(roomCode, playerName));
+    public static HttpRequest joinRoom(String roomCode) {
+        roomCode = URLEncoder.encode(roomCode, StandardCharsets.UTF_8);
+
+        return buildPost("/gameroom/join?roomCode=%s".formatted(roomCode));
     }
 
 
-
-    private static HttpRequest buildGet(String endpoint) {
-        return HttpRequest.newBuilder()
-            .uri(URI.create(API_BASE_URL + endpoint))
-            .GET()
-            .build();
-    }
 
     private static HttpRequest buildPost(String endpoint) {
         return HttpRequest.newBuilder()
@@ -72,20 +84,20 @@ public class ApiService {
 
     // RECORD ------------------------------------------------------------
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record CheckRoomResponse(
-        boolean exists
-    ) {}
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public record CreateRoomResponse(
         String roomCode,
-        String token
+        String token,
+
+        ErrorRequest error
     ) {}
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record JoinRoomResponse(
         String token,
-        Collection<NetworkPlayer> players
+        String pseudo,
+        Collection<NetworkPlayer> players,
+
+        ErrorRequest error
     ) {}
 }

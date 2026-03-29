@@ -22,9 +22,18 @@ public class Room {
         return hostId != null && hostId.equals(playerId);
     }
 
-
     public boolean isPossibleAddPlayer() {
         return players.size() < MAX_PLAYER;
+    }
+
+    public boolean isPseudoAvailable(String pseudo) {
+        for (Player player : players.values()) {
+            if (player.getPseudo().equals(pseudo)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void addPlayer(Player player) throws Exception {
@@ -37,6 +46,7 @@ public class Room {
     public void removePlayer(String playerId) {
         players.remove(playerId);
     }
+
 
 
 

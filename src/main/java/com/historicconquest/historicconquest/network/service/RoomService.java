@@ -1,17 +1,18 @@
 package com.historicconquest.historicconquest.network.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.network.event.RoomInfo;
 import com.historicconquest.historicconquest.network.stomp.SocketClient;
 import com.historicconquest.historicconquest.network.stomp.StompListener;
+import com.historicconquest.historicconquest.ui.Notification;
 import com.historicconquest.historicconquest.util.KeyLoader;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 import java.security.PublicKey;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -114,15 +115,15 @@ public class RoomService {
             @Override
             public void onMessage(String destination, String rawMessage) {
                 JsonNode payload = socketClient.getJson(rawMessage);
-                String type = payload.get("type").asText();
+//                String type = payload.get("type").asText();
+                String title = payload.get("title").asText();
                 String message = payload.get("message").asText();
 
-                if (Objects.equals(type, "ADD_BOT")) {
-                    System.err.println("Error add bot: " + message);
-
-                } else {
-                    System.err.println("Error: " + message);
-                }
+                NotificationController.show(
+                    title,
+                    message,
+                    Notification.Type.ALERT
+                );
             }
         };
     }
@@ -181,8 +182,8 @@ public class RoomService {
         try {
             pingTime = System.currentTimeMillis();
             socketClient.sendJson(
-                    "/app/ping",
-                    Map.of("timestamp", String.valueOf(pingTime))
+                "/app/ping",
+                Map.of("timestamp", String.valueOf(pingTime))
             );
 
         } catch (Exception e) {
@@ -197,7 +198,11 @@ public class RoomService {
             socketClient.sendNoData("/app/addBot");
 
         } catch (Exception e) {
-            System.err.println("Failed to add bot: " + e.getMessage());
+            NotificationController.show(
+                "Failed to add bot",
+                "Impossible to add bot to room, Please try again.",
+                Notification.Type.ALERT
+            );
         }
     }
 
@@ -214,7 +219,30 @@ public class RoomService {
             );
 
         } catch (Exception e) {
-            System.err.println("Failed to update status: " + e.getMessage());
+            NotificationController.show(
+                "Failed to switch status",
+                "Impossible to switch status, Please try again.",
+                Notification.Type.ALERT
+            );
+        }
+    }
+
+    public void updatePseudo(String newPseudo) {
+        try {
+            socketClient.sendJson(
+                "/app/update",
+                Map.of(
+                    "type", "PLAYER_PSEUDO_CHANGE",
+                    "data", newPseudo
+                )
+            );
+
+        } catch (Exception e) {
+            NotificationController.show(
+                "Failed to change pseudo",
+                "Impossible to change pseudo, Please try again.",
+                Notification.Type.ALERT
+            );
         }
     }
 
@@ -230,7 +258,11 @@ public class RoomService {
             );
 
         } catch (Exception e) {
-            System.err.println("Failed to kick player: " + e.getMessage());
+            NotificationController.show(
+                "Failed to kick player",
+                "Impossible to kick player, Please try again.",
+                Notification.Type.ALERT
+            );
         }
     }
 

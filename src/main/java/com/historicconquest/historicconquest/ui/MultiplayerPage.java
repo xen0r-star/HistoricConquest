@@ -2,11 +2,13 @@ package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
+import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.network.api.ApiService;
 import com.historicconquest.historicconquest.network.model.NetworkPlayer;
 import com.historicconquest.historicconquest.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.network.service.RoomService;
+import com.historicconquest.historicconquest.network.stomp.SocketClient;
 import com.historicconquest.historicconquest.ui.multiplayer.PlayerInfo;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -14,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.UnaryOperator;
 
 public class MultiplayerPage {
     private static final String PLAYER_ICON = Constant.PATH + "images/person.png";
@@ -40,14 +44,15 @@ public class MultiplayerPage {
         JOIN_CODE,
         JOIN_USERNAME,
         JOIN_ROOM,
-        HOST_ROOM
+        HOST_ROOM,
+        ERROR_SERVICE
     }
 
 
     @FXML private StackPane root;
     @FXML private Pane mapViewport;
 
-    @FXML private HBox SelectModePanel, JoinPanel, JoinPanel2, JoinPanel3, HostPanel;
+    @FXML private HBox SelectModePanel, JoinPanel, JoinPanel2, JoinPanel3, HostPanel, ErrorService;
 
     // SelectModePanel
     @FXML private Pane JoinPane;
@@ -71,6 +76,7 @@ public class MultiplayerPage {
     @FXML private Button AddBotHost, StartGameHost;
     @FXML private Label NumberPlayerHost, CodeGameHost;
     @FXML private VBox PlayerContainerHost;
+    
 
     private PanelState currentPanel = PanelState.SELECT_MODE;
 
@@ -81,17 +87,22 @@ public class MultiplayerPage {
 
     @FXML
     public void initialize() {
-        setPanel(PanelState.SELECT_MODE);
+        if (ApiService.serverIsUp() && SocketClient.serverIsUp()) {
+            setPanel(PanelState.SELECT_MODE);
 
-        configureSelectModeHandlers();
+            configureSelectModeHandlers();
+
+            configureJoinPanelCodeHandlers();
+            configureJoinPanelUsernameHandlers();
+            configureJoinPanelRoomHandlers();
+
+            configureHostPanelHandlers();
+
+        } else {
+            setPanel(PanelState.ERROR_SERVICE);
+        }
+
         configureBackHandler();
-
-        configureJoinPanelCodeHandlers();
-        configureJoinPanelUsernameHandlers();
-        configureJoinPanelRoomHandlers();
-
-        configureHostPanelHandlers();
-
         configureMapBackground();
     }
 
@@ -110,6 +121,15 @@ public class MultiplayerPage {
                 ApiService.createRoom("Host"),
                 ApiService.CreateRoomResponse.class,
                 response -> {
+                    if (response.error() != null) {
+                        NotificationController.show(
+                            response.error().title(),
+                            response.error().message(),
+                            Notification.Type.ERROR
+                        );
+                        return;
+                    }
+
                     String code = response.roomCode().substring(0, 3) + " " + response.roomCode().substring(3, 6);
                     CodeGameHost.setText(code);
                     this.roomService = new RoomService(response.token());
@@ -133,7 +153,7 @@ public class MultiplayerPage {
 
     private void configureBackHandler() {
         BackBtn.setOnAction(e -> {
-            if (currentPanel == PanelState.SELECT_MODE) {
+            if (currentPanel == PanelState.SELECT_MODE || currentPanel == PanelState.ERROR_SERVICE) {
                 MainApp.getInstance().showMenu();
                 return;
             }
@@ -156,60 +176,18 @@ public class MultiplayerPage {
 
     private void configureJoinPanelCodeHandlers() {
         JoinBtn.setOnAction(e -> ApiService.request(
-            ApiService.checkRoom(getEnteredRoomCode()),
-            ApiService.CheckRoomResponse.class,
-            response -> {
-                if (response.exists()) {
-                    setPanel(PanelState.JOIN_USERNAME);
-
-                } else {
-                    System.err.println("Impossible to join this room.");
-                }
-            }
-        ));
-
-        List<TextField> fields = getTextFields();
-        for (int i = 0; i < fields.size(); i++) {
-            int index = i;
-            TextField field = fields.get(i);
-
-            field.textProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal.isEmpty()) {
-                    return;
-                }
-
-                if (newVal.length() > 1 && newVal.length() <= fields.size()) {
-                    char[] chars = newVal.toUpperCase().toCharArray();
-                    for (int j = 0; j < chars.length && j < fields.size(); j++) {
-                        fields.get(j).setText(String.valueOf(chars[j]));
-                    }
-                    fields.get(Math.min(chars.length, fields.size()) - 1).requestFocus();
-                    return;
-                }
-
-                String value = newVal.substring(0, 1).toUpperCase();
-                if (!value.equals(field.getText())) {
-                    field.setText(value);
-                }
-
-                if (index < fields.size() - 1) {
-                    fields.get(index + 1).requestFocus();
-                }
-            });
-
-            field.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.BACK_SPACE && field.getText().isEmpty() && index > 0) {
-                    fields.get(index - 1).requestFocus();
-                }
-            });
-        }
-    }
-
-    private void configureJoinPanelUsernameHandlers() {
-        ViewRoomBtn.setOnAction(event -> ApiService.request(
-            ApiService.joinRoom(getEnteredRoomCode(), UsernameTF.getText()),
+            ApiService.joinRoom(getEnteredRoomCode()),
             ApiService.JoinRoomResponse.class,
             response -> {
+                if (response.error() != null) {
+                    NotificationController.show(
+                        response.error().title(),
+                        response.error().message(),
+                        Notification.Type.ERROR
+                    );
+                    return;
+                }
+
                 this.roomService = new RoomService(response.token());
                 roomService.setListener(createRoomListener());
 
@@ -222,11 +200,76 @@ public class MultiplayerPage {
                     ));
                 }
 
-                refreshJoinUI();
-
-                setPanel(PanelState.JOIN_ROOM);
+                setPanel(PanelState.JOIN_USERNAME);
             }
         ));
+
+
+        List<TextField> fields = getTextFields();
+        for (int i = 0; i < fields.size(); i++) {
+            int index = i;
+            TextField field = fields.get(i);
+
+            UnaryOperator<TextFormatter.Change> filter = change -> {
+                String newText = change.getControlNewText();
+
+                if (newText.isEmpty()) return change;
+                if (!newText.matches("\\d") ) return null;
+
+                return change;
+            };
+
+            field.setTextFormatter(new TextFormatter<>(filter));
+            field.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal.length() == 1 && index < fields.size() - 1) {
+                    fields.get(index + 1).requestFocus();
+                }
+            });
+
+            field.setOnKeyPressed(event -> {
+                if (Objects.requireNonNull(event.getCode()) == KeyCode.BACK_SPACE) {
+                    if (field.getText().isEmpty() && index > 0) {
+                        fields.get(index - 1).requestFocus();
+                    }
+                }
+            });
+
+            field.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.BACK_SPACE) {
+                    if (field.getText().isEmpty() && index > 0) {
+                        fields.get(index - 1).requestFocus();
+                    }
+                }
+
+                if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                    String paste = Clipboard.getSystemClipboard().getString().replace(" ", "");
+
+                    if (paste.matches("\\d+")) {
+                        char[] chars = paste.toCharArray();
+
+                        for (int j = 0; j < chars.length && (index + j) < fields.size(); j++) {
+                            fields.get(index + j).setText(String.valueOf(chars[j]));
+                        }
+
+                        int nextIndex = Math.min(index + chars.length, fields.size() - 1);
+                        fields.get(nextIndex).requestFocus();
+                    }
+
+                    event.consume();
+                }
+            });
+
+            field.setContextMenu(null);
+        }
+    }
+
+    private void configureJoinPanelUsernameHandlers() {
+        ViewRoomBtn.setOnAction(event -> {
+            roomService.updatePseudo(UsernameTF.getText());
+
+            refreshJoinUI();
+            setPanel(PanelState.JOIN_ROOM);
+        });
     }
 
     private void configureJoinPanelRoomHandlers() {
@@ -254,7 +297,11 @@ public class MultiplayerPage {
                 roomService.addBot();
 
             } else {
-                System.err.println("Too many players");
+                NotificationController.show(
+                    "Room Full",
+                    "You cannot add more bots because the room is full.",
+                    Notification.Type.INFORMATION
+                );
             }
         });
     }
@@ -441,6 +488,7 @@ public class MultiplayerPage {
                     player.getName(),
                     player.getStatus(),
                     player.getPing() + "ms",
+                    player.getId().equals(roomService.getPlayerId()),
                     player.isRobot(),
                     (isHost && player.isRemovable()) ? () -> {
                         roomPlayers.remove(player);
@@ -480,6 +528,7 @@ public class MultiplayerPage {
         String playerName,
         String status,
         String ping,
+        boolean isMe,
         boolean isRobot,
         Runnable onRemove
     ) {
@@ -490,6 +539,7 @@ public class MultiplayerPage {
 
             if (playerInfo != null) {
                 playerInfo.setPlayerName(playerName);
+                playerInfo.setAnnotation(isMe ? "(you)" : null);
                 playerInfo.setPlayerStatus(status);
 
                 if (!isRobot) playerInfo.setPlayerPing(ping);
@@ -543,5 +593,6 @@ public class MultiplayerPage {
         JoinPanel2.setVisible(panel == PanelState.JOIN_USERNAME);
         JoinPanel3.setVisible(panel == PanelState.JOIN_ROOM);
         HostPanel.setVisible(panel == PanelState.HOST_ROOM);
+        ErrorService.setVisible(panel == PanelState.ERROR_SERVICE);
     }
 }

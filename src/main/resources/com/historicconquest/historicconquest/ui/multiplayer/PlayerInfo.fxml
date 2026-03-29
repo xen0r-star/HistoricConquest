@@ -7,15 +7,24 @@
 <?import javafx.scene.text.*?>
 
 <Pane fx:id="root" prefWidth="608.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.multiplayer.PlayerInfo">
-    <HBox prefHeight="25.0" prefWidth="200.0" spacing="6.0">
+    <HBox prefHeight="25.0" spacing="6.0">
         <ImageView fx:id="PlayerIcon" fitHeight="25.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../../images/robots.png" />
+            <Image url="@../../images/person.png" />
         </ImageView>
-        <Label fx:id="PlayerName" alignment="BOTTOM_LEFT" ellipsisString="" minWidth="-Infinity" prefHeight="25.0" style="-fx-text-fill: #463c27;" text="Joueur 1">
-            <font>
-                <Font name="System Bold" size="16.0" />
-            </font>
-        </Label>
+        <HBox prefHeight="25.0">
+            <Label fx:id="PlayerName" alignment="BOTTOM_LEFT" ellipsisString="" minWidth="-Infinity" prefHeight="25.0"
+                   style="-fx-text-fill: #463c27;" text="Joueur 1">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+            <Label fx:id="Annotation" ellipsisString="" minWidth="-Infinity" opacity="0.6" prefHeight="25.0"
+                   style="-fx-text-fill: #463c27;" text="(you)">
+                <font>
+                    <Font name="System Bold" size="14.0"/>
+                </font>
+            </Label>
+        </HBox>
         <Label fx:id="PlayerStatus" minWidth="-Infinity" prefHeight="25.0" style="-fx-text-fill: #463c27; -fx-background-color: #00000022; -fx-background-radius: 5;" text="READY">
          <padding>
             <Insets left="7.0" right="7.0" />

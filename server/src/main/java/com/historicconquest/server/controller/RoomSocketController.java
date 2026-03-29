@@ -36,32 +36,43 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
-        if (!room.isHost(player.getId())) return;
+        if (room.isHost(player.getId())) {
+            Player newBot = new Player(NameGenerator.get(), "bot", room.getCode());
 
+            try {
+                roomService.addPlayer(room.getCode(),  newBot);
 
-        Player newBot = new Player(NameGenerator.get(), "bot", room.getCode());
+            } catch (Exception e) {
+                messagingTemplate.convertAndSendToUser(
+                    playerId,
+                    "/queue/errors",
+                    Map.of(
+                        "type", "ADD_BOT",
+                        "title", "Failed to add bot",
+                        "message", e.getMessage()
+                    )
+                );
+            }
 
-        try {
-            roomService.addPlayer(room.getCode(),  newBot);
+            messagingTemplate.convertAndSend(
+                "/topic/room-" + roomCode,
+                (Object) Map.of(
+                    "type", "PLAYER_JOIN",
+                    "player", newBot
+                )
+            );
 
-        } catch (Exception e) {
+        } else {
             messagingTemplate.convertAndSendToUser(
                 playerId,
                 "/queue/errors",
                 Map.of(
                     "type", "ADD_BOT",
-                    "message", e.getMessage()
+                    "title", "Failed to add bot",
+                    "message", "Only the host can add bots"
                 )
             );
         }
-
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) Map.of(
-                "type", "PLAYER_JOIN",
-                "player", newBot
-            )
-        );
     }
 
 
@@ -83,7 +94,21 @@ public class RoomSocketController {
                 break;
 
             case "PLAYER_PSEUDO_CHANGE":
-                player.setPseudo(data);
+                if (room.isPseudoAvailable(data)) {
+                    player.setPseudo(data);
+
+                } else {
+                    messagingTemplate.convertAndSendToUser(
+                        playerId,
+                        "/queue/errors",
+                        Map.of(
+                            "type", "PLAYER_PSEUDO_CHANGE",
+                            "title", "Failed to change pseudo",
+                            "message", "This pseudo is already taken"
+                        )
+                    );
+                    return;
+                }
                 break;
 
             case "PLAYER_STATUS_CHANGE":
@@ -131,19 +156,29 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
-        if (!room.isHost(player.getId())) return;
+        if (room.isHost(player.getId())) {
+            String playerIdToKick = payload.get("playerId");
+            roomService.removePlayer(roomCode, playerIdToKick);
 
+            messagingTemplate.convertAndSend(
+                "/topic/room-" + roomCode,
+                (Object) Map.of(
+                    "type", "PLAYER_KICK",
+                    "playerId", playerIdToKick
+                )
+            );
 
-        String playerIdToKick = payload.get("playerId");
-        roomService.removePlayer(roomCode, playerIdToKick);
-
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) Map.of(
-                "type", "PLAYER_KICK",
-                "playerId", playerIdToKick
-            )
-        );
+        } else {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "KICK_PLAYER",
+                    "title", "Failed to kick player",
+                    "message", "Only the host can kick players"
+                )
+            );
+        }
     }
 
 
@@ -156,15 +191,28 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
-        if (!room.isHost(player.getId())) return;
+        if (!room.isHost(player.getId())) {
+            roomService.deleteRoom(roomCode);
 
-        roomService.deleteRoom(roomCode);
+            messagingTemplate.convertAndSend(
+                "/topic/room-" + roomCode,
+                (Object) Map.of(
+                    "type", "ROOM_DELETED"
+                )
+            );
 
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) Map.of(
-                "type", "ROOM_DELETED"
-            )
-        );
+        } else {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "DELETE_ROOM",
+                    "title", "Failed to delete room",
+                    "message", "Only the host can delete the room"
+                )
+            );
+        }
+
+
     }
 }

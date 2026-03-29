@@ -50,7 +50,7 @@
          <Insets bottom="100.0" left="100.0" right="100.0" top="100.0" />
       </StackPane.margin>
    </VBox>
-   <HBox fx:id="SelectModePanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+   <HBox fx:id="SelectModePanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -167,7 +167,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -209,7 +209,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -266,6 +266,46 @@
          </VBox>
          <styleClass>
             <String fx:value="button-green" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <HBox fx:id="ErrorService" alignment="TOP_CENTER" layoutX="60.0" layoutY="310.0" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <Pane maxHeight="350.0" maxWidth="601.0" prefHeight="350.0" prefWidth="601.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox alignment="CENTER" layoutX="75.0" layoutY="40.0" prefHeight="107.0" prefWidth="450.0" spacing="13.0">
+            <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/server-outline.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="81.0" prefWidth="309.0" text="Service temporarily unavailable" textFill="#eedcbe" wrapText="true">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="72.0" layoutY="160.0" lineSpacing="3.0" prefHeight="63.0" prefWidth="457.0" text="We are currently experiencing technical difficulties connecting to our servers. Please check your internet connection or try again in a few moments." textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="72.0" layoutY="223.0" lineSpacing="3.0" prefHeight="48.0" prefWidth="457.0" text="If the problem persists, please visit our service status page or help centre for more information on the network status." textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <Button fx:id="RefreshBtn" layoutX="251.0" layoutY="287.0" mnemonicParsing="false" onAction="#initialize" style="-fx-background-radius: 5; -fx-text-fill: #000000CC;" text="Refresh">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <styleClass>
+            <String fx:value="button-red" />
             <String fx:value="not-hover" />
          </styleClass>
       </Pane>
