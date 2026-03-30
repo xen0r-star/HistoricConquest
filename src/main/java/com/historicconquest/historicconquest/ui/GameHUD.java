@@ -1,6 +1,6 @@
 package com.historicconquest.historicconquest.ui;
 
-import com.historicconquest.historicconquest.util.TextureUtils;
+import com.historicconquest.historicconquest.util.Texture;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
@@ -14,7 +14,7 @@ public class GameHUD {
 
     @FXML
     public void initialize() {
-        ImageView noiseLayer = TextureUtils.generatePaperGrain(1920, 1080, 0.1);
+        ImageView noiseLayer = Texture.generatePaperGrain(1920, 1080, 0.1);
 
         noiseLayer.fitWidthProperty().bind(root.widthProperty());
         noiseLayer.fitHeightProperty().bind(root.heightProperty());

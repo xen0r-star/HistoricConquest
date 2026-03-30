@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
+import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -86,16 +87,10 @@ public class NewGame {
 
 
         // Initialise la map derrière (centrée + visible)
-
-        MapBackgroundDisplay mapDisplay = new MapBackgroundDisplay(
-                    root, mapViewport,
-                    0.80, 0.80,
-                    -55,   // translateX (gauche)
-                    -30,   // translateY (haut)
-                    -0.03  // centerBiasX (micro-ajustement visuel)
-            );
-            mapDisplay.initialize();
-        ;
+        MapBackgroundController.show(
+            root, mapViewport,
+            -55 ,-30, -0.03
+        );
 
         // ===== UI New Game =====
         String[] pawnImages = {

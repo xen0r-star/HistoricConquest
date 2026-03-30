@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.MainApp;
+import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
@@ -31,7 +32,8 @@ public class HomePage {
         });
 
         multiplayerBtn.setOnAction(e -> {
-            System.out.println("Multiplayer mode");
+            multiplayerBtn.setDisable(true);
+            MainApp.getInstance().showMultiplayer();
         });
 
         settingsBtn.setOnAction(e -> {
@@ -45,12 +47,9 @@ public class HomePage {
 
 
 
-        // Affichage de la map décoration en arrière-plan
-        MapBackgroundDisplay mapDisplay = new MapBackgroundDisplay(
+        MapBackgroundController.show(
             root, mapViewport,
-            0.80, 0.80,
             -55 ,-30, -0.03
         );
-        mapDisplay.initialize();
     }
 }

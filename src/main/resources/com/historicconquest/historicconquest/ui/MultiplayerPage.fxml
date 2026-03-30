@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.MultiplayerPage">
+   <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #907f66; -fx-border-width: 2;">
+      <StackPane.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </StackPane.margin>
+   </Pane>
+   <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" styleClass="map-grid-transparent" stylesheets="@../styles/style.css">
+      <StackPane.margin>
+         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+      </StackPane.margin>
+   </Region>
+   <Pane fx:id="mapViewport" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent;">
+      <StackPane.margin>
+         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+      </StackPane.margin>
+   </Pane>
+   <Region mouseTransparent="true" prefHeight="400.0" prefWidth="290.0" styleClass="HUD-border" StackPane.alignment="CENTER">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Region>
+   <VBox alignment="TOP_CENTER">
+      <Label alignment="CENTER" style="-fx-text-fill: #FFF8ED;" styleClass="title-label" stylesheets="@../styles/style.css" text="HISTORIC" textAlignment="CENTER" textOverrun="CLIP">
+         <VBox.margin>
+            <Insets bottom="-80.0" />
+         </VBox.margin>
+      </Label>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="97.0">
+         <Circle fill="#fff4e3" radius="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+         <Region maxHeight="2.0" mouseTransparent="true" prefHeight="2.0" prefWidth="400.0" style="-fx-background-color: #FFF4E3;" StackPane.alignment="CENTER">
+            </Region>
+         <Circle fill="#fff4e3" radius="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+      </HBox>
+      <Label alignment="CENTER" styleClass="title-label" stylesheets="@../styles/style.css" text="CONQUEST" textAlignment="CENTER" textOverrun="CLIP">
+         <VBox.margin>
+            <Insets top="-50.0" />
+         </VBox.margin>
+      </Label>
+      <StackPane.margin>
+         <Insets bottom="100.0" left="100.0" right="100.0" top="100.0" />
+      </StackPane.margin>
+   </VBox>
+   <HBox fx:id="SelectModePanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <Pane fx:id="JoinPane" maxHeight="350.0" maxWidth="300.0" prefHeight="350.0" prefWidth="300.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" styleClass="button-blue">
+         <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="100.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../images/globe-outline.png" />
+         </ImageView>
+         <Label alignment="CENTER" layoutX="34.0" layoutY="129.0" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
+            <font>
+               <Font name="Georgia Bold" size="30.0" />
+            </font>
+         </Label>
+         <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="34.0" layoutY="192.0" lineSpacing="3.0" prefHeight="131.0" prefWidth="232.0" text="Enter a game code to join a match hosted by another player. Ask the host for the code and jump straight into the game." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+      </Pane>
+      <Pane fx:id="HostPane" maxHeight="350.0" maxWidth="300.0" prefHeight="350.0" prefWidth="300.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" styleClass="button-green">
+         <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="100.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../images/flash.png" />
+         </ImageView>
+         <Label alignment="CENTER" layoutX="34.0" layoutY="129.0" prefHeight="34.0" prefWidth="232.0" text="HOST GAME" textFill="#eedcbe">
+            <font>
+               <Font name="Georgia Bold" size="30.0" />
+            </font>
+         </Label>
+         <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="34.0" layoutY="192.0" lineSpacing="3.0" prefHeight="131.0" prefWidth="232.0" text="Enter a game code to join a match hosted by another player. Ask the host for the code and jump straight into the game." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+      </Pane>
+   </HBox>
+   <HBox fx:id="JoinPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox layoutX="217.0" layoutY="62.0">
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/globe-outline.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="116.0" layoutY="109.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="469.0" text="Enter a game code provided by the host to join an online match." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <HBox fx:id="CodeBox" alignment="CENTER" layoutX="206.0" layoutY="163.0" spacing="10">
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+            <TextField alignment="CENTER" prefWidth="40" styleClass="code-field" />
+         </HBox>
+         <Button fx:id="JoinBtn" layoutX="222.0" layoutY="243.0" mnemonicParsing="false" text="JOIN">
+            <styleClass>
+               <String fx:value="button-main" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <HBox fx:id="JoinPanel2" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox layoutX="217.0" layoutY="62.0">
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/globe-outline.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="116.0" layoutY="109.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="469.0" text="Choose a username that other players will see in the game." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <TextField fx:id="UsernameTF" alignment="CENTER" layoutX="150.0" layoutY="163.0" prefWidth="400.0" styleClass="code-field" />
+         <Button fx:id="ViewRoomBtn" layoutX="222.0" layoutY="243.0" mnemonicParsing="false" text="VIEW ROOM">
+            <styleClass>
+               <String fx:value="button-main" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox layoutX="277.0" layoutY="36.0" spacing="12.0">
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/globe-outline.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="34.0" text="GAME" textFill="#eedcbe">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="91.0" layoutY="83.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="518.0" text="The game will start as soon as everyone is ready." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <Label fx:id="NumberPlayerJoin" layoutX="32.0" layoutY="118.0" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1 / 4" />
+         <Button fx:id="StatusJoin" layoutX="568.0" layoutY="118.0" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-radius: 5;" text="Ready">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <VBox fx:id="PlayerContainerJoin" layoutX="32.0" layoutY="163.0" prefWidth="636.0" spacing="6.0">
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+         </VBox>
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox layoutX="227.0" layoutY="36.0" spacing="12.0">
+            <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/flash.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="34.0" text="HOST GAME" textFill="#eedcbe">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="91.0" layoutY="83.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="518.0" text="Create a new game lobby and share the game code with friends to join." textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <HBox layoutX="32.0" layoutY="118.0" prefHeight="35.0" spacing="15.0">
+            <Label fx:id="NumberPlayerHost" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1 / 4" />
+            <Button fx:id="AddBotHost" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-radius: 5;" text="Bot" textOverrun="LEADING_WORD_ELLIPSIS">
+               <styleClass>
+                  <String fx:value="button-small" />
+                  <String fx:value="button-beige" />
+               </styleClass>
+               <graphic>
+                  <ImageView fitHeight="25.0" fitWidth="26.0" opacity="0.5" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../images/add-outline.png" />
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+         </HBox>
+         <HBox layoutX="432.0" layoutY="118.0" prefHeight="35.0" spacing="15.0">
+            <Label fx:id="CodeGameHost" style="-fx-text-fill: #443b20; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #faefd9; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand" text="000 000" />
+            <Button fx:id="StartGameHost" mnemonicParsing="false" style="-fx-background-radius: 5;" text="Start Game">
+               <styleClass>
+                  <String fx:value="button-small" />
+                  <String fx:value="button-beige" />
+               </styleClass>
+            </Button>
+         </HBox>
+         <VBox fx:id="PlayerContainerHost" layoutX="32.0" layoutY="163.0" prefWidth="636.0" spacing="6.0">
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+            <Pane prefHeight="36.0" style="-fx-background-color: #EEDCBE88;" styleClass="radius-small" />
+         </VBox>
+         <styleClass>
+            <String fx:value="button-green" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <HBox fx:id="ErrorService" alignment="TOP_CENTER" layoutX="60.0" layoutY="310.0" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+      <padding>
+         <Insets top="25.0" />
+      </padding>
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <Pane maxHeight="350.0" maxWidth="601.0" prefHeight="350.0" prefWidth="601.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox alignment="CENTER" layoutX="75.0" layoutY="40.0" prefHeight="107.0" prefWidth="450.0" spacing="13.0">
+            <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../images/server-outline.png" />
+            </ImageView>
+            <Label alignment="CENTER" prefHeight="81.0" prefWidth="309.0" text="Service temporarily unavailable" textFill="#eedcbe" wrapText="true">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="72.0" layoutY="160.0" lineSpacing="3.0" prefHeight="63.0" prefWidth="457.0" text="We are currently experiencing technical difficulties connecting to our servers. Please check your internet connection or try again in a few moments." textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <Label alignment="TOP_LEFT" contentDisplay="TOP" layoutX="72.0" layoutY="223.0" lineSpacing="3.0" prefHeight="48.0" prefWidth="457.0" text="If the problem persists, please visit our service status page or help centre for more information on the network status." textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="14.0" />
+            </font>
+         </Label>
+         <Button layoutX="251.0" layoutY="287.0" mnemonicParsing="false" onAction="#initialize" style="-fx-background-radius: 5; -fx-text-fill: #000000CC;" text="Refresh">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <styleClass>
+            <String fx:value="button-red" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <Button fx:id="BackBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" text="Back" StackPane.alignment="TOP_LEFT">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+      </StackPane.margin>
+      <styleClass>
+         <String fx:value="button-small" />
+         <String fx:value="button-red" />
+      </styleClass>
+      <graphic>
+         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../images/caret-back-outline.png" />
+         </ImageView>
+      </graphic>
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+      </padding>
+   </Button>
+</StackPane>

@@ -1,15 +1,11 @@
 package com.historicconquest.historicconquest;
 
-import com.historicconquest.historicconquest.controller.NotificationController;
+import com.historicconquest.historicconquest.controller.*;
 import com.historicconquest.historicconquest.map.WorldMap;
-import com.historicconquest.historicconquest.controller.GameController;
-import com.historicconquest.historicconquest.controller.MapNavigationService;
 import com.historicconquest.historicconquest.game.NewGameConfig;
 import com.historicconquest.historicconquest.ui.GameHUD;
-import com.historicconquest.historicconquest.controller.HelpController;
 import com.historicconquest.historicconquest.ui.NewGame;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
-import com.historicconquest.historicconquest.controller.SettingsController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -59,6 +55,8 @@ public class MainApp extends Application {
         HelpController.initialize();
         SettingsController.initialize();
         NotificationController.initialize();
+
+        MapBackgroundController.initialize();
 
         showMenu();
 

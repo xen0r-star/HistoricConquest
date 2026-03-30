@@ -1,0 +1,64 @@
+package com.historicconquest.server.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.historicconquest.server.util.JwtService;
+import java.util.UUID;
+
+public class Player {
+    private final String id;
+
+    @JsonIgnore private final String token;
+
+    private String pseudo;
+    private String color;
+    private final String type;
+    private String status;
+    private int ping;
+
+
+    public Player(String pseudo, String type, String roomCode) {
+        this.id = UUID.randomUUID().toString();
+        this.token = JwtService.generateToken(id, roomCode);
+        this.pseudo = pseudo;
+        this.type = type;
+        this.status = "Waiting";
+    }
+
+    @JsonProperty public String getId() {
+        return id;
+    }
+    @JsonProperty public String getType() {
+        return type;
+    }
+    @JsonProperty public String getPseudo() {
+        return pseudo;
+    }
+    @JsonProperty public String getColor() {
+        return color;
+    }
+    @JsonProperty public String getStatus() {
+        return status;
+    }
+    @JsonProperty public int getPing() {
+        return ping;
+    }
+
+    @JsonIgnore public String getToken() {
+        return token;
+    }
+
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    public void setPing(int ping) {
+        this.ping = ping;
+    }
+}

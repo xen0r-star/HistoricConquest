@@ -38,7 +38,7 @@ public class NotificationController {
 
 	public static void show(String title, String message, Notification.Type type, int ttlMillis) {
 		if (root == null) {
-			System.err.println("Error: NotificationController not initialized. Call NotificationController.initialize() first.");
+			System.err.println("[" + type.toString() + "] " + message);
 			return;
 		}
 
@@ -79,7 +79,7 @@ public class NotificationController {
 				notificationController.startClosingAnimation();
 
 			} catch (Exception e) {
-				System.err.println("Error showing notification: " + e.getMessage());
+				System.err.println("[" + type.toString() + "] " + message);
 			}
 		});
 	}
