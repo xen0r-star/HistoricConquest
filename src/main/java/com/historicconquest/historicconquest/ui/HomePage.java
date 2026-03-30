@@ -39,18 +39,9 @@ public class HomePage {
         });
 
 
-        settingsBtn.setOnAction(e -> {
-            MainApp.getInstance().showSettings(true , root);
-
-        });
-
-        helpBtn.setOnAction(e -> {
-            MainApp.getInstance().showHelp(true, root);
-        });
-
-        exitBtn.setOnAction(e -> {
-             MainApp.getInstance().exit();
-        });
+        settingsBtn.setOnAction(e -> MainApp.getInstance().showSettings(true));
+        helpBtn.setOnAction(    e -> MainApp.getInstance().showHelp(true));
+        exitBtn.setOnAction(    e -> MainApp.getInstance().exit());
 
 
 

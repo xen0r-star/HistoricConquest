@@ -6,17 +6,16 @@ import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
 import com.historicconquest.historicconquest.game.NewGameConfig;
 import com.historicconquest.historicconquest.ui.GameHUD;
-import com.historicconquest.historicconquest.ui.HelpPage;
+import com.historicconquest.historicconquest.controller.HelpController;
 import com.historicconquest.historicconquest.ui.NewGame;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
-import com.historicconquest.historicconquest.ui.PageSettings;
-import com.historicconquest.historicconquest.ui.PageSettingsController;
+import com.historicconquest.historicconquest.controller.SettingsController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -25,13 +24,10 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class MainApp extends Application {
-
     private final Group mapInterface = new Group();
 
     private Stage stage;
     private static StackPane appRoot;
-    private Parent helpPageRoot;
-    private Parent settingsPageRoot ;
     private static MainApp instance;
 
 
@@ -60,7 +56,8 @@ public class MainApp extends Application {
         ).toExternalForm());
 
 
-        loadHelpPage();
+        HelpController.initialize();
+        SettingsController.initialize();
         NotificationController.initialize();
 
         showMenu();
@@ -71,13 +68,14 @@ public class MainApp extends Application {
         stage.show();
     }
 
+
+
     public void showMenu() {
         try {
             FXMLLoader loaderHomePage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HomePage.fxml"));
             StackPane homePageRoot = loaderHomePage.load();
 
-            appRoot.getChildren().setAll(homePageRoot);
-            showNotification();
+            setAppContent(homePageRoot);
 
         } catch (Exception e) {
             System.err.println("Error loading home page");
@@ -86,8 +84,7 @@ public class MainApp extends Application {
 
     public void showNewGame() {
         NewGame page = new NewGame();
-        appRoot.getChildren().setAll(page.createView(this));
-        showNotification();
+        setAppContent(page.createView(this));
     }
 
     public void showMultiplayer() {
@@ -95,12 +92,41 @@ public class MainApp extends Application {
             FXMLLoader loaderMultiplayerPage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/MultiplayerPage.fxml"));
             StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
 
-            appRoot.getChildren().setAll(multiplayerPageRoot);
-            showNotification();
+            setAppContent(multiplayerPageRoot);
 
         } catch (Exception e) {
             System.err.println("Error loading multiplayer page");
         }
+    }
+
+
+
+    public void showSettings(boolean show) {
+        StackPane settings = SettingsController.getSettings();
+        if (settings == null) return;
+
+        addOverlay(settings);
+        if (show) {
+            SettingsController.show();
+            settings.toFront();
+            return;
+        }
+
+        SettingsController.close();
+    }
+
+    public void showHelp(boolean show) {
+        StackPane help = HelpController.getHelp();
+        if (help == null) return;
+
+        addOverlay(help);
+        if (show) {
+            HelpController.show();
+            help.toFront();
+            return;
+        }
+
+        HelpController.close();
     }
 
     public void startGame(NewGameConfig config) {
@@ -128,8 +154,7 @@ public class MainApp extends Application {
             MapNavigationService navService = new MapNavigationService();
             navService.attachNavigation(gameHUDRoot, mapInterface);
 
-            appRoot.getChildren().setAll(rootLayout);
-            showNotification();
+            setAppContent(rootLayout);
 
         } catch (Exception e) {
             System.err.println("Error start game");
@@ -145,6 +170,7 @@ public class MainApp extends Application {
     public void exit() {
         stage.close();
     }
+
 
 
     private StackPane createLayout(StackPane gameHUDRoot, ZoneInfoPanel zoneInfoPanel) {
@@ -168,92 +194,27 @@ public class MainApp extends Application {
         ));
     }
 
-    private void loadHelpPage() {
-        try {
+    private void setAppContent(Node content) {
+        appRoot.getChildren().setAll(content);
 
-            helpPageRoot = HelpPage.getHelpStackPane();
-            appRoot.setAlignment(helpPageRoot, Pos.TOP_RIGHT);
-            appRoot.setMargin(helpPageRoot, new Insets(30, 30, 0, 0));
-            appRoot.getChildren().add(helpPageRoot);
-
-        } catch (Exception e) {
-            System.err.println("Error loading help page: " + e.getMessage());
-        }
+        addOverlay(SettingsController.getSettings());
+        addOverlay(HelpController.getHelp());
+        addOverlay(NotificationController.getNotifications());
     }
 
-    public void showHelp(boolean show, StackPane currentRoot) {
-        if (helpPageRoot == null) loadHelpPage();
+    private void addOverlay(Node overlay) {
+        if (overlay == null) return;
 
-        if (show) {
-            //pour afficher dans le root newgame et pas dans le root homepage
-            if (!currentRoot.getChildren().contains(helpPageRoot)) {
-                currentRoot.getChildren().add(helpPageRoot);
-            }
-            helpPageRoot.toFront(); // On la met tout devant
+        if (overlay.getParent() instanceof Pane parent && parent != appRoot) {
+            parent.getChildren().remove(overlay);
         }
 
-        helpPageRoot.setVisible(show);
-        helpPageRoot.setManaged(show);
-    }
-
-
-    private Parent loadSettingsPage() {
-        // On appelle ta classe PageSettings qui charge le FXML
-        return PageSettings.getSettingsStackPane();
-    }
-
-
-    public void showSettings(boolean show, StackPane currentRoot) {
-        // 1. Charger les paramètres s'ils ne le sont pas encore
-        if (settingsPageRoot == null) {
-            settingsPageRoot = loadSettingsPage();
-        }
-
-        if (show && settingsPageRoot != null && currentRoot != null) {
-            // 2. Nettoyer le parent précédent (si on change de vue)
-            if (settingsPageRoot.getParent() != null && settingsPageRoot.getParent() != currentRoot) {
-                ((StackPane) settingsPageRoot.getParent()).getChildren().remove(settingsPageRoot);
-            }
-
-            // 3. Ajouter au root actuel s'il n'y est pas
-            if (!currentRoot.getChildren().contains(settingsPageRoot)) {
-                currentRoot.getChildren().add(settingsPageRoot);
-            }
-
-            // 4. Mettre tout devant
-            settingsPageRoot.toFront();
-        }
-
-        // 5. Afficher ou masquer
-        if (settingsPageRoot != null) {
-            settingsPageRoot.setVisible(show);
-            settingsPageRoot.setManaged(show);
+        if (!appRoot.getChildren().contains(overlay)) {
+            appRoot.getChildren().add(overlay);
         }
     }
 
 
-    public static StackPane getSettingsStackPane() {
-        try {
-            FXMLLoader loader = new FXMLLoader(PageSettings.class.getResource("/com/historicconquest/historicconquest/ui/SettingsPage.fxml"));
-            StackPane root = loader.load();
-
-            // Récupérer le contrôleur pour lui donner le Stage principal
-            PageSettingsController controller = loader.getController();
-            controller.setStage(MainApp.getInstance().getStage());
-
-            return root;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new StackPane();
-        }
-    }
-
-    public void showNotification() {
-        appRoot.getChildren().add(NotificationController.getNotificationsHost());
-    }
-    public Stage getStage() {
-        return stage;
-    }
 
     public static MainApp getInstance() {
         return instance;

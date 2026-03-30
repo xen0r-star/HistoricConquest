@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.PageSettingsController">
+<StackPane maxHeight="650.0" maxWidth="700.0" minHeight="650.0" minWidth="700.0" prefHeight="650.0" prefWidth="700.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.SettingsPage">
 
     <!-- PANNEAU PRINCIPAL -->
-    <VBox alignment="CENTER" maxHeight="600" maxWidth="750" spacing="0" styleClass="settings-panel">
+    <VBox alignment="CENTER" maxHeight="600" maxWidth="750">
 
         <!-- TITRE DU PANNEAU -->
-        <HBox alignment="CENTER_LEFT" styleClass="settings-header">
-            <Label styleClass="settings-title" text="PARAMÈTRES" />
+        <HBox alignment="CENTER_LEFT">
+            <Label text="PARAMÈTRES" textFill="WHITE" />
         </HBox>
 
         <!-- CONTENU SCROLLABLE -->
-        <VBox spacing="25" styleClass="settings-content">
+        <VBox spacing="25">
             <padding>
                 <Insets bottom="30" left="40" right="40" top="30" />
             </padding>
 
             <!-- SECTION : AUDIO -->
-            <Label styleClass="settings-section-title" text="— AUDIO" />
+            <Label text="— AUDIO" textFill="WHITE" />
 
-            <GridPane hgap="20" styleClass="settings-grid" vgap="18">
+            <GridPane hgap="20" vgap="18">
                 <!-- Musique -->
-                <Label styleClass="settings-label" text="Musique" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <Slider fx:id="musicSlider" max="100" min="0" prefWidth="320" styleClass="settings-slider" value="80" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <Label fx:id="musicValueLabel" styleClass="settings-value" text="80%" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <Label minWidth="-Infinity" text="Musique" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Slider fx:id="musicSlider" prefWidth="320" value="80" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label fx:id="musicValueLabel" minWidth="-Infinity" text="80%" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="0" />
 
                 <!-- Effets sonores -->
-                <Label styleClass="settings-label" text="Effets sonores" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <Slider fx:id="sfxSlider" max="100" min="0" prefWidth="320" styleClass="settings-slider" value="70" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label fx:id="sfxValueLabel" styleClass="settings-value" text="70%" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <Label minWidth="-Infinity" text="Effets sonores" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Slider fx:id="sfxSlider" prefWidth="320" value="70" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label fx:id="sfxValueLabel" text="70%" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
                 <!-- Muet -->
-                <Label styleClass="settings-label" text="Muet" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <CheckBox fx:id="muteCheck" styleClass="settings-checkbox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label minWidth="-Infinity" text="Muet" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <CheckBox fx:id="muteCheck" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <columnConstraints>
                <ColumnConstraints />
                <ColumnConstraints />
@@ -50,23 +51,23 @@
             </GridPane>
 
             <!-- SÉPARATEUR -->
-            <HBox styleClass="settings-separator" />
+            <HBox />
 
             <!-- SECTION : AFFICHAGE -->
-            <Label styleClass="settings-section-title" text="— AFFICHAGE" />
+            <Label text="— AFFICHAGE" textFill="WHITE" />
 
-            <GridPane hgap="20" styleClass="settings-grid" vgap="18">
+            <GridPane hgap="20" vgap="18">
                 <!-- Résolution -->
-                <Label styleClass="settings-label" text="Résolution" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <ComboBox fx:id="resolutionCombo" prefWidth="200" styleClass="settings-combo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label minWidth="-Infinity" text="Résolution" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="resolutionCombo" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                 <!-- Plein écran -->
-                <Label styleClass="settings-label" text="Plein écran" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <CheckBox fx:id="fullscreenCheck" styleClass="settings-checkbox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label minWidth="-Infinity" text="Plein écran" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <CheckBox fx:id="fullscreenCheck" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                 <!-- Langue -->
-                <Label styleClass="settings-label" text="Langue" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <ComboBox fx:id="langCombo" prefWidth="200" styleClass="settings-combo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label minWidth="-Infinity" text="Langue" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <ComboBox fx:id="langCombo" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <columnConstraints>
                <ColumnConstraints />
                <ColumnConstraints />
@@ -81,17 +82,32 @@
         </VBox>
 
         <!-- BOUTONS BAS -->
-        <HBox alignment="CENTER_RIGHT" spacing="15" styleClass="settings-footer">
+        <HBox alignment="CENTER_RIGHT" spacing="15">
             <padding>
                 <Insets bottom="20" left="30" right="30" top="15" />
             </padding>
-            <Button fx:id="cancelBtn" onAction="#onCancel" styleClass="settings-btn-cancel" text="ANNULER" />
-            <Button fx:id="saveBtn" onAction="#onSave" styleClass="settings-btn-save" text="SAUVEGARDER" />
+
+            <Button onAction="#onCancel" text="ANNULER">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass></Button>
+
+            <Button onAction="#onSave" text="SAUVEGARDER">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass></Button>
         </HBox>
 
     </VBox>
    <padding>
       <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
    </padding>
+   <styleClass>
+      <String fx:value="button-gray" />
+      <String fx:value="button-main" />
+      <String fx:value="not-hover" />
+   </styleClass>
 
 </StackPane>

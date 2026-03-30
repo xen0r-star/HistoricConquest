@@ -44,14 +44,14 @@ public class NewGame {
                 btnHelp.setOnAction(e -> {
                     System.out.println("Clic Help!");
                     // On passe 'root' (le StackPane de NewGame) à la méthode
-                    MainApp.getInstance().showHelp(true, root);
+                    MainApp.getInstance().showHelp(true);
                 });
             }
 
 
             if (btnSettings != null) {
                 btnSettings.setOnAction(e -> {
-                    MainApp.getInstance().showSettings(true , root);
+                    MainApp.getInstance().showSettings(true);
 
                 }); }
 

@@ -16,20 +16,20 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 public class NotificationController {
-	private static VBox notificationsHost = null;
+	private static VBox root = null;
 
 
 	private NotificationController() { }
 
 	public static void initialize() {
-		if (notificationsHost != null) return;
+		if (root != null) return;
 
-        notificationsHost = new VBox(12);
-        notificationsHost.setPickOnBounds(false);
-        notificationsHost.setMouseTransparent(false);
-        notificationsHost.setAlignment(Pos.BOTTOM_RIGHT);
-        StackPane.setAlignment(notificationsHost, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(notificationsHost, new Insets(40, 40, 40, 40));
+		root = new VBox(12);
+		root.setPickOnBounds(false);
+		root.setMouseTransparent(false);
+		root.setAlignment(Pos.BOTTOM_RIGHT);
+        StackPane.setAlignment(root, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(root, new Insets(40, 40, 40, 40));
     }
 
 	public static void show(String title, String message, Notification.Type type) {
@@ -37,7 +37,7 @@ public class NotificationController {
 	}
 
 	public static void show(String title, String message, Notification.Type type, int ttlMillis) {
-		if (notificationsHost == null) {
+		if (root == null) {
 			System.err.println("Error: NotificationController not initialized. Call NotificationController.initialize() first.");
 			return;
 		}
@@ -65,11 +65,11 @@ public class NotificationController {
 					fadeOut.setToValue(0);
 
 					ParallelTransition parallel = new ParallelTransition(slideOut, fadeOut);
-					parallel.setOnFinished(e -> notificationsHost.getChildren().remove(notificationView));
+					parallel.setOnFinished(e -> root.getChildren().remove(notificationView));
 					parallel.play();
 				});
 
-				notificationsHost.getChildren().addLast(notificationView);
+				root.getChildren().addLast(notificationView);
 
 
 				TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), notificationView);
@@ -91,7 +91,7 @@ public class NotificationController {
 	}
 
 
-	public static VBox getNotificationsHost() {
-		return notificationsHost;
+	public static VBox getNotifications() {
+		return root;
 	}
 }
