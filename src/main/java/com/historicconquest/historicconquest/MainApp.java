@@ -1,5 +1,6 @@
 package com.historicconquest.historicconquest;
 
+import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
@@ -18,8 +19,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -59,31 +59,48 @@ public class MainApp extends Application {
             getClass().getResource(Constant.PATH + "styles/style.css")
         ).toExternalForm());
 
-        stage.setScene(scene);
-        // stage.setFullScreen(true);
-        stage.setMaximized(true);
-        stage.show();
+
+        loadHelpPage();
+        NotificationController.initialize();
 
         showMenu();
 
-        loadHelpPage();
+
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.show();
     }
 
-    public static void showMenu() {
+    public void showMenu() {
         try {
-            FXMLLoader loaderHomePage = new FXMLLoader(MainApp.class.getResource(Constant.PATH + "ui/HomePage.fxml"));
+            FXMLLoader loaderHomePage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HomePage.fxml"));
             StackPane homePageRoot = loaderHomePage.load();
 
             appRoot.getChildren().setAll(homePageRoot);
+            showNotification();
 
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error loading home page");
         }
     }
 
     public void showNewGame() {
         NewGame page = new NewGame();
         appRoot.getChildren().setAll(page.createView(this));
+        showNotification();
+    }
+
+    public void showMultiplayer() {
+        try {
+            FXMLLoader loaderMultiplayerPage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/MultiplayerPage.fxml"));
+            StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
+
+            appRoot.getChildren().setAll(multiplayerPageRoot);
+            showNotification();
+
+        } catch (Exception e) {
+            System.err.println("Error loading multiplayer page");
+        }
     }
 
     public void startGame(NewGameConfig config) {
@@ -112,6 +129,7 @@ public class MainApp extends Application {
             navService.attachNavigation(gameHUDRoot, mapInterface);
 
             appRoot.getChildren().setAll(rootLayout);
+            showNotification();
 
         } catch (Exception e) {
             System.err.println("Error start game");
@@ -146,7 +164,7 @@ public class MainApp extends Application {
 
     private Image loadImage(String path) {
         return new Image(Objects.requireNonNull(
-                getClass().getResourceAsStream(Constant.PATH + path)
+            getClass().getResourceAsStream(Constant.PATH + path)
         ));
     }
 
@@ -163,7 +181,6 @@ public class MainApp extends Application {
         }
     }
 
-    // Dans MainApp.java
     public void showHelp(boolean show, StackPane currentRoot) {
         if (helpPageRoot == null) loadHelpPage();
 
@@ -231,6 +248,9 @@ public class MainApp extends Application {
         }
     }
 
+    public void showNotification() {
+        appRoot.getChildren().add(NotificationController.getNotificationsHost());
+    }
     public Stage getStage() {
         return stage;
     }

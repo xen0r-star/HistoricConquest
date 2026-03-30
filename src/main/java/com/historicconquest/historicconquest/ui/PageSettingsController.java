@@ -102,10 +102,10 @@ public class PageSettingsController implements Initializable {
 
     @FXML
     private void onCancel() {
-        Back.back();
+        MainApp.getInstance().showMenu();
     }
 
     private void goBack() {
-        Back.back();
+        MainApp.getInstance().showMenu();
     }
 }

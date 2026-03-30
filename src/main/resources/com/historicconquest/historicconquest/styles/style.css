@@ -77,6 +77,31 @@
     -fx-border-radius: 0;
 }
 
+.button-small {
+    -fx-cursor: hand;
+
+    -fx-border-width: 0, 0;
+    -fx-border-insets: 0, 1;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 0;
+
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-font-family: "Georgia";
+}
+
+.button-light {
+    -fx-background-color: #EEDCBE88;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button-light:hover {
+    -fx-background-color: rgba(238, 220, 190, 0.65);
+    -fx-background-radius: 5;
+}
+
+
 .button-beige {
     -fx-background-color: #EEDCBE;
     -fx-border-color: #675932, #675932;
@@ -107,6 +132,12 @@
     -fx-text-fill: #EEDCBE;
 }
 
+.button-yellow {
+    -fx-background-color: #A99235;
+    -fx-border-color: #EEDCBE, #EEDCBE;
+    -fx-text-fill: #EEDCBE;
+}
+
 
 .button-beige:hover {
     -fx-background-color: #fae9cc;
@@ -128,7 +159,53 @@
     -fx-background-color: #884142;
 }
 
+.button-yellow:hover {
+    -fx-background-color: #887741;
+}
 
+
+
+.button-beige.not-hover:hover {
+    -fx-background-color: #EEDCBE;
+}
+
+.button-green.not-hover:hover {
+    -fx-background-color: #635A2D;
+}
+
+.button-blue.not-hover:hover {
+    -fx-background-color: #2D5763;
+}
+
+.button-gray.not-hover:hover {
+    -fx-background-color: #535353;
+}
+
+.button-red.not-hover:hover {
+    -fx-background-color: #632D2E;
+}
+
+.button-yellow.not-hover:hover {
+    -fx-background-color: #A99235;
+}
+
+
+.code-field {
+    -fx-padding: 10;
+
+    -fx-background-color: #EEDCBE;
+    -fx-background-radius: 3;
+    -fx-border-width: 0;
+
+    -fx-font-family: "Consolas";
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+    -fx-text-fill: #675932;
+}
+
+.radius-small {
+    -fx-background-radius: 5;
+}
 
 
 /* HELP PAGE */
