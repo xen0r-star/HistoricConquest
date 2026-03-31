@@ -18,6 +18,7 @@ public class QuestionPage {
     public Label describeDifficult;
     private static byte difficultyQuestion;
     private static StackPane mainStackPane, questionStackPane, confirmStackPane;
+    private static Theme theme;
 
     public QuestionPage(){ instance = this;}
 
@@ -25,6 +26,10 @@ public class QuestionPage {
 
     //OK
     public static void showQuestionPage(StackPane parent){
+        /*String content = Question.readFile("/com/historicconquest/historicconquest/datas/History.json");
+        System.out.println(content);*/
+        theme = Question.getThemeFromJsonFile("/com/historicconquest/historicconquest/datas/History.json");
+
         //Chargement du FXML avec les différentes difficultés
         FXMLLoader questionLoader = new FXMLLoader(
                 Objects.requireNonNull(
@@ -74,16 +79,16 @@ public class QuestionPage {
             difficultyQuestion = (byte) slider.getValue();
             switch (difficultyQuestion){
                 case 1 :
-                    //describeDifficult.setText();
+                    describeDifficult.setText(theme.describeDifficult.get(0));
                     break;
                 case 2:
-                    //describeDifficult.setText();
+                    describeDifficult.setText(theme.describeDifficult.get(1));
                     break;
                 case 3:
-                    //describeDifficult.setText();
+                    describeDifficult.setText(theme.describeDifficult.get(2));
                     break;
                 case 4:
-                    //describeDifficult.setText();
+                    describeDifficult.setText(theme.describeDifficult.get(3));
                     break;
                 default:
                     describeDifficult.setText("Hey what the ....");
