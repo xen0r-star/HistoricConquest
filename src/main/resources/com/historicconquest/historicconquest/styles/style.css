@@ -38,6 +38,16 @@
     -fx-padding: 0 0 30 0;
 }
 
+
+.subtitle-label {
+    -fx-font-size: 35;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6B1515;
+    -fx-font-family: "Georgia";
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 2, 2);
+    -fx-padding: 0 0 30 0;
+}
+
 /* Conteneur principal pour centrer */
 
 

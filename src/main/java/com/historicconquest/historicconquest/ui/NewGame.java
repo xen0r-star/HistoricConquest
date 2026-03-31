@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.ui;
 
-
 import com.historicconquest.historicconquest.Constant;
 import com.historicconquest.historicconquest.MainApp;
 import javafx.fxml.FXMLLoader;
@@ -10,86 +9,174 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import java.util.Objects;
 
 public class NewGame {
 
-    @SuppressWarnings("SpellCheckingInspection")
-    public StackPane createView(MainApp app) {
-        // 1. On crée le conteneur principal d'abord
-        StackPane root = new StackPane();
+    private Pane mapViewport;
 
-        // --- LE FOND (HUD) ---
-        Parent hudBackground = loadGameHudBackground();
-        if (hudBackground != null) {
-            hudBackground.setMouseTransparent(true);
-            hudBackground.setFocusTraversable(false);
-            root.getChildren().add(hudBackground); // Maintenant 'root' existe !
+    public StackPane createView(MainApp app) {
+        StackPane root = new StackPane();
+        VBox cornerButtons = new VBox(15);
+        try {
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
+                    getClass().getResource(Constant.PATH + "ui/HomePage.fxml")
+            ));
+            Parent homeRoot = loader.load();
+
+            // Récupération des boutons du FXML
+            Button btnExit = (Button) homeRoot.lookup("#exitBtn");
+            Button btnHelp = (Button) homeRoot.lookup("#helpBtn");
+            Button btnSettings = (Button) homeRoot.lookup("#settingsBtn");
+
+            if (btnExit != null) {
+                btnExit.setOnAction(e -> MainApp.getInstance().exit());
+            }
+
+            if (btnHelp != null) {
+                btnHelp.setOnAction(e -> {
+                    System.out.println("Clic Help!");
+                    // On passe 'root' (le StackPane de NewGame) à la méthode
+                    MainApp.getInstance().showHelp(true);
+                });
+            }
+
+
+            if (btnSettings != null) {
+                btnSettings.setOnAction(e -> {
+                    MainApp.getInstance().showSettings(true);
+
+                }); }
+
+            if (btnSettings != null) cornerButtons.getChildren().add(btnSettings);
+            if (btnHelp != null) cornerButtons.getChildren().add(btnHelp);
+            if (btnExit != null) cornerButtons.getChildren().add(btnExit);
+
+            cornerButtons.setAlignment(Pos.BOTTOM_RIGHT);
+            cornerButtons.setPickOnBounds(false);
+            StackPane.setMargin(cornerButtons, new Insets(50));
+        } catch (Exception e) {
+            System.err.println("Erreur chargement boutons : " + e.getMessage());
         }
 
-        // --- TITRES ET SAISIE ---
+        Parent hudBackground = loadGameHudBackground();
+        if (hudBackground != null) {
+            // IMPORTANT : Ne pas mettre MouseTransparent sur TOUT le hud,
+            // sinon on ne peut plus cliquer sur les boutons de sortie/aide !
+            hudBackground.setFocusTraversable(false);
+            root.getChildren().add(hudBackground);
+        }
+
+        root.getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource(Constant.PATH + "styles/newgame.css")
+        ).toExternalForm());
+
+        mapViewport = new Pane();
+        mapViewport.setMouseTransparent(true);
+        StackPane.setMargin(mapViewport, new Insets(30));
+        root.getChildren().add(mapViewport);
+
+
+
+        // Initialise la map derrière (centrée + visible)
+
+        MapBackgroundDisplay mapDisplay = new MapBackgroundDisplay(
+                    root, mapViewport,
+                    0.80, 0.80,
+                    -55,   // translateX (gauche)
+                    -30,   // translateY (haut)
+                    -0.03  // centerBiasX (micro-ajustement visuel)
+            );
+            mapDisplay.initialize();
+        ;
+
+        // ===== UI New Game =====
+        String[] pawnImages = {
+                "/com/historicconquest/historicconquest/pawn/pawn_black.png",
+                "/com/historicconquest/historicconquest/pawn/pawn_grey.png",
+                "/com/historicconquest/historicconquest/pawn/pawn_white.png",
+                "/com/historicconquest/historicconquest/pawn/pawn_beige.png",
+        };
+        final String[] selectedPawn = { pawnImages[0] };
+
         Label title = new Label("NEW");
         Label title2 = new Label("GAME");
         title.getStyleClass().add("title-label");
         title2.getStyleClass().add("title-label");
 
-// 1. Récupérer l'URL de ton image de fond (ex : une barre de saisie stylisée)
-        String bgPath = Objects.requireNonNull(getClass().getResource("/com/historicconquest/historicconquest/images/textFieldNewGame.png")).toExternalForm();
+        String bgPath = Objects.requireNonNull(
+                getClass().getResource("/com/historicconquest/historicconquest/images/textFieldNewGame.png")
+        ).toExternalForm();
 
-// 2. Créer le TextField (on le laisse totalement transparent)
+        Label nameLabel = new Label("Name : ");
+        nameLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 18px; -fx-font-family: Georgia");
+
         TextField playerName = new TextField();
-        playerName.setPromptText("NAME : ");
-        playerName.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-padding: 10;");
+        playerName.setPromptText("Enter your name...");
+        playerName.setPrefWidth(500);
+        playerName.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-padding:0 10; ");
 
-// 3. Créer le conteneur qui portera l'image
-        HBox fieldContainer = new HBox(playerName);
+        HBox fieldContainer = new HBox(10, nameLabel, playerName);
         fieldContainer.setAlignment(Pos.CENTER);
-        fieldContainer.setMaxWidth(700); // Ajuste selon la taille de ton image
-        fieldContainer.setPrefHeight(100); // Ajuste selon la hauteur de ton image
-
-// 4. Appliquer l'image au fond du conteneur
+        fieldContainer.setMaxWidth(700);
+        fieldContainer.setPrefHeight(100);
         fieldContainer.setStyle(
-                "-fx-background-image: url('" + bgPath + "'); " +
-                        "-fx-background-size: 100% 100%; " + // L'image remplit tout le rectangle
-                        "-fx-background-repeat: no-repeat; " +
-                        "-fx-background-position: center; " +
+                "-fx-background-image: url('" + bgPath + "');" +
+                        "-fx-background-size: 100% 100%;" +
+                        "-fx-background-repeat: no-repeat;" +
+                        "-fx-background-position: center;" +
                         "-fx-background-color: transparent;"
         );
 
-        VBox mainBox = new VBox(-5, title, title2, fieldContainer); // Ajout de playerName ici
+        Label chooseLabel = new Label("SELECT YOUR PAWN");
+        chooseLabel.getStyleClass().add("subtitle-label");
 
-        mainBox.setAlignment(Pos.CENTER);
+        HBox pawnBox = new HBox(20);
+        pawnBox.setAlignment(Pos.CENTER);
+
+        for (String path : pawnImages) {
+            ImageView iv = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+            iv.setFitWidth(150);
+            iv.setPreserveRatio(true);
+
+            Button pawnBtn = new Button();
+            pawnBtn.setGraphic(iv);
+            pawnBtn.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-cursor: hand; -fx-background-radius: 10;");
+
+            pawnBtn.setOnAction(e -> {
+                selectedPawn[0] = path;
+                pawnBox.getChildren().forEach(node ->
+                        node.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-cursor: hand; -fx-background-radius: 10;")
+                );
+                pawnBtn.setStyle("-fx-background-color: transparent; -fx-border-color: #FFD700; -fx-border-width: 3; -fx-border-radius: 10;");
+            });
+
+            pawnBox.getChildren().add(pawnBtn);
+        }
+
+        VBox mainBox = new VBox(0, title, title2, fieldContainer, chooseLabel, pawnBox);
+        VBox.setMargin(title2, new Insets(-5, 0, 0, 0));
+        VBox.setMargin(fieldContainer, new Insets(30, 0, 0, 0));
+        VBox.setMargin(chooseLabel, new Insets(40, 0, 10, 0));
+        VBox.setMargin(pawnBox, new Insets(10, 0, 0, 0));
+        mainBox.setAlignment(Pos.TOP_CENTER);
         mainBox.setPickOnBounds(false);
-        mainBox.setPadding(new Insets(0, 0, 30, 0));
+        mainBox.setPadding(new Insets(100, 0, 0, 0));
 
-        // --- BARRE ICONS DROITE ---
-        Button settingsBtn = createIconButton(Constant.PATH + "images/settings.png");
-        Button helpBtn = createIconButton(Constant.PATH + "images/help.png");
-        Button exitBtn = createIconButton(Constant.PATH + "images/sortie.png");
-        exitBtn.setOnAction(e -> MainApp.getInstance().exit());
-
-        VBox iconBar = new VBox(-5, settingsBtn, helpBtn, exitBtn);
-        iconBar.setAlignment(Pos.BOTTOM_RIGHT); // Alignement interne à la VBox
-        iconBar.setPadding(new Insets(0, 15, 15, 0));
-        iconBar.setPickOnBounds(false);
-        iconBar.setMaxWidth(130);
-
-        // Positionnement de l'iconBar dans le StackPane
-        StackPane.setAlignment(iconBar, Pos.BOTTOM_RIGHT);
-
-        // 2. On ajoute tout au root
-        root.getChildren().addAll(mainBox, iconBar);
+        root.getChildren().add(mainBox);
+        root.getChildren().add(cornerButtons);
 
         return root;
     }
+
+
 
     private Parent loadGameHudBackground() {
         try {
@@ -104,35 +191,4 @@ public class NewGame {
         }
     }
 
-    private Button createIconButton(String s) {
-
-        try {
-            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(s)));
-            ImageView iv = new ImageView(img);
-            iv.setFitWidth(450);
-            iv.setFitHeight(110);
-            iv.setPreserveRatio(true);
-
-            Button btn = new Button();
-            btn.setGraphic(iv);
-            btn.setPrefSize(450, 110);
-            btn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-
-            DropShadow hoverShadow = new DropShadow(15, Color.rgb(0, 0, 0, 0.6));
-            btn.setOnMouseEntered(e -> {
-                iv.setScaleX(1.1);
-                iv.setScaleY(1.1);
-                iv.setEffect(hoverShadow);
-            });
-            btn.setOnMouseExited(e -> {
-                iv.setScaleX(1.0);
-                iv.setScaleY(1.0);
-                iv.setEffect(null);
-            });
-
-            return btn;
-        } catch (Exception e) {
-            return new Button("Image manquante");
-        }
-    }
 }

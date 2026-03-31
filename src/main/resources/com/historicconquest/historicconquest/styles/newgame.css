@@ -1,0 +1,7 @@
+.text-field {
+    -fx-background-color: lightgray;
+    -fx-text-fill: darkblue;
+    -fx-font-family: Georgia;
+    -fx-font-size: 18px;
+    -fx-prompt-text-fill: derive(black, 50%);
+}

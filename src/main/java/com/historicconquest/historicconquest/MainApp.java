@@ -1,19 +1,21 @@
 package com.historicconquest.historicconquest;
 
+import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.map.WorldMap;
 import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapNavigationService;
-import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.game.NewGameConfig;
 import com.historicconquest.historicconquest.ui.GameHUD;
+import com.historicconquest.historicconquest.controller.HelpController;
 import com.historicconquest.historicconquest.ui.NewGame;
 import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
+import com.historicconquest.historicconquest.controller.SettingsController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -22,12 +24,10 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class MainApp extends Application {
-
     private final Group mapInterface = new Group();
 
     private Stage stage;
-    private StackPane appRoot;
-    private Parent helpPageRoot;
+    private static StackPane appRoot;
     private static MainApp instance;
 
 
@@ -56,7 +56,8 @@ public class MainApp extends Application {
         ).toExternalForm());
 
 
-        loadHelpPage();
+        HelpController.initialize();
+        SettingsController.initialize();
         NotificationController.initialize();
 
         showMenu();
@@ -67,13 +68,14 @@ public class MainApp extends Application {
         stage.show();
     }
 
+
+
     public void showMenu() {
         try {
             FXMLLoader loaderHomePage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HomePage.fxml"));
             StackPane homePageRoot = loaderHomePage.load();
 
-            appRoot.getChildren().setAll(homePageRoot);
-            showNotification();
+            setAppContent(homePageRoot);
 
         } catch (Exception e) {
             System.err.println("Error loading home page");
@@ -82,8 +84,7 @@ public class MainApp extends Application {
 
     public void showNewGame() {
         NewGame page = new NewGame();
-        appRoot.getChildren().setAll(page.createView(this));
-        showNotification();
+        setAppContent(page.createView(this));
     }
 
     public void showMultiplayer() {
@@ -91,12 +92,41 @@ public class MainApp extends Application {
             FXMLLoader loaderMultiplayerPage = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/MultiplayerPage.fxml"));
             StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
 
-            appRoot.getChildren().setAll(multiplayerPageRoot);
-            showNotification();
+            setAppContent(multiplayerPageRoot);
 
         } catch (Exception e) {
             System.err.println("Error loading multiplayer page");
         }
+    }
+
+
+
+    public void showSettings(boolean show) {
+        StackPane settings = SettingsController.getSettings();
+        if (settings == null) return;
+
+        addOverlay(settings);
+        if (show) {
+            SettingsController.show();
+            settings.toFront();
+            return;
+        }
+
+        SettingsController.close();
+    }
+
+    public void showHelp(boolean show) {
+        StackPane help = HelpController.getHelp();
+        if (help == null) return;
+
+        addOverlay(help);
+        if (show) {
+            HelpController.show();
+            help.toFront();
+            return;
+        }
+
+        HelpController.close();
     }
 
     public void startGame(NewGameConfig config) {
@@ -124,8 +154,7 @@ public class MainApp extends Application {
             MapNavigationService navService = new MapNavigationService();
             navService.attachNavigation(gameHUDRoot, mapInterface);
 
-            appRoot.getChildren().setAll(rootLayout);
-            showNotification();
+            setAppContent(rootLayout);
 
         } catch (Exception e) {
             System.err.println("Error start game");
@@ -141,6 +170,7 @@ public class MainApp extends Application {
     public void exit() {
         stage.close();
     }
+
 
 
     private StackPane createLayout(StackPane gameHUDRoot, ZoneInfoPanel zoneInfoPanel) {
@@ -164,34 +194,27 @@ public class MainApp extends Application {
         ));
     }
 
-    private void loadHelpPage() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "ui/HelpPage.fxml"));
-            helpPageRoot = loader.load();
+    private void setAppContent(Node content) {
+        appRoot.getChildren().setAll(content);
 
-            helpPageRoot.setVisible(false);
-            helpPageRoot.setManaged(false);
+        addOverlay(SettingsController.getSettings());
+        addOverlay(HelpController.getHelp());
+        addOverlay(NotificationController.getNotifications());
+    }
 
-            appRoot.getChildren().add(helpPageRoot);
+    private void addOverlay(Node overlay) {
+        if (overlay == null) return;
 
-        } catch (Exception e) {
-            System.err.println("Error loading help page: " + e.getMessage());
+        if (overlay.getParent() instanceof Pane parent && parent != appRoot) {
+            parent.getChildren().remove(overlay);
+        }
+
+        if (!appRoot.getChildren().contains(overlay)) {
+            appRoot.getChildren().add(overlay);
         }
     }
 
-    public void showHelp(boolean show) {
-        if (helpPageRoot == null) loadHelpPage();
-        helpPageRoot.setVisible(show);
-        helpPageRoot.setManaged(show);
-    }
 
-    public void showNotification() {
-        appRoot.getChildren().add(NotificationController.getNotificationsHost());
-    }
-
-    public Stage getStage() {
-        return stage;
-    }
 
     public static MainApp getInstance() {
         return instance;

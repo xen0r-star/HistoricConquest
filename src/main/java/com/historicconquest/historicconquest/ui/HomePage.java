@@ -41,8 +41,10 @@ public class HomePage {
             System.out.println("Settings");
         });
 
-        helpBtn.setOnAction(e -> MainApp.getInstance().showHelp(true));
-        exitBtn.setOnAction(e -> MainApp.getInstance().exit());
+
+        settingsBtn.setOnAction(e -> MainApp.getInstance().showSettings(true));
+        helpBtn.setOnAction(    e -> MainApp.getInstance().showHelp(true));
+        exitBtn.setOnAction(    e -> MainApp.getInstance().exit());
 
 
 
@@ -50,7 +52,7 @@ public class HomePage {
         MapBackgroundDisplay mapDisplay = new MapBackgroundDisplay(
             root, mapViewport,
             0.80, 0.80,
-            100
+            -55 ,-30, -0.03
         );
         mapDisplay.initialize();
 
