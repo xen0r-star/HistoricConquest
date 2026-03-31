@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.ui;
 
 import com.historicconquest.historicconquest.MainApp;
+import com.historicconquest.historicconquest.questions.QuestionPage;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
@@ -17,6 +18,8 @@ public class HomePage {
     public Button settingsBtn;
     public Button helpBtn;
     public Button exitBtn;
+
+    public Button questionsBtn;
 
     @FXML
     public void initialize() {
@@ -50,5 +53,9 @@ public class HomePage {
             100
         );
         mapDisplay.initialize();
+
+        questionsBtn.setOnAction(e -> {
+            QuestionPage.getInstance().showQuestionPage(root);
+        });
     }
 }

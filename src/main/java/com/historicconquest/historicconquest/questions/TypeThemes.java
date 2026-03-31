@@ -3,10 +3,10 @@ package com.historicconquest.historicconquest.questions;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum TypeThemes {
-    DIVERTISSEMENT("Divertissement"),
-    INFORMATIQUE("Informatique"),
-    TOURISME("Tourisme"),
-    HISTOIRE("Histoire"),
+    DIVERTISSMENT("Divertissment"),
+    INFORMATIC("Informatic"),
+    TOURISM("Tourism"),
+    HISTORY("History"),
     NONE("None");
 
 
