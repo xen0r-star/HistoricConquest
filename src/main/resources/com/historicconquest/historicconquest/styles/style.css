@@ -258,4 +258,21 @@
     -fx-line-spacing: 4px;
     -fx-text-fill: white;
 }
+.slider .thumb {
+    -fx-background-color: #bb945a;
+    -fx-background-radius: 5;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 25px;
+}
 
+.slider .track {
+    -fx-background-color: #75c2c6;
+    -fx-pref-height: 10px;
+}
+.slider .axis {
+    -fx-tick-length: 8px;
+}
+.slider .axis .axis-tick-mark {
+    -fx-stroke-width: 4px;   /* épaisseur */
+    -fx-stroke:  #eeddc0;
+}

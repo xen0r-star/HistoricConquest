@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
-<StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.HomePage">
+<StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.ui.HomePage">
    <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #907f66; -fx-border-width: 2;">
       <StackPane.margin>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -73,6 +79,7 @@
       </StackPane.margin>
    </VBox>
    <VBox alignment="BOTTOM_RIGHT" pickOnBounds="false" prefHeight="200.0" prefWidth="100.0" spacing="15.0" StackPane.alignment="BOTTOM_RIGHT">
+      <Button fx:id="questionsBtn" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#initialize" prefHeight="41.0" prefWidth="70.0" text="Questions" />
       <Button fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../styles/style.css">
          <styleClass>
             <String fx:value="button-icon" />

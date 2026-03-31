@@ -24,4 +24,5 @@ module com.historicconquest.historicconquest {
     opens com.historicconquest.historicconquest.network.service to com.fasterxml.jackson.databind;
     exports com.historicconquest.historicconquest.controller;
     opens com.historicconquest.historicconquest.controller to javafx.fxml, javafx.graphics;
+    opens com.historicconquest.historicconquest.datas;
 }
