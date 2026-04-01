@@ -1,10 +1,10 @@
 package com.historicconquest.historicconquest.controller;
 
-import com.historicconquest.historicconquest.map.WorldMap;
-import com.historicconquest.historicconquest.map.Zone;
-import com.historicconquest.historicconquest.map.ZonePathfinder;
-import com.historicconquest.historicconquest.ui.GameHUD;
-import com.historicconquest.historicconquest.ui.ZoneInfoPanel;
+import com.historicconquest.historicconquest.model.map.WorldMap;
+import com.historicconquest.historicconquest.model.map.Zone;
+import com.historicconquest.historicconquest.model.map.ZonePathfinder;
+import com.historicconquest.historicconquest.view.GameHUD;
+import com.historicconquest.historicconquest.view.ZoneInfoPanel;
 import javafx.animation.PathTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;

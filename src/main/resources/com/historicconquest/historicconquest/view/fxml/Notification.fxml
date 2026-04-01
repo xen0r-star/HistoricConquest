@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="Root" maxHeight="1.7976931348623157E308" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" style="-fx-cursor: DEFAULT; -fx-background-radius: 7; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.view.Notification">
+     <ImageView fx:id="Icon" fitHeight="32.0" fitWidth="32.0" layoutX="15.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="12.0">
+         <Image url="@../images/success-icon.png" />
+     </ImageView>
+     <Label fx:id="Title" alignment="TOP_LEFT" layoutX="85.0" layoutY="17.0" prefWidth="465.0" text="JOIN GAME" textFill="#eedcbe" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="12.0">
+         <font>
+             <Font name="Georgia Bold" size="18.0" />
+         </font>
+     </Label>
+    <Label fx:id="Message" alignment="TOP_LEFT" contentDisplay="CENTER" layoutX="85.0" layoutY="45.0" lineSpacing="3.0" maxWidth="500.0" prefWidth="279.0" text="You have successfully joined the room!" textFill="#eedcbe" wrapText="true" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="51.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="36.0">
+        <font>
+            <Font name="Georgia Bold" size="12.0" />
+        </font>
+    </Label>
+    <Pane layoutX="3.0" layoutY="117.0" maxHeight="6.0" minHeight="6.0" prefHeight="6.0" style="-fx-background-color: #00000079; -fx-background-radius: 0 0 7 7;" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <Pane fx:id="ClosingBar" maxHeight="6.0" minHeight="6.0" prefHeight="6.0" prefWidth="350.0" style="-fx-background-color: #eedcbe; -fx-background-radius: 7;" />
+    </Pane>
+    <ImageView fitHeight="32.0" fitWidth="32.0" layoutX="568.0" onMouseClicked="#closeNotification" pickOnBounds="true"
+               preserveRatio="true" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+        <cursor>
+            <Cursor fx:constant="HAND"/>
+        </cursor>
+        <Image url="@../images/close-beige.png"/>
+    </ImageView>
+    <styleClass>
+        <String fx:value="button-small" />
+        <String fx:value="not-hover" />
+      <String fx:value="button-green" />
+    </styleClass>
+   <cursor>
+      <Cursor fx:constant="DEFAULT" />
+   </cursor>
+</AnchorPane>

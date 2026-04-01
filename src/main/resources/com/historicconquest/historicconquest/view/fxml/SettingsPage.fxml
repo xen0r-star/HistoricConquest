@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane maxHeight="650.0" maxWidth="700.0" minHeight="650.0" minWidth="700.0" prefHeight="650.0" prefWidth="700.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.view.SettingsPage">
+
+    <!-- PANNEAU PRINCIPAL -->
+    <VBox alignment="CENTER" maxHeight="600" maxWidth="750">
+
+        <!-- TITRE DU PANNEAU -->
+        <HBox alignment="CENTER_LEFT">
+            <Label text="PARAMÈTRES" textFill="WHITE" />
+        </HBox>
+
+        <!-- CONTENU SCROLLABLE -->
+        <VBox spacing="25">
+            <padding>
+                <Insets bottom="30" left="40" right="40" top="30" />
+            </padding>
+
+            <!-- SECTION : AUDIO -->
+            <Label text="— AUDIO" textFill="WHITE" />
+
+            <GridPane hgap="20" vgap="18">
+                <!-- Musique -->
+                <Label minWidth="-Infinity" text="Musique" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Slider fx:id="musicSlider" prefWidth="320" value="80" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label fx:id="musicValueLabel" minWidth="-Infinity" text="80%" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+
+                <!-- Effets sonores -->
+                <Label minWidth="-Infinity" text="Effets sonores" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Slider fx:id="sfxSlider" prefWidth="320" value="70" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label fx:id="sfxValueLabel" text="70%" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+                <!-- Muet -->
+                <Label minWidth="-Infinity" text="Muet" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <CheckBox fx:id="muteCheck" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <columnConstraints>
+               <ColumnConstraints />
+               <ColumnConstraints />
+               <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
+            </GridPane>
+
+            <!-- SÉPARATEUR -->
+            <HBox />
+
+            <!-- SECTION : AFFICHAGE -->
+            <Label text="— AFFICHAGE" textFill="WHITE" />
+
+            <GridPane hgap="20" vgap="18">
+                <!-- Résolution -->
+                <Label minWidth="-Infinity" text="Résolution" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="resolutionCombo" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <!-- Plein écran -->
+                <Label minWidth="-Infinity" text="Plein écran" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <CheckBox fx:id="fullscreenCheck" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <!-- Langue -->
+                <Label minWidth="-Infinity" text="Langue" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <ComboBox fx:id="langCombo" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <columnConstraints>
+               <ColumnConstraints />
+               <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
+            </GridPane>
+
+        </VBox>
+
+        <!-- BOUTONS BAS -->
+        <HBox alignment="CENTER_RIGHT" spacing="15">
+            <padding>
+                <Insets bottom="20" left="30" right="30" top="15" />
+            </padding>
+
+            <Button onAction="#onCancel" text="ANNULER">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass></Button>
+
+            <Button onAction="#onSave" text="SAUVEGARDER">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass></Button>
+        </HBox>
+
+    </VBox>
+   <padding>
+      <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+   </padding>
+   <styleClass>
+      <String fx:value="button-gray" />
+      <String fx:value="button-main" />
+      <String fx:value="not-hover" />
+   </styleClass>
+
+</StackPane>

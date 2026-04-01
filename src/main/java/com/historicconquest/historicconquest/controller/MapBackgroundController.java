@@ -1,6 +1,6 @@
 package com.historicconquest.historicconquest.controller;
 
-import com.historicconquest.historicconquest.map.WorldMap;
+import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.util.Texture;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;

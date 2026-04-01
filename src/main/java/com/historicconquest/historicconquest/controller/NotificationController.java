@@ -1,7 +1,7 @@
 package com.historicconquest.historicconquest.controller;
 
-import com.historicconquest.historicconquest.Constant;
-import com.historicconquest.historicconquest.ui.Notification;
+import com.historicconquest.historicconquest.app.Constant;
+import com.historicconquest.historicconquest.view.Notification;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -44,7 +44,7 @@ public class NotificationController {
 
 		Platform.runLater(() -> {
 			try {
-				FXMLLoader loader = new FXMLLoader(NotificationController.class.getResource(Constant.PATH + "ui/Notification.fxml"));
+				FXMLLoader loader = new FXMLLoader(NotificationController.class.getResource(Constant.PATH + "view/fxml/Notification.fxml"));
 				AnchorPane notificationView = loader.load();
 				Notification notificationController = loader.getController();
 

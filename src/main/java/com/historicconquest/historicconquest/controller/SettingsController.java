@@ -13,7 +13,7 @@ public class SettingsController {
         if (root != null) return;
 
         try {
-            FXMLLoader loader = new FXMLLoader(SettingsController.class.getResource("/com/historicconquest/historicconquest/ui/SettingsPage.fxml"));
+            FXMLLoader loader = new FXMLLoader(SettingsController.class.getResource("/com/historicconquest/historicconquest/view/fxml/SettingsPage.fxml"));
             root = loader.load();
 
             root.setVisible(false);

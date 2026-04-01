@@ -1,6 +1,6 @@
 package com.historicconquest.historicconquest.util;
 
-import com.historicconquest.historicconquest.Constant;
+import com.historicconquest.historicconquest.app.Constant;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
