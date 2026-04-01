@@ -5,6 +5,9 @@ import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.map.ZonePathfinder;
 import com.historicconquest.historicconquest.view.GameHUD;
 import com.historicconquest.historicconquest.view.ZoneInfoPanel;
+import com.historicconquest.historicconquest.view.map.MapView;
+import com.historicconquest.historicconquest.view.map.MapViewFactory;
+import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.animation.PathTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -29,8 +32,9 @@ public class GameController {
     private final ZoneInfoPanel zoneInfoPanel;
     private final GameHUD gameHUD;
     private final Group mapInterface;
+    private final MapView mapView;
 
-    private Zone selectedZone;
+    private ZoneView selectedZoneView;
     private Zone startZoneForPath;  // Zone de départ pour le pathfinding
 
     public GameController(WorldMap worldMap, ZoneInfoPanel zoneInfoPanel, GameHUD gameHUD, Group mapInterface) {
@@ -38,19 +42,20 @@ public class GameController {
         this.zoneInfoPanel = zoneInfoPanel;
         this.gameHUD = gameHUD;
         this.mapInterface = mapInterface;
-        this.selectedZone = null;
+        this.mapView = MapViewFactory.build(worldMap, true);
+        this.selectedZoneView = null;
         this.startZoneForPath = null;
 
         initialize();
     }
 
     private void initialize() {
-        mapInterface.getChildren().addAll(worldMap.getBlocs());
+        mapInterface.getChildren().add(mapView.getRoot());
         gameHUD.initializeMap(mapInterface);
 
-        worldMap.getBlocs().forEach(bloc ->
-            bloc.getZones().forEach(zone ->
-                zone.setOnMouseClicked(event -> handleZoneClick(zone))
+        mapView.getBlocs().forEach(blocView ->
+            blocView.getZoneViews().forEach(zoneView ->
+                zoneView.setOnMouseClicked(event -> handleZoneClick(zoneView))
             )
         );
 
@@ -59,12 +64,13 @@ public class GameController {
 
 
 
-    private void handleZoneClick(Zone zone) {
+    private void handleZoneClick(ZoneView zoneView) {
+        Zone zone = zoneView.getZone();
         // TESTE D'AFFICHAGE DU PATHFINDING -----------------------------------------------------------
         if (startZoneForPath == null) {
             startZoneForPath = zone;
             System.out.println("\n🎯 [CLIC 1] Zone de départ sélectionnée: " + zone.getName());
-            selectZone(zone);
+            selectZone(zoneView);
             return;
         }
 
@@ -110,7 +116,7 @@ public class GameController {
         }
         System.out.println("╚════════════════════════════════╝\n");
 
-        Group groupDrawPath = drawPath(pathResult.zones());
+        Group groupDrawPath = drawPath(mapView.toViews(pathResult.zones()));
         if (groupDrawPath != null) {
             groupDrawPath.setId("DrawPathGroup");
             mapInterface.getChildren().add(groupDrawPath);
@@ -124,20 +130,20 @@ public class GameController {
 
 
 
-    private void selectZone(Zone zone) {
-        selectedZone = zone;
-        zone.setFocusedZone(true);
-        zone.updateColor(Color.web("#D4AF37"));
+    private void selectZone(ZoneView zoneView) {
+        selectedZoneView = zoneView;
+        zoneView.setFocusedZone(true);
+        zoneView.setColor(Color.web("#D4AF37"));
 
-        zoneInfoPanel.setData(zone.getName());
+        zoneInfoPanel.setData(zoneView.getZone().getName());
         zoneInfoPanel.show();
     }
 
     private void deselectZone() {
-        if (selectedZone != null) {
-            selectedZone.setFocusedZone(false);
-            selectedZone.updateColor(selectedZone.getColor());
-            selectedZone = null;
+        if (selectedZoneView != null) {
+            selectedZoneView.setFocusedZone(false);
+            selectedZoneView.setColor(selectedZoneView.getZone().getColor());
+            selectedZoneView = null;
         }
 
         zoneInfoPanel.hide();
@@ -145,7 +151,7 @@ public class GameController {
 
 
 
-    private Group drawPath(List<Zone> path) {
+    private Group drawPath(List<ZoneView> path) {
         if (path == null || path.size() < 2) return null;
 
         Group root = new Group();
@@ -154,7 +160,7 @@ public class GameController {
         Path directPath = new Path();
 
         // Obtenir le premier point (centre de la première zone)
-        Zone firstZone = path.getFirst();
+        ZoneView firstZone = path.getFirst();
         Bounds firstBounds = firstZone.getZoneSVGGroup().getBoundsInParent();
         double startX = firstBounds.getCenterX();
         double startY = firstBounds.getCenterY();
@@ -163,7 +169,7 @@ public class GameController {
 
         // Ajouter des segments droits entre chaque zone successive
         for (int i = 1; i < path.size(); i++) {
-            Zone zone = path.get(i);
+            ZoneView zone = path.get(i);
             Bounds bounds = zone.getZoneSVGGroup().getBoundsInParent();
             directPath.getElements().add(new javafx.scene.shape.LineTo(bounds.getCenterX(), bounds.getCenterY()));
         }
@@ -193,7 +199,7 @@ public class GameController {
     private Node createCarriageAnimation(Path path, int numberOfZones) {
         try {
             // Charger l'image SVG de la charrette
-            var inputStream = getClass().getResourceAsStream("/com/historicconquest/historicconquest/pawn/Horse-drawn1.png");
+            var inputStream = getClass().getResourceAsStream("/pawn/Horse-drawn1.png");
             if (inputStream == null) {
                 System.err.println("Erreur: Le fichier Horse-drawn1.svg n'a pas pu être trouvé");
                 return null;

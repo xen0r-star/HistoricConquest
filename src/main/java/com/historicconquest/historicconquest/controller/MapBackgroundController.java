@@ -2,6 +2,8 @@ package com.historicconquest.historicconquest.controller;
 
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.util.Texture;
+import com.historicconquest.historicconquest.view.map.MapView;
+import com.historicconquest.historicconquest.view.map.MapViewFactory;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -14,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 
 public class MapBackgroundController {
     private static WorldMap backgroundMap;
+    private static MapView backgroundMapView;
     private static ImageView noiseLayer;
 
 
@@ -21,6 +24,7 @@ public class MapBackgroundController {
 
     public static void initialize() {
         backgroundMap = new WorldMap(true, false, false, Color.web("#f2e1bf"), Color.web("#C5A682"));
+        backgroundMapView = MapViewFactory.build(backgroundMap, false);
         noiseLayer = Texture.generatePaperGrain(1920, 1080, 0.1);
     }
 
@@ -31,8 +35,10 @@ public class MapBackgroundController {
 
 
         // Map
-        Group mapInterface = new Group();
-        mapInterface.getChildren().addAll(backgroundMap.getBlocs());
+        Group mapInterface = backgroundMapView.getRoot();
+        if (mapInterface.getParent() instanceof Pane p) {
+            p.getChildren().remove(mapInterface);
+        }
 
         // Texture
         noiseLayer.setViewOrder(-1.0);

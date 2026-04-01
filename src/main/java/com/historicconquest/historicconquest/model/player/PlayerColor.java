@@ -2,12 +2,13 @@ package com.historicconquest.historicconquest.model.player;
 
 public enum PlayerColor {
     RED(),
-    GREEN(),
+    ORANGE(),
     YELLOW(),
+    GREEN(),
+    LIME(),
+    CYAN(),
     BLUE(),
-    PINK(),
-    PURPLE(),
     LIGHT_BLUE(),
-    LIGHT_GREEN(),
-    CYAN()
+    PURPLE(),
+    PINK()
 }

@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.view;
 
-import com.historicconquest.historicconquest.app.Constant;
 import com.historicconquest.historicconquest.app.MainApp;
 import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.NotificationController;
@@ -34,8 +33,8 @@ import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 public class MultiplayerPage {
-    private static final String PLAYER_ICON = Constant.PATH + "images/person.png";
-    private static final String ROBOT_ICON = Constant.PATH + "images/robots.png";
+    private static final String PLAYER_ICON = "/images/person.png";
+    private static final String ROBOT_ICON = "/images/robots.png";
     private static final String AREA_EMPTY_STYLE = "-fx-background-color: #EEDCBE88";
     private static final String AREA_FILLED_STYLE = "-fx-background-color: #EEDCBEDC";
     private static final int MAX_PLAYERS = 4;
@@ -535,7 +534,7 @@ public class MultiplayerPage {
         Runnable onRemove
     ) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constant.PATH + "view/fxml/multiplayer/PlayerInfo.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/multiplayer/PlayerInfo.fxml"));
             Pane node = loader.load();
             PlayerInfo playerInfo = loader.getController();
 

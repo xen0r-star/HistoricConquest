@@ -3,6 +3,9 @@ package com.historicconquest.historicconquest.util.tools;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.map.WorldMap;
+import com.historicconquest.historicconquest.view.map.MapView;
+import com.historicconquest.historicconquest.view.map.MapViewFactory;
+import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.shape.SVGPath;
@@ -18,6 +21,7 @@ public class AdjacencyGenerator {
 
     public static void main(String[] args) throws IOException {
         WorldMap worldMap = new WorldMap();
+        MapView mapView = MapViewFactory.build(worldMap, false);
         List<Zone> zones = worldMap.getAllZones();
 
 
@@ -32,7 +36,7 @@ public class AdjacencyGenerator {
                 Zone z1 = zones.get(i);
                 Zone z2 = zones.get(j);
 
-                if (areAdjacent(z1, z2)) {
+                if (areAdjacent(mapView.getViewFor(z1), mapView.getViewFor(z2))) {
                     adjacencyZone.get(z1.getName()).add(z2.getName());
                     adjacencyZone.get(z2.getName()).add(z1.getName());
                 }
@@ -45,7 +49,7 @@ public class AdjacencyGenerator {
     }
 
 
-    private static boolean areAdjacent(Zone z1, Zone z2) {
+    private static boolean areAdjacent(ZoneView z1, ZoneView z2) {
         Shape s1 = getShape(z1);
         Shape s2 = getShape(z2);
 
@@ -58,13 +62,11 @@ public class AdjacencyGenerator {
         return bounds.getWidth() > 0 || bounds.getHeight() > 0;
     }
 
-    private static Shape getShape(Zone zone) {
-        if (zone.getZoneSVGGroup() == null) {
-            return null;
-        }
+    private static Shape getShape(ZoneView zoneView) {
+        if (zoneView == null || zoneView.getZoneSVGGroup() == null) return null;
 
         Shape combinedShape = null;
-        for (Node node : zone.getZoneSVGGroup().getChildren()) {
+        for (Node node : zoneView.getZoneSVGGroup().getChildren()) {
             if (node instanceof SVGPath svgPath) {
                 if (combinedShape == null) {
                     combinedShape = svgPath;

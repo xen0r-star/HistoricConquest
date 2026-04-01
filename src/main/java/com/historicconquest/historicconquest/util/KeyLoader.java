@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.util;
 
-import com.historicconquest.historicconquest.app.Constant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -10,9 +11,14 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class KeyLoader {
+    private static final Logger logger = LoggerFactory.getLogger(KeyLoader.class);
+
+
     public static PublicKey loadPublicKey() throws Exception {
-        InputStream is = KeyLoader.class.getResourceAsStream(Constant.PATH + "keys/public.pem");
+        InputStream is = KeyLoader.class.getResourceAsStream("/keys/public.pem");
+
         if (is == null) {
+            logger.error("public.pem not found in classpath!");
             throw new RuntimeException("public.pem not found");
         }
 

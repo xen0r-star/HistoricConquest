@@ -2,12 +2,12 @@ package com.historicconquest.historicconquest.model.map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.historicconquest.historicconquest.app.Constant;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import javafx.scene.paint.Color;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WorldMap {
@@ -31,18 +31,19 @@ public class WorldMap {
 
 
     private void loadIconConfig() {
-        String path = Constant.PATH + "icons/icon_config.json";
+        String path = "/icons/icon_config.json";
 
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null) throw new RuntimeException("Icon config not found: " + path);
             iconConfig = mapper.readTree(is);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private void loadMapConfig(boolean loadIcon, Color defaultZoneColor, Color defaultZoneBorderColor) {
-        String path = Constant.PATH + "zones/map_config.json";
+        String path = "/zones/map_config.json";
 
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null) throw new RuntimeException("Map config not found: " + path);
@@ -92,7 +93,7 @@ public class WorldMap {
                             defaultZoneBorderColor
                         );
 
-                        zone.setBlockHover(true);
+                        zone.setColor(defaultZoneColor);
                     }
 
                     bloc.addZone(zone);
@@ -116,11 +117,12 @@ public class WorldMap {
                 }
             }
         }
+
         return null;
     }
 
     private void initializeAdjacencies() {
-        String path = Constant.PATH + "map/adjacency.json";
+        String path = "/map/adjacency.json";
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null) return;
 
@@ -137,7 +139,7 @@ public class WorldMap {
 
                         allZones.stream()
                                 .filter(z -> z.getName().equals(neighborName))
-                                .findFirst().ifPresent(zone::addAdjacentZones);
+                                .findFirst().ifPresent(zone::addAdjacentZone);
                     }
                 }
             }
@@ -158,6 +160,6 @@ public class WorldMap {
     }
 
     public List<Bloc> getBlocs() {
-        return blocs;
+        return Collections.unmodifiableList(blocs);
     }
 }

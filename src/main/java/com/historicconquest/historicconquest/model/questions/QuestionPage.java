@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.model.questions;
 
-import com.historicconquest.historicconquest.app.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -28,19 +27,19 @@ public class QuestionPage {
     public static void showQuestionPage(StackPane parent){
         /*String content = Question.readFile("/com/historicconquest/historicconquest/datas/History.json");
         System.out.println(content);*/
-        theme = Question.getThemeFromJsonFile("/com/historicconquest/historicconquest/datas/History.json");
+        theme = Question.getThemeFromJsonFile("/datas/History.json");
 
         //Chargement du FXML avec les différentes difficultés
         FXMLLoader questionLoader = new FXMLLoader(
                 Objects.requireNonNull(
-                        QuestionPage.class.getResource(Constant.PATH + "view/QuestionsPage.fxml")
+                        QuestionPage.class.getResource("/view/QuestionsPage.fxml")
                 )
         );
 
         //Chargement du FXML avec la demande de confirmation
         FXMLLoader confirmLoader = new FXMLLoader(
                 Objects.requireNonNull(
-                        QuestionPage.class.getResource(Constant.PATH + "view/ConfirmPage.fxml")
+                        QuestionPage.class.getResource("/view/ConfirmPage.fxml")
                 )
         );
 

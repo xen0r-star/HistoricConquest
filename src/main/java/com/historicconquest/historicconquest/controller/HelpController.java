@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.controller;
 
-import com.historicconquest.historicconquest.app.Constant;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,7 +17,7 @@ public class HelpController {
         if (root != null) return;
 
         try {
-            FXMLLoader helpLoader = new FXMLLoader(HelpController.class.getResource(Constant.PATH + "view/fxml/HelpPage.fxml"));
+            FXMLLoader helpLoader = new FXMLLoader(HelpController.class.getResource("/view/fxml/HelpPage.fxml"));
             root = helpLoader.load();
 
             StackPane.setAlignment(root, Pos.TOP_RIGHT);

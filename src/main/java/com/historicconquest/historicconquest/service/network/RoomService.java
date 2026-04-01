@@ -8,6 +8,8 @@ import com.historicconquest.historicconquest.view.Notification;
 import com.historicconquest.historicconquest.util.KeyLoader;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.PublicKey;
 import java.util.Map;
@@ -32,6 +34,9 @@ public class RoomService {
 
     private ScheduledExecutorService pingScheduler;
     private RoomEventListener listener;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(RoomService.class);
 
 
 
@@ -60,7 +65,9 @@ public class RoomService {
             return new JwtRoomClaims(claims.getSubject(), claims.get("roomCode", String.class));
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
+            logger.error("Failed to parse JWT token: {}", e.getMessage());
+            System.exit(1);
+            return null;
         }
     }
 

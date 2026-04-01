@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.view;
 
-import com.historicconquest.historicconquest.app.Constant;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -107,7 +106,7 @@ public class Notification {
 
     private Image loadIcon(String fileName) {
         return new Image(Objects.requireNonNull(
-            getClass().getResourceAsStream(Constant.PATH + "view/images/" + fileName)
+            getClass().getResourceAsStream("/view/images/" + fileName)
         ));
     }
 }

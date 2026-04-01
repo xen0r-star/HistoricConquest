@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.view;
 
-import com.historicconquest.historicconquest.app.Constant;
 import com.historicconquest.historicconquest.app.MainApp;
 import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import javafx.fxml.FXMLLoader;
@@ -28,7 +27,7 @@ public class NewGame {
         VBox cornerButtons = new VBox(15);
         try {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
-                    getClass().getResource(Constant.PATH + "view/fxml/HomePage.fxml")
+                    getClass().getResource("/view/fxml/HomePage.fxml")
             ));
             Parent homeRoot = loader.load();
 
@@ -76,7 +75,7 @@ public class NewGame {
         }
 
         root.getStylesheets().add(Objects.requireNonNull(
-                getClass().getResource(Constant.PATH + "view/styles/newgame.css")
+                getClass().getResource("/view/styles/newgame.css")
         ).toExternalForm());
 
         mapViewport = new Pane();
@@ -94,10 +93,10 @@ public class NewGame {
 
         // ===== UI New Game =====
         String[] pawnImages = {
-            Constant.PATH + "pawn/pawn_black.png",
-            Constant.PATH + "pawn/pawn_grey.png",
-            Constant.PATH + "pawn/pawn_white.png",
-            Constant.PATH + "pawn/pawn_beige.png",
+            "/pawn/pawn_black.png",
+            "/pawn/pawn_grey.png",
+            "/pawn/pawn_white.png",
+            "/pawn/pawn_beige.png",
         };
         final String[] selectedPawn = { pawnImages[0] };
 
@@ -107,7 +106,7 @@ public class NewGame {
         title2.getStyleClass().add("title-label");
 
         String bgPath = Objects.requireNonNull(
-                getClass().getResource(Constant.PATH + "view/images/textFieldNewGame.png")
+                getClass().getResource("/view/images/textFieldNewGame.png")
         ).toExternalForm();
 
         Label nameLabel = new Label("Name : ");
@@ -176,13 +175,13 @@ public class NewGame {
     private Parent loadGameHudBackground() {
         try {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
-                    getClass().getResource(Constant.PATH + "view/fxml/GameHUD.fxml"),
-                    "FXML introuvable: " + Constant.PATH + "view/fxml/GameHUD.fxml"
+                    getClass().getResource("/view/fxml/GameHUD.fxml"),
+                    "FXML introuvable: " + "/view/fxml/GameHUD.fxml"
             ));
             return loader.load();
 
         } catch (Exception e) {
-            System.err.println("Erreur: impossible de charger " + Constant.PATH + "view/fxml/GameHUD.fxml");
+            System.err.println("Erreur: impossible de charger " + "/view/fxml/GameHUD.fxml");
             return null;
         }
     }
