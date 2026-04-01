@@ -3,6 +3,8 @@ package com.historicconquest.historicconquest.model.questions;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,28 +12,32 @@ import java.util.List;
 
 public class Question {
 
+    private static final Logger logger = LoggerFactory.getLogger(Question.class);
 
     public Question(){
 
     }
 
     public static String readFile(String path) {
-        String theme = null;
+        StringBuilder theme = null;
         try (InputStream is = QuestionPage.class.getResourceAsStream(path);
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
 
-            theme = "";
+            theme = new StringBuilder();
             String line = "";
             while (line != null) {
-                theme += line;
+                theme.append(line);
                 line = bufferedReader.readLine();
             }
+
         } catch (NullPointerException e) {
-            System.err.println("The file " + path + " is not found in classpath!");
+            logger.error("The file {} is not found in classpath!", path, e);
+
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("I/O error while reading questions file {}", path, e);
         }
-        return theme;
+
+        return theme.toString();
     }
 
 
@@ -50,20 +56,19 @@ public class Question {
                         }
                 );
 
-                // Test
-                for (Theme t : themes) {
-                    System.out.println("Theme: " + t.name);
-
-                    for (String label : t.describeDifficult) {
-                        System.out.println(" - " + label);
-                    }
-                }
-
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Failed to parse theme JSON from file {}", file, e);
+                return null;
             }
         }
-        return this_theme = themes.get(0);
+
+        if (themes == null || themes.isEmpty()) {
+            logger.warn("No themes found in JSON file {}", file);
+            return null;
+        }
+
+        this_theme = themes.getFirst();
+        return this_theme;
     }
 
 }

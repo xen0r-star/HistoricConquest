@@ -18,6 +18,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.MoveTo;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -27,6 +29,8 @@ public class GameController {
     *     CODE TEMPORAIRE POUR TESTER LE VISUEL DE LA MAP
     * =======================================================
     */
+
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     private final WorldMap worldMap;
     private final ZoneInfoPanel zoneInfoPanel;
@@ -69,7 +73,7 @@ public class GameController {
         // TESTE D'AFFICHAGE DU PATHFINDING -----------------------------------------------------------
         if (startZoneForPath == null) {
             startZoneForPath = zone;
-            System.out.println("\n🎯 [CLIC 1] Zone de départ sélectionnée: " + zone.getName());
+            logger.debug("[PATHFINDING] First click - start zone selected: {}", zone.getName());
             selectZone(zoneView);
             return;
         }
@@ -77,11 +81,11 @@ public class GameController {
         if (startZoneForPath == zone) {
             deselectZone();
             startZoneForPath = null;
-            System.out.println("❌ Clic annulé - même zone");
+            logger.debug("[PATHFINDING] Click cancelled - same zone clicked twice: {}", zone.getName());
             return;
         }
 
-        System.out.println("🎯 [CLIC 2] Zone d'arrivée sélectionnée: " + zone.getName());
+        logger.debug("[PATHFINDING] Second click - target zone selected: {}", zone.getName());
 
         ZonePathfinder.PathResult pathResult = ZonePathfinder.findPath(startZoneForPath, zone);
 
@@ -92,29 +96,33 @@ public class GameController {
         }
 
 
-        System.out.println("\n╔════════════════════════════════╗");
-        System.out.println("║     RÉSULTAT DU PATHFINDING    ║");
-        System.out.println("╠════════════════════════════════╣");
-        System.out.println("║ De: " + String.format("%-27s", startZoneForPath.getName()) + "║");
-        System.out.println("║ À:  " + String.format("%-27s", zone.getName()) + "║");
-        System.out.println("║ Type: " + String.format("%-25s", pathResult.type()) + "║");
+        if (logger.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("\n╔════════════════════════════════╗\n");
+            sb.append("║     RÉSULTAT DU PATHFINDING    ║\n");
+            sb.append("╠════════════════════════════════╣\n");
+            sb.append(String.format("║ De: %-27s║\n", startZoneForPath.getName()));
+            sb.append(String.format("║ À:  %-27s║\n", zone.getName()));
+            sb.append(String.format("║ Type: %-25s║\n", pathResult.type()));
 
-        if (pathResult.zones() != null) {
-            System.out.println("║ Chemin (" + pathResult.zones().size() + " zones):              ║");
-            for (int i = 0; i < pathResult.zones().size(); i++) {
-                String zoneName = (i + 1) + ". " + pathResult.zones().get(i).getName();
-                System.out.println("║   " + String.format("%-26s", zoneName) + "║");
-            }
-            System.out.println("╠════════════════════════════════╣");
-            if (pathResult.type() == ZonePathfinder.PathType.DIRECT) {
-                System.out.println("║ ✓ Trajet possible!                 ║");
+            if (pathResult.zones() != null) {
+                sb.append(String.format("║ Chemin (%d zones):              ║\n", pathResult.zones().size()));
+                for (int i = 0; i < pathResult.zones().size(); i++) {
+                    String zoneName = (i + 1) + ". " + pathResult.zones().get(i).getName();
+                    sb.append(String.format("║   %-26s║\n", zoneName));
+                }
+                sb.append("╠════════════════════════════════╣\n");
+                if (pathResult.type() == ZonePathfinder.PathType.DIRECT) {
+                    sb.append("║ ✓ Trajet possible!                 ║\n");
+                } else {
+                    sb.append("║ ✗ Trajet trop long (> 4 zones)     ║\n");
+                }
             } else {
-                System.out.println("║ ✗ Trajet trop long (> 4 zones)     ║");
+                sb.append("║ Aucun chemin trouvé!              ║\n");
             }
-        } else {
-            System.out.println("║ Aucun chemin trouvé!              ║");
+            sb.append("╚════════════════════════════════╝\n");
+            logger.debug(sb.toString());
         }
-        System.out.println("╚════════════════════════════════╝\n");
 
         Group groupDrawPath = drawPath(mapView.toViews(pathResult.zones()));
         if (groupDrawPath != null) {

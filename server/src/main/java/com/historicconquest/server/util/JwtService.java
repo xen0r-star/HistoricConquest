@@ -3,6 +3,8 @@ package com.historicconquest.server.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JwtService {
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
     private static final long VALIDITY_TIME = 2 * 60 * 60 * 1000; // 2 hours
     private static final PrivateKey privateKey;
     private static final PublicKey publicKey;
@@ -54,7 +57,8 @@ public class JwtService {
             return result;
 
         } catch (Exception e) {
-            return null;
+            logger.warn("Failed to verify JWT token", e);
+            throw new RuntimeException("Invalid JWT token");
         }
     }
 }

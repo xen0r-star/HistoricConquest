@@ -59,7 +59,7 @@
       </padding>
       <Pane fx:id="JoinPane" maxHeight="350.0" maxWidth="300.0" prefHeight="350.0" prefWidth="300.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" styleClass="button-blue">
          <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="100.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../images/globe-outline.png" />
+            <Image url="@../icons/globe.png" />
          </ImageView>
          <Label alignment="CENTER" layoutX="34.0" layoutY="129.0" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
             <font>
@@ -74,7 +74,7 @@
       </Pane>
       <Pane fx:id="HostPane" maxHeight="350.0" maxWidth="300.0" prefHeight="350.0" prefWidth="300.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" styleClass="button-green">
          <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="100.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../images/flash.png" />
+            <Image url="@../icons/flash.png" />
          </ImageView>
          <Label alignment="CENTER" layoutX="34.0" layoutY="129.0" prefHeight="34.0" prefWidth="232.0" text="HOST GAME" textFill="#eedcbe">
             <font>
@@ -98,7 +98,7 @@
       <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
          <HBox layoutX="217.0" layoutY="62.0">
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../images/globe-outline.png" />
+               <Image url="@../icons/globe.png" />
             </ImageView>
             <Label alignment="CENTER" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
                <font>
@@ -141,7 +141,7 @@
       <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
          <HBox layoutX="217.0" layoutY="62.0">
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../images/globe-outline.png" />
+               <Image url="@../icons/globe.png" />
             </ImageView>
             <Label alignment="CENTER" prefHeight="34.0" prefWidth="232.0" text="JOIN GAME" textFill="#eedcbe">
                <font>
@@ -177,7 +177,7 @@
       <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
          <HBox layoutX="277.0" layoutY="36.0" spacing="12.0">
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../images/globe-outline.png" />
+               <Image url="@../icons/globe.png" />
             </ImageView>
             <Label alignment="CENTER" prefHeight="34.0" text="GAME" textFill="#eedcbe">
                <font>
@@ -219,7 +219,7 @@
       <Pane maxHeight="350.0" maxWidth="700.0" prefHeight="350.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
          <HBox layoutX="227.0" layoutY="36.0" spacing="12.0">
             <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../images/flash.png" />
+               <Image url="@../icons/flash.png" />
             </ImageView>
             <Label alignment="CENTER" prefHeight="34.0" text="HOST GAME" textFill="#eedcbe">
                <font>
@@ -241,7 +241,7 @@
                </styleClass>
                <graphic>
                   <ImageView fitHeight="25.0" fitWidth="26.0" opacity="0.5" pickOnBounds="true" preserveRatio="true">
-                     <Image url="@../images/add-outline.png" />
+                     <Image url="@../icons/add.png" />
                   </ImageView>
                </graphic>
                <HBox.margin>
@@ -280,7 +280,7 @@
       <Pane maxHeight="350.0" maxWidth="601.0" prefHeight="350.0" prefWidth="601.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: hand; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
          <HBox alignment="CENTER" layoutX="75.0" layoutY="40.0" prefHeight="107.0" prefWidth="450.0" spacing="13.0">
             <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../images/server-outline.png" />
+               <Image url="@../icons/server.png" />
             </ImageView>
             <Label alignment="CENTER" prefHeight="81.0" prefWidth="309.0" text="Service temporarily unavailable" textFill="#eedcbe" wrapText="true">
                <font>
@@ -320,7 +320,7 @@
       </styleClass>
       <graphic>
          <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../images/caret-back-outline.png" />
+            <Image url="@../icons/caret-back.png" />
          </ImageView>
       </graphic>
       <padding>

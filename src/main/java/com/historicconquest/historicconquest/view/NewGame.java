@@ -1,6 +1,6 @@
 package com.historicconquest.historicconquest.view;
 
-import com.historicconquest.historicconquest.app.MainApp;
+import com.historicconquest.historicconquest.app.App;
 import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -15,14 +15,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
 public class NewGame {
+    private static final Logger logger = LoggerFactory.getLogger(NewGame.class);
 
     private Pane mapViewport;
 
-    public StackPane createView(MainApp app) {
+    public StackPane createView(App app) {
         StackPane root = new StackPane();
         VBox cornerButtons = new VBox(15);
         try {
@@ -37,21 +40,21 @@ public class NewGame {
             Button btnSettings = (Button) homeRoot.lookup("#settingsBtn");
 
             if (btnExit != null) {
-                btnExit.setOnAction(e -> MainApp.getInstance().exit());
+                btnExit.setOnAction(e -> App.getInstance().exit());
             }
 
             if (btnHelp != null) {
                 btnHelp.setOnAction(e -> {
-                    System.out.println("Clic Help!");
+                    logger.debug("Help button clicked in NewGame view");
                     // On passe 'root' (le StackPane de NewGame) à la méthode
-                    MainApp.getInstance().showHelp(true);
+                    App.getInstance().showHelp(true);
                 });
             }
 
 
             if (btnSettings != null) {
                 btnSettings.setOnAction(e -> {
-                    MainApp.getInstance().showSettings(true);
+                    App.getInstance().showSettings(true);
 
                 }); }
 
@@ -63,7 +66,7 @@ public class NewGame {
             cornerButtons.setPickOnBounds(false);
             StackPane.setMargin(cornerButtons, new Insets(50));
         } catch (Exception e) {
-            System.err.println("Erreur chargement boutons : " + e.getMessage());
+            logger.error("Failed to load HomePage buttons in NewGame view", e);
         }
 
         Parent hudBackground = loadGameHudBackground();
@@ -181,7 +184,7 @@ public class NewGame {
             return loader.load();
 
         } catch (Exception e) {
-            System.err.println("Erreur: impossible de charger " + "/view/fxml/GameHUD.fxml");
+            logger.error("Erreur: impossible de charger " + "/view/fxml/GameHUD.fxml", e);
             return null;
         }
     }

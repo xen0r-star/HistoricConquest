@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.view;
 
-import com.historicconquest.historicconquest.app.MainApp;
+import com.historicconquest.historicconquest.app.App;
+import com.historicconquest.historicconquest.controller.SettingsController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -51,25 +52,24 @@ public class SettingsPage implements Initializable {
 
     @FXML
     private void onSave() {
-        System.out.println("=== Paramètres sauvegardés ===");
-        System.out.println("Musique : " + (int) musicSlider.getValue() + "%");
-        System.out.println("Effets  : " + (int) sfxSlider.getValue() + "%");
-        System.out.println("Muet    : " + muteCheck.isSelected());
-        System.out.println("Résolution : " + resolutionCombo.getValue());
-        System.out.println("Plein écran: " + fullscreenCheck.isSelected());
-        System.out.println("Langue  : " + langCombo.getValue());
-
-        // Retour au menu
+        SettingsController.save(
+            (int) musicSlider.getValue(),
+            (int) sfxSlider.getValue(),
+            muteCheck.isSelected(),
+            resolutionCombo.getValue(),
+            fullscreenCheck.isSelected(),
+            langCombo.getValue()
+        );
         goBack();
     }
 
 
     @FXML
     private void onCancel() {
-        MainApp.getInstance().showSettings(false);
+        App.getInstance().showSettings(false);
     }
 
     private void goBack() {
-        MainApp.getInstance().showSettings(false);
+        App.getInstance().showSettings(false);
     }
 }

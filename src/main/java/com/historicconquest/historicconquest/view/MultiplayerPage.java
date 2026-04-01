@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.view;
 
-import com.historicconquest.historicconquest.app.MainApp;
+import com.historicconquest.historicconquest.app.App;
+import com.historicconquest.historicconquest.app.AppPage;
 import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.service.network.ApiService;
@@ -24,6 +25,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 public class MultiplayerPage {
+    private static final Logger logger = LoggerFactory.getLogger(MultiplayerPage.class);
     private static final String PLAYER_ICON = "/images/person.png";
     private static final String ROBOT_ICON = "/images/robots.png";
     private static final String AREA_EMPTY_STYLE = "-fx-background-color: #EEDCBE88";
@@ -154,7 +158,7 @@ public class MultiplayerPage {
     private void configureBackHandler() {
         BackBtn.setOnAction(e -> {
             if (currentPanel == PanelState.SELECT_MODE || currentPanel == PanelState.ERROR_SERVICE) {
-                MainApp.getInstance().showMenu();
+                App.getInstance().showPage(AppPage.HOME);
                 return;
             }
 
@@ -284,7 +288,9 @@ public class MultiplayerPage {
     }
 
     private void configureHostPanelHandlers() {
-        StartGameHost.setOnAction(e -> System.out.println("Start button clicked"));
+        StartGameHost.setOnAction(e -> {
+            logger.debug("Start game button clicked in host panel");
+        });
 
         CodeGameHost.setOnMouseClicked(e -> {
             ClipboardContent content = new ClipboardContent();

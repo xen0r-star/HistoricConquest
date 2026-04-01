@@ -9,7 +9,7 @@
 
 <AnchorPane fx:id="Root" maxHeight="1.7976931348623157E308" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" style="-fx-cursor: DEFAULT; -fx-background-radius: 7; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.view.Notification">
      <ImageView fx:id="Icon" fitHeight="32.0" fitWidth="32.0" layoutX="15.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="12.0">
-         <Image url="@../images/success-icon.png" />
+         <Image url="@../icons/success.png" />
      </ImageView>
      <Label fx:id="Title" alignment="TOP_LEFT" layoutX="85.0" layoutY="17.0" prefWidth="465.0" text="JOIN GAME" textFill="#eedcbe" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="51.0" AnchorPane.topAnchor="12.0">
          <font>
@@ -29,7 +29,7 @@
         <cursor>
             <Cursor fx:constant="HAND"/>
         </cursor>
-        <Image url="@../images/close-beige.png"/>
+        <Image url="@../icons/close.png"/>
     </ImageView>
     <styleClass>
         <String fx:value="button-small" />

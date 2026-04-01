@@ -14,6 +14,8 @@ module com.historicconquest.historicconquest {
     exports com.historicconquest.historicconquest.view;
     exports com.historicconquest.historicconquest.service.map;
     exports com.historicconquest.historicconquest.service.network;
+    exports com.historicconquest.historicconquest.model.network.model;
+    exports com.historicconquest.historicconquest.model.network.event;
 
     // JAVAFX
     opens com.historicconquest.historicconquest.app to javafx.fxml;

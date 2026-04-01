@@ -50,7 +50,7 @@
             <Insets top="30.0" />
          </StackPane.margin>
          <image>
-            <Image url="@../images/alert-icon.png" />
+            <Image url="@../icons/alert.png" />
          </image>
       </ImageView>
    </children>

@@ -13,7 +13,7 @@ public class SettingsController {
         if (root != null) return;
 
         try {
-            FXMLLoader loader = new FXMLLoader(SettingsController.class.getResource("/com/historicconquest/historicconquest/view/fxml/SettingsPage.fxml"));
+            FXMLLoader loader = new FXMLLoader(SettingsController.class.getResource("/view/fxml/SettingsPage.fxml"));
             root = loader.load();
 
             root.setVisible(false);
@@ -22,6 +22,16 @@ public class SettingsController {
         } catch (Exception e) {
             System.err.println("Error loading settings");
         }
+    }
+
+    public static void save(int music, int effets, boolean sound, String resolution, boolean fullScreen, String lang) {
+        System.out.println("=== Paramètres sauvegardés ===");
+        System.out.println("Musique : " + music + "%");
+        System.out.println("Effets  : " + effets + "%");
+        System.out.println("Muet    : " + sound);
+        System.out.println("Résolution : " +resolution);
+        System.out.println("Plein écran: " + fullScreen);
+        System.out.println("Langue  : " + lang);
     }
 
     public static void show(){

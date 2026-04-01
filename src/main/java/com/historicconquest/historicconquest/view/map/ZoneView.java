@@ -30,7 +30,7 @@ public class ZoneView extends Group {
         setCursor(Cursor.HAND);
         setPickOnBounds(false);
 
-        String zoneSVG = "/zones/" + zone.getBlocName() + "/" + zone.getName() + ".svg";
+        String zoneSVG = "/map/zones/" + zone.getBlocName() + "/" + zone.getName() + ".svg";
         zoneSVGGroup = loadSVG(zoneSVG, zone.getX(), zone.getY(), -1, -1, zone.getColor(), zone.getBorderColor());
         if (zoneSVGGroup == null) {
             throw new IllegalStateException("Failed to load zone SVG for: " + zone.getName());
@@ -38,7 +38,7 @@ public class ZoneView extends Group {
         getChildren().add(zoneSVGGroup);
 
         if (zone.getIcon() != null) {
-            String iconSVG = "/icons/" + zone.getThemes() + ".svg";
+            String iconSVG = "/map/icons/" + zone.getThemes() + ".svg";
             Group iconSVGGroup = loadSVG(
                 iconSVG,
                 zone.getIcon().x(), zone.getIcon().y(),

@@ -20,7 +20,7 @@ public final class MapViewFactory {
         Map<Zone, ZoneView> zoneIndex = new HashMap<>();
 
         for (Bloc bloc : worldMap.getBlocs()) {
-            BlocView blocView = new BlocView(bloc);
+            BlocView blocView = new BlocView();
             for (Zone zone : bloc.getZones()) {
                 ZoneView zoneView = new ZoneView(zone);
                 if (!enableHover) {

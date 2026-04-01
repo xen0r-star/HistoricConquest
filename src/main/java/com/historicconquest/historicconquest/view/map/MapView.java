@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MapView {
     private final Group root;
@@ -34,7 +35,7 @@ public class MapView {
         if (zones == null) return List.of();
         return zones.stream()
             .map(zoneViewIndex::get)
-            .filter(zv -> zv != null)
+            .filter(Objects::nonNull)
             .toList();
     }
 }

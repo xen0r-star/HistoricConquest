@@ -12,13 +12,13 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class MainApp extends Application {
+public class App extends Application {
     private Stage stage;
     private static StackPane root;
-    private static MainApp instance;
+    private static App instance;
 
 
-    public MainApp() {
+    public App() {
         instance = this;
     }
 
@@ -28,7 +28,7 @@ public class MainApp extends Application {
 
         stage.setTitle("Historic Conquest");
         stage.getIcons().add(new Image(Objects.requireNonNull(
-            getClass().getResourceAsStream("view/images/icon64.png")
+            getClass().getResourceAsStream("/view/images/icon.png")
         )));
 
 
@@ -46,8 +46,8 @@ public class MainApp extends Application {
 
         MapBackgroundController.initialize();
 
-        showMenu();
 
+        showPage(AppPage.HOME);
 
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -55,33 +55,36 @@ public class MainApp extends Application {
     }
 
 
+    public void showPage(AppPage page) {
+        switch (page) {
+            case HOME -> {
+                try {
+                    FXMLLoader loaderHomePage = new FXMLLoader(getClass().getResource("/view/fxml/HomePage.fxml"));
+                    StackPane homePageRoot = loaderHomePage.load();
 
-    public void showMenu() {
-        try {
-            FXMLLoader loaderHomePage = new FXMLLoader(getClass().getResource("/view/fxml/HomePage.fxml"));
-            StackPane homePageRoot = loaderHomePage.load();
+                    setAppContent(homePageRoot);
 
-            setAppContent(homePageRoot);
+                } catch (Exception e) {
+                    System.err.println("Error loading home page");
+                }
+            }
 
-        } catch (Exception e) {
-            System.err.println("Error loading home page");
-        }
-    }
+            case NEW_GAME -> {
+                NewGame newGame = new NewGame();
+                setAppContent(newGame.createView(this));
+            }
 
-    public void showNewGame() {
-        NewGame page = new NewGame();
-        setAppContent(page.createView(this));
-    }
+            case MULTIPLAYER -> {
+                try {
+                    FXMLLoader loaderMultiplayerPage = new FXMLLoader(getClass().getResource("/view/fxml/MultiplayerPage.fxml"));
+                    StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
 
-    public void showMultiplayer() {
-        try {
-            FXMLLoader loaderMultiplayerPage = new FXMLLoader(getClass().getResource("/view/fxml/MultiplayerPage.fxml"));
-            StackPane multiplayerPageRoot = loaderMultiplayerPage.load();
+                    setAppContent(multiplayerPageRoot);
 
-            setAppContent(multiplayerPageRoot);
-
-        } catch (Exception e) {
-            System.err.println("Error loading multiplayer page");
+                } catch (Exception e) {
+                    System.err.println("Error loading multiplayer page");
+                }
+            }
         }
     }
 
@@ -145,7 +148,7 @@ public class MainApp extends Application {
 
 
 
-    public static MainApp getInstance() {
+    public static App getInstance() {
         return instance;
     }
 

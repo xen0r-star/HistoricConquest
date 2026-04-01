@@ -51,22 +51,22 @@ public class Notification {
         switch (type) {
             case SUCCESS:
                 Root.getStyleClass().add("button-green");
-                Icon.setImage(loadIcon("success-icon.png"));
+                Icon.setImage(loadIcon("success.png"));
                 break;
 
             case INFORMATION:
                 Root.getStyleClass().add("button-blue");
-                Icon.setImage(loadIcon("information-icon.png"));
+                Icon.setImage(loadIcon("information.png"));
                 break;
 
             case ALERT:
                 Root.getStyleClass().add("button-yellow");
-                Icon.setImage(loadIcon("alert-icon.png"));
+                Icon.setImage(loadIcon("alert.png"));
                 break;
 
             case ERROR:
                 Root.getStyleClass().add("button-red");
-                Icon.setImage(loadIcon("error-close.png"));
+                Icon.setImage(loadIcon("error-close-dark.png"));
                 break;
         }
     }

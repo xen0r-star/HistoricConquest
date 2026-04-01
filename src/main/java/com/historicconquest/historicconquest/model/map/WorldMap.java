@@ -31,7 +31,7 @@ public class WorldMap {
 
 
     private void loadIconConfig() {
-        String path = "/icons/icon_config.json";
+        String path = "/map/icons/icon_config.json";
 
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null) throw new RuntimeException("Icon config not found: " + path);
@@ -43,7 +43,7 @@ public class WorldMap {
     }
 
     private void loadMapConfig(boolean loadIcon, Color defaultZoneColor, Color defaultZoneBorderColor) {
-        String path = "/zones/map_config.json";
+        String path = "/map/zones/map_config.json";
 
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null) throw new RuntimeException("Map config not found: " + path);

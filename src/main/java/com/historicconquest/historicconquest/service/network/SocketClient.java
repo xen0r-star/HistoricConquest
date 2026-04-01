@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +18,7 @@ public class SocketClient extends WebSocketClient {
     private static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:8080/ws";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
     private final Queue<String> messageQueue = new LinkedList<>();
     private final List<StompListener> listeners = new ArrayList<>();
     private final Map<String, StompListener> subscriptionListeners = new HashMap<>();
@@ -189,11 +192,11 @@ public class SocketClient extends WebSocketClient {
         }
 
         if (message.startsWith("ERROR")) {
-            System.err.println("Error received: " + getBody(message));
+            logger.error("STOMP error frame received: {}", getBody(message));
             return;
         }
 
-        System.out.println("Request inconnue: " + message);
+        logger.warn("Unknown STOMP frame received: {}", message);
     }
 
     @Override
@@ -213,12 +216,12 @@ public class SocketClient extends WebSocketClient {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         isConnected = false;
-        System.out.println("Déconnecté");
+        logger.info("WebSocket closed: code={}, reason='{}', remote={}.", code, reason, remote);
     }
 
     @Override
     public void onError(Exception ex) {
-        System.err.println("Error : " + ex.getMessage());
+        logger.error("WebSocket error", ex);
     }
 
 
@@ -253,7 +256,7 @@ public class SocketClient extends WebSocketClient {
                 return MAPPER.readTree(json);
 
             } catch (Exception e) {
-                System.err.println("Invalid JSON payload: " + e.getMessage());
+                logger.error("Invalid JSON payload: {}", e.getMessage(), e);
                 return NullNode.getInstance();
             }
         }
@@ -261,25 +264,34 @@ public class SocketClient extends WebSocketClient {
         return NullNode.getInstance();
     }
 
-    public String getBody(String message) {
-        String[] parts = message.split("\n\n", 2);
 
-        if (parts.length > 1) {
-            return parts[1].replace("\u0000", "").trim();
+    public String toJson(Object object) {
+        try {
+            return MAPPER.writeValueAsString(object);
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert object to JSON", e);
         }
-
-        return null;
     }
 
-    public String getHeaderValue(String message, String headerName) {
-        String prefix = headerName + ":";
 
-        for (String line : message.split("\\n")) {
-            if (line.startsWith(prefix)) {
-                return line.substring(prefix.length()).trim();
+    public String getHeaderValue(String frame, String headerName) {
+        String[] lines = frame.split("\\n");
+        for (String line : lines) {
+            if (line.startsWith(headerName + ":")) {
+                return line.substring(headerName.length() + 1);
             }
         }
-
         return null;
     }
+
+
+    public String getBody(String frame) {
+        int index = frame.indexOf("\n\n");
+        if (index != -1) {
+            return frame.substring(index + 2).replace("\u0000", "");
+        }
+        return "";
+    }
 }
+
