@@ -276,3 +276,13 @@
     -fx-stroke-width: 4px;   /* épaisseur */
     -fx-stroke:  #eeddc0;
 }
+
+.bouton_game {
+    -fx-font-size: 35;
+    -fx-font-weight: bold;
+    -fx-text-fill: #EEDCBE;
+    -fx-font-family: "Georgia";
+    -fx-background-color: #6B1515;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}

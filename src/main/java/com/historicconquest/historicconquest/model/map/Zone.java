@@ -46,6 +46,7 @@ public class Zone {
     public void addAdjacentZone(Zone zone) {
         if (zone == null || adjacentZones.contains(zone)) return;
         adjacentZones.add(zone);
+        zone.addAdjacentZone(this);
     }
 
 

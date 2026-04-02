@@ -23,4 +23,17 @@ public class Player {
     public void setAlliance(Alliance alliance) {
         this.alliance = alliance;
     }
+
+
+    public String getPseudo() {
+        return pseudo;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public PlayerColor getColor() {
+        return color;
+    }
 }
