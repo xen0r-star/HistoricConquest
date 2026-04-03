@@ -4,6 +4,7 @@ import com.historicconquest.historicconquest.app.App;
 import com.historicconquest.historicconquest.controller.GameController;
 import com.historicconquest.historicconquest.controller.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.PawnController;
+import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.player.Player;
@@ -34,8 +35,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class NewGame {
-    private static final double PAWN_SIZE_PX = 50.0;
-    private static final double PAWN_BUTTON_SIZE_PX = 72.0;
+    private static final double PAWN_SIZE_PX = 120.0;
+    private static final double PAWN_BUTTON_SIZE_PX = 120.0;
     private final List<Player> ListPlayer = new ArrayList<>();
     private static final int Nb_PLAYERS = 4;
     private final Set<PlayerColor> usedPawnColors = new HashSet<>();
@@ -65,6 +66,7 @@ public class NewGame {
             cornerButtons.setAlignment(Pos.BOTTOM_RIGHT);
             cornerButtons.setPickOnBounds(false);
             StackPane.setMargin(cornerButtons, new Insets(50));
+
         } catch (Exception e) {
             System.err.println("Erreur chargement boutons : " + e.getMessage());
         }
@@ -129,14 +131,19 @@ public class NewGame {
         for (PlayerColor color : availableColors) {
             Group pawnPreview = PawnController.createPawn(color, PAWN_SIZE_PX);
             pawnPreview.setMouseTransparent(true);
+            StackPane pawnGraphic = new StackPane(pawnPreview);
+            pawnGraphic.setMinSize(PAWN_SIZE_PX, PAWN_SIZE_PX);
+            pawnGraphic.setPrefSize(PAWN_SIZE_PX, PAWN_SIZE_PX);
+            pawnGraphic.setMaxSize(PAWN_SIZE_PX, PAWN_SIZE_PX);
+            pawnGraphic.setPickOnBounds(false);
 
             Button pawnBtn = new Button();
-            pawnBtn.setGraphic(pawnPreview);
+            pawnBtn.setGraphic(pawnGraphic);
             pawnBtn.setUserData(color);
             pawnBtn.setMinSize(PAWN_BUTTON_SIZE_PX, PAWN_BUTTON_SIZE_PX);
             pawnBtn.setPrefSize(PAWN_BUTTON_SIZE_PX, PAWN_BUTTON_SIZE_PX);
             pawnBtn.setMaxSize(PAWN_BUTTON_SIZE_PX, PAWN_BUTTON_SIZE_PX);
-            pawnBtn.setPadding(new Insets(4));
+            pawnBtn.setPadding(Insets.EMPTY);
             pawnBtn.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-cursor: hand; -fx-background-radius: 10;");
 
             pawnBtn.setOnAction(e -> {
@@ -253,15 +260,19 @@ public class NewGame {
                             pawnGroup.setTranslateX(b.getCenterX() - pawnCenterX);
                             pawnGroup.setTranslateY(b.getCenterY() - pawnCenterY);
                             mapInterface.getChildren().add(pawnGroup);
+
+                            p.setCurrentZone(startZone);
+                            p.setPawnNode(pawnGroup);
                         }
 
+                        Game gameEngine = new Game(ListPlayer, worldMap, gameController);
                         worldMap.getAllZones().forEach(zone -> {
                             ZoneView zoneView = mapView.getViewFor(zone);
                             if (zoneView == null) return;
 
                             zoneView.setPickOnBounds(true);
                             zoneView.setOnMouseClicked(event -> {
-                                gameController.showZoneInfo(zone);
+                                gameEngine.handleZoneSelection(zone);
                                 event.consume();
                             });
                         });

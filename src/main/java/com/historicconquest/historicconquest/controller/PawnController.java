@@ -162,16 +162,16 @@ public class PawnController {
 		if (color == null) return Color.web(BASE_HEX_COLOR);
 
         return switch (color) {
-            case RED ->         Color.web("#E53935");
-            case ORANGE ->      Color.web("#FB8C00");
-            case YELLOW ->      Color.web("#FDD835");
-            case GREEN ->       Color.web("#43A047");
-            case LIME ->        Color.web("#C0CA33");
-            case CYAN ->        Color.web("#00ACC1");
-            case BLUE ->        Color.web("#1E88E5");
-            case LIGHT_BLUE ->  Color.web("#90CAF9");
-            case PURPLE ->      Color.web("#8E24AA");
-            case PINK ->        Color.web("#EC407A");
+            case RED ->         Color.web("#A2383A");
+            case ORANGE ->      Color.web("#B9693E");
+            case YELLOW ->      Color.web("#B68D3B");
+            case GREEN ->       Color.web("#61712A");
+            case LIME ->        Color.web("#89A238");
+            case CYAN ->        Color.web("#38A270");
+            case BLUE ->        Color.web("#389BA2");
+            case LIGHT_BLUE ->  Color.web("#385BA2");
+            case PURPLE ->      Color.web("#6838A2");
+            case PINK ->        Color.web("#A23887");
         };
 	}
 }

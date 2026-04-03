@@ -1,15 +1,21 @@
 package com.historicconquest.historicconquest.model.player;
 
+import com.historicconquest.historicconquest.model.map.Zone;
+import javafx.scene.Node;
+
 import java.util.List;
 
 public class Player {
     private final int id;
     private final String pseudo;
     private final PlayerColor color;
+    private List<Zone> zones;
     private int consecutiveSuccesses;
     private int consecutiveFailures;
     private Alliance alliance;
     private List<Pawn> pawns;
+    private Zone currentZone;
+    private Node pawnNode;
 
     public Player(int id, String pseudo, PlayerColor color) {
         this.id = id;
@@ -35,5 +41,21 @@ public class Player {
 
     public PlayerColor getColor() {
         return color;
+    }
+
+    public Zone getCurrentZone() {
+        return currentZone;
+    }
+
+    public void setCurrentZone(Zone currentZone) {
+        this.currentZone = currentZone;
+    }
+
+    public Node getPawnNode() {
+        return pawnNode;
+    }
+
+    public void setPawnNode(Node pawnNode) {
+        this.pawnNode = pawnNode;
     }
 }
