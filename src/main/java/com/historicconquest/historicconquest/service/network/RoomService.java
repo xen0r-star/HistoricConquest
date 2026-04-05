@@ -56,11 +56,11 @@ public class RoomService {
     private JwtRoomClaims parseToken(String token) {
         try {
             PublicKey publicKey = KeyLoader.loadPublicKey();
-            Claims claims = Jwts.parserBuilder()
-                .setSigningKey(publicKey)
+            Claims claims = Jwts.parser()
+                .verifyWith(publicKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
             return new JwtRoomClaims(claims.getSubject(), claims.get("roomCode", String.class));
 

@@ -35,21 +35,21 @@ public class JwtService {
         Date expiry = new Date(now.getTime() + VALIDITY_TIME);
 
         return Jwts.builder()
-                   .setSubject(playerId)
+                   .subject(playerId)
                    .claim("roomCode", roomCode)
-                   .setIssuedAt(now)
-                   .setExpiration(expiry)
-                   .signWith(privateKey, SignatureAlgorithm.RS256)
+                   .issuedAt(now)
+                   .expiration(expiry)
+                   .signWith(privateKey)
                    .compact();
     }
 
     public static Map<String, String> verifyToken(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                                .setSigningKey(publicKey)
+            Claims claims = Jwts.parser()
+                                .verifyWith(publicKey)
                                 .build()
-                                .parseClaimsJws(token)
-                                .getBody();
+                                .parseSignedClaims(token)
+                                .getPayload();
 
             Map<String, String> result = new HashMap<>();
             result.put("playerId", claims.getSubject());
