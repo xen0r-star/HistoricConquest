@@ -1,7 +1,7 @@
 package com.historicconquest.server.model;
 
-import tools.jackson.annotation.JsonIgnore;
-import tools.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.historicconquest.server.util.JwtService;
 import java.util.UUID;
 
@@ -28,7 +28,8 @@ public class Player {
     @JsonProperty public String getId() {
         return id;
     }
-    @JsonProperty public String getType() {
+    @JsonProperty
+    public String getType() {
         return type;
     }
     @JsonProperty public String getPseudo() {
