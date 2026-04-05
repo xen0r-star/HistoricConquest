@@ -110,7 +110,7 @@ public class RoomService {
                     return;
                 }
 
-                RoomInfo.from(type.asText()).handle(payload, listener);
+                RoomInfo.from(type.asString()).handle(payload, listener);
             }
         };
     }
@@ -121,8 +121,8 @@ public class RoomService {
             public void onMessage(String destination, String rawMessage) {
                 JsonNode payload = socketClient.getJson(rawMessage);
 //                String type = payload.get("type").asText();
-                String title = payload.get("title").asText();
-                String message = payload.get("message").asText();
+                String title = payload.get("title").asString();
+                String message = payload.get("message").asString();
 
                 NotificationController.show(
                     title,
