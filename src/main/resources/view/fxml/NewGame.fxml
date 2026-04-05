@@ -73,30 +73,28 @@
             </font>
          </Label>
          <HBox layoutX="113.0" layoutY="125.0" prefHeight="35.0" prefWidth="495.0" spacing="8.0">
-            <TextField fx:id="NameTextField" minWidth="-Infinity" prefHeight="35.0" prefWidth="443.0"
-                       promptText="Enter your name...." style="-fx-prompt-text-fill: #00000086; -fx-font-size: 14;">
+            <TextField fx:id="NameTextField" minWidth="-Infinity" prefHeight="35.0" prefWidth="443.0" promptText="Enter your name...." style="-fx-prompt-text-fill: #00000086; -fx-font-size: 15;">
                <styleClass>
-                  <String fx:value="button-small"/>
-                  <String fx:value="button-beige"/>
-                  <String fx:value="not-hover"/>
+                  <String fx:value="button-small" />
+                  <String fx:value="button-beige" />
+                  <String fx:value="not-hover" />
                </styleClass>
             </TextField>
-            <Button fx:id="RandomName" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0"
-                    prefWidth="79.0" style="-fx-background-radius: 5;" textOverrun="LEADING_WORD_ELLIPSIS">
+            <Button fx:id="RandomName" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="79.0" style="-fx-background-radius: 5;" textOverrun="LEADING_WORD_ELLIPSIS">
                <styleClass>
-                  <String fx:value="button-small"/>
-                  <String fx:value="button-beige"/>
+                  <String fx:value="button-small" />
+                  <String fx:value="button-beige" />
                </styleClass>
                <graphic>
                   <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                     <Image url="@../icons/dice.png"/>
+                     <Image url="@../icons/dice.png" />
                   </ImageView>
                </graphic>
                <HBox.margin>
-                  <Insets/>
+                  <Insets />
                </HBox.margin>
                <padding>
-                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0"/>
+                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                </padding>
             </Button>
          </HBox>
@@ -116,25 +114,23 @@
                <Font name="Georgia Bold" size="16.0" />
             </font>
          </Label>
-         <AnchorPane layoutX="113.0" layoutY="208.0" prefHeight="128.0" prefWidth="495.0" style="-fx-background-radius: 4;">
+         <AnchorPane layoutX="113.0" layoutY="208.0" prefHeight="128.0" prefWidth="495.0" style="-fx-background-radius: 4; -fx-cursor: DEFAULT;">
             <styleClass>
                <String fx:value="button-small" />
                <String fx:value="button-beige" />
                <String fx:value="not-hover" />
             </styleClass>
-            <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="9.0" prefHeight="100.0" prefWidth="280.0" spacing="25.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="10.0">
-               <ImageView fx:id="HorseDrawnImage" fitHeight="73.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
-                  <Image url="@../../pawn/Horse-drawn.png" />
+            <HBox alignment="CENTER_LEFT" layoutX="17.0" layoutY="12.0" prefHeight="106.0" prefWidth="257.0" spacing="25.0" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="11.0">
+               <StackPane fx:id="HorseDrawnImage" maxHeight="73.0" maxWidth="130.0" minHeight="73.0" minWidth="130.0" prefHeight="73.0" prefWidth="130.0">
                   <HBox.margin>
                      <Insets />
                   </HBox.margin>
-               </ImageView>
-               <ImageView fx:id="ShipImage" fitHeight="73.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
-                  <Image url="@../../pawn/Ship.png" />
+               </StackPane>
+               <StackPane fx:id="ShipImage" maxHeight="73.0" maxWidth="100.0" minHeight="73.0" minWidth="100.0" prefHeight="73.0" prefWidth="100.0">
                   <HBox.margin>
                      <Insets />
                   </HBox.margin>
-               </ImageView>
+               </StackPane>
             </HBox>
             <VBox layoutX="296.0" layoutY="14.0" spacing="4.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
                <Label fx:id="TeamColorLabel" alignment="BOTTOM_LEFT" lineSpacing="3.0" prefHeight="25.0" prefWidth="150.0" text="Red Team" textFill="#616161" textOverrun="CLIP" wrapText="true">
@@ -165,7 +161,7 @@
                   <Circle fx:id="Color9" fill="#6838a2" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                </GridPane>
             </VBox>
-            <Line endY="50.0" layoutX="296.0" layoutY="64.0" startY="-50.0" stroke="#00000066" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="3.0" />
+            <Line endY="50.0" layoutX="296.0" layoutY="64.0" startY="-50.0" stroke="#00000066" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0" />
          </AnchorPane>
          <Label fx:id="PawnError" alignment="TOP_RIGHT" layoutX="113.0" layoutY="338.0" lineSpacing="3.0" prefHeight="24.0" prefWidth="495.0" text="This color is already taken." textFill="#d76a55" textOverrun="CLIP" wrapText="true">
             <font>

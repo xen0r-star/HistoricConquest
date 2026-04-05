@@ -13,17 +13,33 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class PawnController {
 	private static final String BASE_HEX_COLOR = "#A2383A";
-	private static Document pawnFile;
+	private static final String HORSE_SVG_PATH = "/pawn/Horse-drawn.svg";
+	private static final String SHIP_SVG_PATH = "/pawn/Ship.svg";
+	private static final Map<String, Document> pawnFiles = new HashMap<>();
 
 	private PawnController() { }
 
 
 	public static Group createPawn(PlayerColor color, double targetSizePx) {
-		Document doc = loadSvgDocument();
+		return createPawn(HORSE_SVG_PATH, color, targetSizePx);
+	}
+
+	public static Group createHorsePawn(PlayerColor color, double targetSizePx) {
+		return createPawn(HORSE_SVG_PATH, color, targetSizePx);
+	}
+
+	public static Group createShipPawn(PlayerColor color, double targetSizePx) {
+		return createPawn(SHIP_SVG_PATH, color, targetSizePx);
+	}
+
+	public static Group createPawn(String svgResourcePath, PlayerColor color, double targetSizePx) {
+		Document doc = loadSvgDocument(svgResourcePath);
 		Group root = new Group();
 
 		if (doc == null) return root;
@@ -137,8 +153,9 @@ public class PawnController {
 		return f.equalsIgnoreCase(PawnController.BASE_HEX_COLOR);
 	}
 
-	private static Document loadSvgDocument() {
-		if (pawnFile != null) return pawnFile;
+	private static Document loadSvgDocument(String resourcePath) {
+		Document cached = pawnFiles.get(resourcePath);
+		if (cached != null) return cached;
 
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -147,11 +164,12 @@ public class PawnController {
 			factory.setIgnoringElementContentWhitespace(true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 
-			InputStream is = PawnController.class.getResourceAsStream("/pawn/Horse-drawn.svg");
+			InputStream is = PawnController.class.getResourceAsStream(resourcePath);
 			if (is == null) return null;
 
-            pawnFile = builder.parse(is);
-			return pawnFile;
+			Document parsed = builder.parse(is);
+			pawnFiles.put(resourcePath, parsed);
+			return parsed;
 
 		} catch (Exception e) {
 			return null;

@@ -19,6 +19,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -28,6 +29,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
@@ -37,10 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class NewGame {
-    private static final double PAWN_SIZE_PX = 50.0;
     private static final int NB_PLAYERS = 4;
-    private static final String STYLE_COLOR_DEFAULT = "-fx-cursor: hand;";
-    private static final String STYLE_COLOR_DISABLED = "-fx-opacity: 0.35;";
 
     @FXML private StackPane root;
     @FXML private Pane mapViewport;
@@ -48,6 +47,7 @@ public class NewGame {
 
     @FXML private Label StepLabel, NameError, PawnError, TeamColorLabel;
     @FXML private TextField NameTextField;
+    @FXML private StackPane HorseDrawnImage, ShipImage;
 
     @FXML private Button BackBtn, NextPlayer, RandomName;
     @FXML private Circle Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9;
@@ -70,6 +70,9 @@ public class NewGame {
         RandomName.setOnAction(e -> NameTextField.setText(NameGenerator.get()));
         NextPlayer.setOnAction(e -> handleNextPlayer());
 
+
+        configurePreviewContainer(HorseDrawnImage, 130);
+        configurePreviewContainer(ShipImage, 100.0);
 
         MapBackgroundController.show(root, mapViewport, -55, -30, -0.03);
         initColorSelection();
@@ -102,7 +105,7 @@ public class NewGame {
         circleColorMap.put(circle, color);
         colorCircleMap.put(color, circle);
 
-        circle.setStyle(STYLE_COLOR_DEFAULT);
+        circle.setStyle("-fx-cursor: hand;");
         circle.setStrokeWidth(0.0);
         circle.setOnMouseClicked(e -> {
             if (circle.isDisable()) return;
@@ -118,19 +121,59 @@ public class NewGame {
             if (!circle.isDisable()) {
                 circle.setStrokeWidth(0.0);
                 circle.setStroke(Color.TRANSPARENT);
-                circle.setStyle(STYLE_COLOR_DEFAULT);
+                circle.setStyle("-fx-cursor: hand;");
             }
         }
 
         if (!selectedCircle.isDisable()) {
-            selectedCircle.setStroke(Color.web("#FFD700"));
+            selectedCircle.setStroke(Color.web("#636363"));
             selectedCircle.setStrokeWidth(3.0);
         }
 
         if (TeamColorLabel != null) {
             TeamColorLabel.setText(formatColorName(color) + " Team");
         }
+
+        refreshPawnPreviews();
     }
+
+    private void refreshPawnPreviews() {
+        if (selectedPawnColor == null) return;
+
+        setPreview(HorseDrawnImage, PawnController.createHorsePawn(selectedPawnColor, 122.0));
+        setPreview(ShipImage, PawnController.createShipPawn(selectedPawnColor, 95.0));
+    }
+
+
+    private void setPreview(StackPane container, Group pawnPreview) {
+        if (container == null) return;
+
+        container.getChildren().clear();
+
+        if (pawnPreview == null) return;
+
+        Bounds b = pawnPreview.getLayoutBounds();
+        pawnPreview.setTranslateX(-b.getMinX() - b.getWidth() / 2.0);
+        pawnPreview.setTranslateY(-b.getMinY() - b.getHeight() / 2.0);
+
+        pawnPreview.setMouseTransparent(true);
+        Group centeredPreview = new Group(pawnPreview);
+
+        StackPane.setAlignment(centeredPreview, Pos.CENTER);
+        container.getChildren().add(centeredPreview);
+    }
+
+    private void configurePreviewContainer(StackPane container, double width) {
+        container.setMinSize(width, 70.0);
+        container.setPrefSize(width, 70.0);
+        container.setMaxSize(width, 70.0);
+
+        Rectangle clip = new Rectangle(width, 70.0);
+        clip.widthProperty().bind(container.widthProperty());
+        clip.heightProperty().bind(container.heightProperty());
+        container.setClip(clip);
+    }
+
 
     private void handleNextPlayer() {
         String name = NameTextField.getText().trim();
@@ -176,7 +219,7 @@ public class NewGame {
         circle.setDisable(true);
         circle.setStrokeWidth(0.0);
         circle.setStroke(Color.TRANSPARENT);
-        circle.setStyle(STYLE_COLOR_DISABLED);
+        circle.setStyle("-fx-opacity: 0.35;");
     }
 
     private void autoSelectNextAvailableColor() {
@@ -234,7 +277,7 @@ public class NewGame {
                     ZoneView startZoneView = mapView.getViewFor(startZone);
                     if (startZoneView == null) continue;
 
-                    Group pawnGroup = PawnController.createPawn(player.getColor(), PAWN_SIZE_PX);
+                    Group pawnGroup = PawnController.createPawn(player.getColor(), 40.0);
                     pawnGroup.setMouseTransparent(true);
 
                     Bounds zoneBounds = startZoneView.getZoneSVGGroup().getBoundsInParent();
