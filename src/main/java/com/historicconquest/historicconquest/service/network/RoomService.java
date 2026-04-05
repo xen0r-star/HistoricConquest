@@ -1,6 +1,6 @@
 package com.historicconquest.historicconquest.service.network;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.model.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.model.network.event.RoomInfo;

@@ -1,74 +1,52 @@
 package com.historicconquest.historicconquest.model.questions;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Question {
+public record Question(String question, int difficulty, List<String> choices, int answer) {
+    private static final int NUMBER_CHOICE = 4;
 
-    private static final Logger logger = LoggerFactory.getLogger(Question.class);
+    @JsonCreator
+    public Question(
+            @JsonProperty("question") String question,
+            @JsonProperty("difficulty") int difficulty,
+            @JsonProperty("choices") List<String> choices,
+            @JsonProperty("answer") int answer
+    ) {
+        this.question = question;
+        this.difficulty = difficulty;
 
-    public Question(){
+        if (choices == null || choices.size() != NUMBER_CHOICE) {
+            throw new IllegalArgumentException("Choices must be a list of " + NUMBER_CHOICE + " items.");
+        }
 
+        this.choices = choices;
+        this.answer = answer;
     }
 
-    public static String readFile(String path) {
-        StringBuilder theme = null;
-        try (InputStream is = QuestionPage.class.getResourceAsStream(path);
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+    public static List<Theme> getThemesFromJsonFile(String file) {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            theme = new StringBuilder();
-            String line = "";
-            while (line != null) {
-                theme.append(line);
-                line = bufferedReader.readLine();
-            }
+        try (InputStream is = Question.class.getResourceAsStream(file)) {
+            if (is == null) return new ArrayList<>();
 
-        } catch (NullPointerException e) {
-            logger.error("The file {} is not found in classpath!", path, e);
+            return objectMapper.readValue(is, new TypeReference<>() {
+            });
 
         } catch (IOException e) {
-            logger.error("I/O error while reading questions file {}", path, e);
+            return new ArrayList<>();
         }
-
-        return theme.toString();
     }
 
 
-    public static Theme getThemeFromJsonFile(String file){
-        String json = readFile(file);
-        Theme this_theme = new Theme();
-        List<Theme> themes = null;
-        if (json != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
-
-            try {
-                themes = mapper.readValue(
-                        json,
-                        new TypeReference<List<Theme>>() {
-                        }
-                );
-
-            } catch (Exception e) {
-                logger.error("Failed to parse theme JSON from file {}", file, e);
-                return null;
-            }
-        }
-
-        if (themes == null || themes.isEmpty()) {
-            logger.warn("No themes found in JSON file {}", file);
-            return null;
-        }
-
-        this_theme = themes.getFirst();
-        return this_theme;
+    public boolean isCorrectAnswer(int answer) {
+        return this.answer == answer;
     }
-
 }

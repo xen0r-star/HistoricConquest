@@ -3,10 +3,12 @@ module com.historicconquest.historicconquest {
     requires javafx.fxml;
     requires javafx.graphics;
     requires java.net.http;
-    requires com.fasterxml.jackson.databind;
+    requires tools.jackson.core;
     requires org.java_websocket;
     requires jjwt.api;
     requires java.xml;
+    requires tools.jackson.databind;
+    requires com.fasterxml.jackson.core;
 
     // EXPORTS
     exports com.historicconquest.historicconquest.app;

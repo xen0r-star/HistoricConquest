@@ -1,0 +1,205 @@
+[
+    {
+        "name": "HISTORY",
+        "describeDifficult" :
+        ["A gentle introduction to the archives.",
+            "Get straight to the point.",
+            "Only the sharpest minds will be able to unravel the past.",
+            "The ultimate challenge for true experts."],
+        "questions" :
+        [
+            {"question" : "Which French emperor lost the Battle of Waterloo ?",
+                "difficulty" :  1,
+                "choices" :  ["Louis Philippe Ier", "Napoléon III", "Napoléon Bonaparte", "Charles X"],
+                "answer" :  3},
+
+            {"question" : "Which famous text was adopted on August 26, 1789, in France ?",
+                "difficulty" :  2,
+                "choices" :  ["The Civil Code", "The Constitution of the Republic", "The Treaty of Versailles", "The Declaration of the Rights of Man and of the Citizen"],
+                "answer" :  4},
+
+            {"question" : "Which Ottoman sultan conquered Constantinople in 1453 ?",
+                "difficulty" :  3,
+                "choices" :  ["Mehmed II", "Soliman le Magnifique", "Osman 1er", "Selim 1er"],
+                "answer" :  1},
+
+            {"question" : "Which Ottoman ruler, nicknamed 'the Magnificent' by Europeans, brought the Empire to its peak in the 16th century ?",
+                "difficulty" :  4,
+                "choices" :  ["Osman III", "Soliman", "Mourad IV", "Abdülhamid II"],
+                "answer" :  2},
+
+            {"question" : "In what year did the Belgian Revolution take place ?",
+                "difficulty" :  1,
+                "choices" :  ["1789", "1848", "1914", "1830"],
+                "answer" :  4},
+
+            {"question" : "In which region was the printing press invented ?",
+                "difficulty" :  2,
+                "choices" :  ["In East Asia", "In Europe", "In the Middle East", "In Central America"],
+                "answer" :  2},
+
+            {"question" : "What was the Enigma machine used for during World War II ?",
+                "difficulty" :  3,
+                "choices" :  ["To encrypt and decrypt secret messages", "To detect enemy submarines using ultrasound", "To calculate the trajectory of V2 missiles", "To transmit propaganda images via radio waves."],
+                "answer" :  1},
+
+            {"question" : "In what year did television broadcast color images for the first time in Belgium ?",
+                "difficulty" :  4,
+                "choices" :  ["1953", "1975", "1967", "1982"],
+                "answer" :  3}
+        ]
+
+    },
+    {
+        "name": "INFORMATIC",
+        "describeDifficult" :
+        ["Ready to try your hand at the basics of computing ?",
+            "You know the basics… but is that enough ?",
+            "Here, improvisation won’t be enough.",
+            "Here, every detail counts."],
+        "questions" :
+        [
+            {"question" : "What does the acronym 'RAM' stand for ?",
+                "difficulty" :  1,
+                "choices" :  ["Random Access Memory", "Global Active Network", "Modular Automated Routing", "Amplely Mobilized Resource"],
+                "answer" :  1},
+
+            {"question" : "In what programming language was the Linux kernel written ?",
+                "difficulty" :  2,
+                "choices" :  ["Assembly language", "C# language", "C language", "JAVA language"],
+                "answer" :  3},
+
+            {"question" : "What is my network's IP address? (ex : 192.128.1.15 )",
+                "difficulty" :  3,
+                "choices" :  ["192.128.0.0", "192.128.1.0", "192.128.1.255", "192.128.1.15"],
+                "answer" :  2},
+
+            {"question" : "Who is considered the first computer programmer in history ?",
+                "difficulty" :  4,
+                "choices" :  ["Bill gates ", "Ada Lovelace", "Thomas Pesquet ", "Jeff bezos"],
+                "answer" :  2},
+
+            {"question" : "A programmer's job consists of :",
+                "difficulty" :  1,
+                "choices" :  ["Physically repairing internal computer components.", "Exclusively managing the sale of computer hardware in a store.", "Monitoring building security through surveillance cameras.", "Writing and testing code to create software or applications."],
+                "answer" :  4},
+
+            {"question" : "What is a programming language ?",
+                "difficulty" :  2,
+                "choices" :  ["A foreign language used only by network engineers.", "A software used to translate texts from one language to another.", "A dictionary of technical words for repairing keyboards.", "A code allowing a human to give instructions to a machine."],
+                "answer" :  4},
+
+            {"question" : "What is the difference between a bit and a byte ?",
+                "difficulty" :  3,
+                "choices" :  ["A bit is used for text and a byte is used only for images.", "A byte is a hardware part while a bit is a Wi-Fi signal.", "A bit is the minimum unit (0 or 1), while a byte is a group of 8 bits.", "There is no difference; they are two words for the same thing."],
+                "answer" :  3},
+
+            {"question" : "What is the major difference between RAM and ROM ?",
+                "difficulty" :  4,
+                "choices" :  ["RAM is volatile (erases without power) while ROM is permanent.", "RAM is used to store photos and ROM is used to run games.", "RAM is an external component (USB flash drive) and ROM is internal to the computer.", "RAM is much slower than ROM for reading information."],
+                "answer" :  1}
+        ]
+
+    },
+    {
+        "name" : "DIVERTISSMENT",
+        "describeDifficult" :
+        ["Perfect for getting started in the world of entertainment.",
+            "There are quite a few surprises in store for you here.",
+            "The classics won’t be enough anymore, we need to go further.",
+            "This requires a real grasp of pop culture."],
+        "questions" :
+        [
+            {"question" : "Which plumber is Nintendo's mascot ?",
+                "difficulty" :  1,
+                "choices" :  ["Cars", "Sonic", "Mario", "Luigi"],
+                "answer" :  3},
+
+            {"question" : "Which Swedish music streaming service dominated the market in the 2010s ?",
+                "difficulty" :  2,
+                "choices" :  ["Deezer", "Apple Music", "Google Music", "Spotify"],
+                "answer" :  4},
+
+            {"question" : "Which actor plays Jack Sparrow in Pirates of the Caribbean ?",
+                "difficulty" :  3,
+                "choices" :  ["Leonardo DiCaprio", "Johnny Depp", "Brad Pitt", "Tom Cruise"],
+                "answer" :  2},
+
+            {"question" : "In what year was the first iPhone released ?",
+                "difficulty" :  4,
+                "choices" :  ["2006 ", "2007", "2008 ", "2002"],
+                "answer" :  2},
+
+            {"question" : "Who is the NBA player with the most championships ?",
+                "difficulty" :  1,
+                "choices" :  ["Bill Russell", "Sam Jones ", "LeBron James ", "Michael Jordan"],
+                "answer" :  1},
+
+            {"question" : "What is the most watched sport on the planet ?",
+                "difficulty" :  2,
+                "choices" :  ["Formula 1", "Tennis", "Football", "Basketball"],
+                "answer" :  3},
+
+            {"question" : "What is the most expensive transfer fee in football history ?",
+                "difficulty" :  3,
+                "choices" :  ["222 millions", "180 millions ", "145 millions", "126 millions"],
+                "answer" :  1},
+
+            {"question" : "Why was Mike Tyson, aka Iron Mike, disqualified during his fight against Evander Holyfield in 1997 ?",
+                "difficulty" :  4,
+                "choices" :  ["He accidentally knocked out the referee.", "He kept hitting after the bell.", "He bit his opponent's ear.", "He used an illegal kick."],
+                "answer" :  3}
+        ]
+    },
+    {
+        "name" : "TOURISM",
+        "describeDifficult" :
+        ["We’re starting off gently – perfect for exploring new horizons.",
+            "We're venturing off the beaten track a bit.",
+            "Things are getting serious when it comes to tourism.",
+            "A real challenge for passionates."],
+        "questions" :
+        [
+            {"question" : "In which country is Machu Picchu located ?",
+                "difficulty" :  1,
+                "choices" :  ["Peru", "Bolivia", "Chile", "Mexico"],
+                "answer" :  1},
+
+            {"question" : "What is the capital of Japan ??",
+                "difficulty" :  2,
+                "choices" :  ["Osaka", "Kyoto", "Tokyo", "Hiroshima"],
+                "answer" :  3},
+
+            {"question" : "Which country is historically the world's top tourist destination by number of visitors ?",
+                "difficulty" :  3,
+                "choices" :  ["Spain", "United States", "China", "France"],
+                "answer" :  4},
+
+            {"question" : "Which monument was built by an emperor in memory of his wife ?",
+                "difficulty" :  4,
+                "choices" :  ["Red Fort ", "Taj Mahal", "Golden Temple ", "Qutub Minar"],
+                "answer" :  2},
+
+            {"question" : "Which country has the most islands in the world ?",
+                "difficulty" :  1,
+                "choices" :  ["Norway", "Indonesia", "Sweden", "Philippines"],
+                "answer" :  3},
+
+            {"question" : "In which country is Mont Blanc located ?",
+                "difficulty" :  2,
+                "choices" :  ["Italy", "France", "Austria", "Switzerland"],
+                "answer" :  2},
+
+            {"question" : "Which is the largest mosque in Africa ?",
+                "difficulty" :  3,
+                "choices" :  ["The Hassan II Mosque (Morocco)", "Al-Azhar Mosque (Egypt)", "The Great Mosque of Kairouan (Tunisia)", "The Great Mosque of Algiers (Algeria)"],
+                "answer" :  4},
+
+            {"question" : "Where do 'French Fries' come from ?",
+                "difficulty" :  4,
+                "choices" :  ["United States", "Canada", "Belgium", "France"],
+                "answer" :  3}
+        ]
+
+    }
+]

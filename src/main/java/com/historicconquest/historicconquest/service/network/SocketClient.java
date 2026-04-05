@@ -1,9 +1,9 @@
 package com.historicconquest.historicconquest.service.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.NullNode;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
@@ -266,12 +266,7 @@ public class SocketClient extends WebSocketClient {
 
 
     public String toJson(Object object) {
-        try {
-            return MAPPER.writeValueAsString(object);
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert object to JSON", e);
-        }
+        return MAPPER.writeValueAsString(object);
     }
 
 

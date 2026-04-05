@@ -1,7 +1,7 @@
 package com.historicconquest.server.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import tools.jackson.annotation.JsonIgnore;
+import tools.jackson.annotation.JsonProperty;
 import com.historicconquest.server.util.JwtService;
 import java.util.UUID;
 

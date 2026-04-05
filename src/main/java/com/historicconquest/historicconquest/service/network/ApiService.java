@@ -1,7 +1,7 @@
 package com.historicconquest.historicconquest.service.network;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.historicconquest.historicconquest.model.network.model.ErrorRequest;
 import com.historicconquest.historicconquest.model.network.model.NetworkPlayer;
 import javafx.application.Platform;
