@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.view.NewGame">
+   <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #907f66; -fx-border-width: 2;">
+      <StackPane.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </StackPane.margin>
+   </Pane>
+   <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" styleClass="map-grid-transparent" stylesheets="@../styles/style.css">
+      <StackPane.margin>
+         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+      </StackPane.margin>
+   </Region>
+   <Pane fx:id="mapViewport" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent;">
+      <StackPane.margin>
+         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+      </StackPane.margin>
+   </Pane>
+   <Region mouseTransparent="true" prefHeight="400.0" prefWidth="290.0" styleClass="HUD-border" StackPane.alignment="CENTER">
+      <StackPane.margin>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      </StackPane.margin>
+   </Region>
+   <VBox alignment="TOP_CENTER">
+      <Label alignment="CENTER" style="-fx-text-fill: #FFF8ED;" styleClass="title-label" stylesheets="@../styles/style.css" text="HISTORIC" textAlignment="CENTER" textOverrun="CLIP">
+         <VBox.margin>
+            <Insets bottom="-80.0" />
+         </VBox.margin>
+      </Label>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="97.0">
+         <Circle fill="#fff4e3" radius="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+         <Region maxHeight="2.0" mouseTransparent="true" prefHeight="2.0" prefWidth="400.0" style="-fx-background-color: #FFF4E3;" StackPane.alignment="CENTER">
+            </Region>
+         <Circle fill="#fff4e3" radius="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+      </HBox>
+      <Label alignment="CENTER" styleClass="title-label" stylesheets="@../styles/style.css" text="CONQUEST" textAlignment="CENTER" textOverrun="CLIP">
+         <VBox.margin>
+            <Insets top="-50.0" />
+         </VBox.margin>
+      </Label>
+      <StackPane.margin>
+         <Insets bottom="100.0" left="100.0" right="100.0" top="100.0" />
+      </StackPane.margin>
+   </VBox>
+   <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
+      </StackPane.margin>
+      <Pane maxHeight="428.0" maxWidth="700.0" prefHeight="428.0" prefWidth="700.0" style="-fx-border-width: 2, 2; -fx-border-insets: 6, 11; -fx-border-style: solid, solid; -fx-cursor: default; -fx-background-radius: 3; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);">
+         <HBox layoutX="256.0" layoutY="36.0" spacing="12.0">
+            <Label alignment="CENTER" prefHeight="34.0" text="NEW GAME" textFill="#eedcbe">
+               <font>
+                  <Font name="Georgia Bold" size="30.0" />
+               </font>
+            </Label>
+         </HBox>
+         <Label fx:id="StepLabel" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="91.0" layoutY="71.0" lineSpacing="3.0" prefHeight="35.0" prefWidth="518.0" text="Player (1 / 4)" textAlignment="CENTER" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="17.0" />
+            </font>
+         </Label>
+         <Label alignment="BOTTOM_LEFT" layoutX="114.0" layoutY="100.0" lineSpacing="3.0" prefHeight="25.0" text="Name" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="16.0" />
+            </font>
+         </Label>
+         <HBox layoutX="113.0" layoutY="125.0" prefHeight="35.0" prefWidth="495.0" spacing="8.0">
+            <TextField fx:id="NameTextField" minWidth="-Infinity" prefHeight="35.0" prefWidth="443.0"
+                       promptText="Enter your name...." style="-fx-prompt-text-fill: #00000086; -fx-font-size: 14;">
+               <styleClass>
+                  <String fx:value="button-small"/>
+                  <String fx:value="button-beige"/>
+                  <String fx:value="not-hover"/>
+               </styleClass>
+            </TextField>
+            <Button fx:id="RandomName" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0"
+                    prefWidth="79.0" style="-fx-background-radius: 5;" textOverrun="LEADING_WORD_ELLIPSIS">
+               <styleClass>
+                  <String fx:value="button-small"/>
+                  <String fx:value="button-beige"/>
+               </styleClass>
+               <graphic>
+                  <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../icons/dice.png"/>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets/>
+               </HBox.margin>
+               <padding>
+                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0"/>
+               </padding>
+            </Button>
+         </HBox>
+         <Button fx:id="NextPlayer" layoutX="294.0" layoutY="362.0" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-radius: 5;" text="Next player" textOverrun="LEADING_WORD_ELLIPSIS">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+            </styleClass>
+         </Button>
+         <Label fx:id="NameError" alignment="TOP_RIGHT" layoutX="180.0" layoutY="162.0" lineSpacing="3.0" prefHeight="24.0" prefWidth="428.0" text="This name is already taken." textFill="#d76a55" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="12.0" />
+            </font>
+         </Label>
+         <Label alignment="BOTTOM_LEFT" layoutX="113.0" layoutY="180.0" lineSpacing="3.0" prefHeight="25.0" text="Pawn" textFill="#eedcbe" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="16.0" />
+            </font>
+         </Label>
+         <AnchorPane layoutX="113.0" layoutY="208.0" prefHeight="128.0" prefWidth="495.0" style="-fx-background-radius: 4;">
+            <styleClass>
+               <String fx:value="button-small" />
+               <String fx:value="button-beige" />
+               <String fx:value="not-hover" />
+            </styleClass>
+            <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="9.0" prefHeight="100.0" prefWidth="280.0" spacing="25.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="10.0">
+               <ImageView fx:id="HorseDrawnImage" fitHeight="73.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@../../pawn/Horse-drawn.png" />
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+               </ImageView>
+               <ImageView fx:id="ShipImage" fitHeight="73.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@../../pawn/Ship.png" />
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+               </ImageView>
+            </HBox>
+            <VBox layoutX="296.0" layoutY="14.0" spacing="4.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
+               <Label fx:id="TeamColorLabel" alignment="BOTTOM_LEFT" lineSpacing="3.0" prefHeight="25.0" prefWidth="150.0" text="Red Team" textFill="#616161" textOverrun="CLIP" wrapText="true">
+                  <font>
+                     <Font name="Georgia Bold" size="16.0" />
+                  </font>
+               </Label>
+               <GridPane fx:id="ColorContainer">
+                  <columnConstraints>
+                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" prefWidth="100.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" prefWidth="100.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                  <Circle fx:id="Color1" fill="#a2383a" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="0" />
+                  <Circle fx:id="Color2" fill="#b9693e" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="1" />
+                  <Circle fx:id="Color3" fill="#b68d3b" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="2" />
+                  <Circle fx:id="Color4" fill="#89a238" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="3" />
+                  <Circle fx:id="Color5" fill="#61712a" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="4" />
+                  <Circle fx:id="Color6" fill="#385ba2" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Circle fx:id="Color7" fill="#389ba2" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.rowIndex="1" />
+                  <Circle fx:id="Color8" fill="#a23887" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Circle fx:id="Color9" fill="#6838a2" radius="12.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+               </GridPane>
+            </VBox>
+            <Line endY="50.0" layoutX="296.0" layoutY="64.0" startY="-50.0" stroke="#00000066" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="3.0" />
+         </AnchorPane>
+         <Label fx:id="PawnError" alignment="TOP_RIGHT" layoutX="113.0" layoutY="338.0" lineSpacing="3.0" prefHeight="24.0" prefWidth="495.0" text="This color is already taken." textFill="#d76a55" textOverrun="CLIP" wrapText="true">
+            <font>
+               <Font name="Georgia Bold" size="12.0" />
+            </font>
+         </Label>
+         <styleClass>
+            <String fx:value="button-green" />
+            <String fx:value="not-hover" />
+         </styleClass>
+      </Pane>
+   </HBox>
+   <Button fx:id="BackBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" text="Back" StackPane.alignment="TOP_LEFT">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+      </StackPane.margin>
+      <styleClass>
+         <String fx:value="button-small" />
+         <String fx:value="button-red" />
+      </styleClass>
+      <graphic>
+         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../icons/caret-back.png" />
+         </ImageView>
+      </graphic>
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+      </padding>
+   </Button>
+</StackPane>

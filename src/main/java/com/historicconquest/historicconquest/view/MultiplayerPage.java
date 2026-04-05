@@ -106,8 +106,9 @@ public class MultiplayerPage {
             setPanel(PanelState.ERROR_SERVICE);
         }
 
+
         configureBackHandler();
-        configureMapBackground();
+        MapBackgroundController.show(root, mapViewport, -55 ,-30, -0.03);
     }
 
     private void configureSelectModeHandlers() {
@@ -310,13 +311,6 @@ public class MultiplayerPage {
                 );
             }
         });
-    }
-
-    private void configureMapBackground() {
-        MapBackgroundController.show(
-                root, mapViewport,
-                -55 ,-30, -0.03
-        );
     }
 
 

@@ -1,7 +1,6 @@
 package com.historicconquest.historicconquest.app;
 
 import com.historicconquest.historicconquest.controller.*;
-import com.historicconquest.historicconquest.view.NewGame;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -70,8 +69,15 @@ public class App extends Application {
             }
 
             case NEW_GAME -> {
-                NewGame newGame = new NewGame();
-                setAppContent(newGame.createView(this));
+                try {
+                    FXMLLoader loaderNewGamePage = new FXMLLoader(getClass().getResource("/view/fxml/NewGame.fxml"));
+                    StackPane newGamePageRoot = loaderNewGamePage.load();
+
+                    setAppContent(newGamePageRoot);
+
+                } catch (Exception e) {
+                    System.err.println("Error loading new game page");
+                }
             }
 
             case MULTIPLAYER -> {
