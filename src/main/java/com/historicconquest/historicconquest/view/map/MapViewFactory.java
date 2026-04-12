@@ -5,9 +5,7 @@ import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import javafx.scene.Group;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class MapViewFactory {
@@ -16,7 +14,6 @@ public final class MapViewFactory {
 
     public static MapView build(WorldMap worldMap, boolean enableHover) {
         Group root = new Group();
-        List<BlocView> blocViews = new ArrayList<>();
         Map<Zone, ZoneView> zoneIndex = new HashMap<>();
 
         for (Bloc bloc : worldMap.getBlocs()) {
@@ -29,10 +26,9 @@ public final class MapViewFactory {
                 blocView.addZoneView(zoneView);
                 zoneIndex.put(zone, zoneView);
             }
-            blocViews.add(blocView);
             root.getChildren().add(blocView);
         }
 
-        return new MapView(root, blocViews, zoneIndex);
+        return new MapView(root, zoneIndex);
     }
 }
