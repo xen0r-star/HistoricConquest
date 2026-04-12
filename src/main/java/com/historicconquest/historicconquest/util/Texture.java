@@ -20,7 +20,7 @@ public class Texture {
                 double base = 0.5;
                 double value = base + noise * strength;
 
-                value = Math.max(0, Math.min(1, value));
+                value = Math.clamp(value, 0, 1);
                 writer.setColor(x, y, Color.color(value, value, value));
             }
         }

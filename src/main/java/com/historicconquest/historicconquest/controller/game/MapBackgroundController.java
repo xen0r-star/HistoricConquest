@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.controller;
+package com.historicconquest.historicconquest.controller.game;
 
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.util.Texture;

@@ -1,6 +1,7 @@
-package com.historicconquest.historicconquest.controller;
+package com.historicconquest.historicconquest.controller.overlay;
 
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
@@ -11,7 +12,12 @@ public class HelpController {
     private static StackPane root;
 
 
-    private HelpController() { }
+    public HelpController() { }
+
+    @FXML
+    private void closeFromUi() {
+        HelpController.close();
+    }
 
     public static void initialize() {
         if (root != null) return;
@@ -50,3 +56,4 @@ public class HelpController {
         return root;
     }
 }
+

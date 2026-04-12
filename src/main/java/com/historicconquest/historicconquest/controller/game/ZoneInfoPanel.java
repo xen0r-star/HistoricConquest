@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.view;
+package com.historicconquest.historicconquest.controller.game;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -26,3 +26,5 @@ public class ZoneInfoPanel {
         root.setManaged(false);
     }
 }
+
+

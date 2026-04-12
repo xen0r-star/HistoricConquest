@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.view;
+package com.historicconquest.historicconquest.controller.game;
 
 import com.historicconquest.historicconquest.util.Texture;
 import javafx.fxml.FXML;
@@ -35,3 +35,4 @@ public class GameHUD {
         }
     }
 }
+

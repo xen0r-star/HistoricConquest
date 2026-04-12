@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="551.0" prefWidth="357.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.view.HelpPage">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="551.0" prefWidth="357.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.overlay.HelpController">
    <Label alignment="CENTER" contentDisplay="CENTER" text="Rules of the game " textAlignment="CENTER" textFill="#030303" StackPane.alignment="TOP_CENTER">
       <font>
          <Font name="Georgia Bold" size="32.0" />
@@ -14,7 +14,7 @@
          <Insets left="25.0" top="30.0" />
       </StackPane.margin>
    </Label>
-   <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#close" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #911616;" text="X" textAlignment="CENTER" textFill="#070707" StackPane.alignment="TOP_RIGHT">
+   <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#closeFromUi" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #911616;" text="X" textAlignment="CENTER" textFill="#070707" StackPane.alignment="TOP_RIGHT">
       <font>
          <Font name="Georgia Bold" size="12.0" />
       </font>

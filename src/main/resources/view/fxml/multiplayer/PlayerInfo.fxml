@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane fx:id="root" prefWidth="608.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.view.multiplayer.PlayerInfo">
+<Pane fx:id="root" prefWidth="608.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.multiplayer.PlayerInfo">
     <HBox prefHeight="25.0" spacing="6.0">
         <ImageView fx:id="PlayerIcon" fitHeight="25.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../../icons/person.png" />

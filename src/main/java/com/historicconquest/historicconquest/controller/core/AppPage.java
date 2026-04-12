@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.app;
+package com.historicconquest.historicconquest.controller.core;
 
 public enum AppPage {
     HOME,

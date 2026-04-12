@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.controller;
+package com.historicconquest.historicconquest.controller.game;
 
 import com.historicconquest.historicconquest.model.player.PlayerColor;
 import javafx.scene.Group;
@@ -117,7 +117,7 @@ public class PawnController {
 			opacity *= parseOpacity(opacityAttr);
 		}
 
-		path.setOpacity(Math.max(0.0, Math.min(1.0, opacity)));
+		path.setOpacity(Math.clamp(opacity, 0.0, 1.0));
 	}
 
 	private static double parseOpacity(String value) {
@@ -193,3 +193,4 @@ public class PawnController {
         };
 	}
 }
+

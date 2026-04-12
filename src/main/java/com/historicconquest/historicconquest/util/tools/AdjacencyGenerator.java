@@ -12,14 +12,13 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class AdjacencyGenerator {
     private static final String filePath = "./adjacency.json";
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         WorldMap worldMap = new WorldMap();
         MapView mapView = MapViewFactory.build(worldMap, false);
         List<Zone> zones = worldMap.getAllZones();

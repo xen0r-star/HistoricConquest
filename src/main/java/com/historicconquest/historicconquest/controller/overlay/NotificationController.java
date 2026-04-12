@@ -1,6 +1,5 @@
-package com.historicconquest.historicconquest.controller;
+package com.historicconquest.historicconquest.controller.overlay;
 
-import com.historicconquest.historicconquest.view.Notification;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -88,3 +87,4 @@ public class NotificationController {
 		return root;
 	}
 }
+

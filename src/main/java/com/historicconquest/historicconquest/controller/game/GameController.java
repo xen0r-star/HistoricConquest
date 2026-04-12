@@ -1,8 +1,7 @@
-package com.historicconquest.historicconquest.controller;
+package com.historicconquest.historicconquest.controller.game;
 
+import com.historicconquest.historicconquest.model.game.GameAnimationPort;
 import com.historicconquest.historicconquest.model.map.Zone;
-import com.historicconquest.historicconquest.view.GameHUD;
-import com.historicconquest.historicconquest.view.ZoneInfoPanel;
 import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.animation.PathTransition;
@@ -16,7 +15,7 @@ import javafx.util.Duration;
 import java.util.List;
 
 
-public class GameController {
+public class GameController implements GameAnimationPort {
     private final ZoneInfoPanel zoneInfoPanel;
     private final MapView mapView;
 
@@ -56,8 +55,7 @@ public class GameController {
         pt.setCycleCount(1);
 
         pt.setOnFinished(e -> {
-            if (onFinished != null)
-                onFinished.run();
+            if (onFinished != null) onFinished.run();
         });
 
         pt.play();

@@ -1,10 +1,8 @@
 package com.historicconquest.historicconquest.service.network;
 
 import tools.jackson.databind.JsonNode;
-import com.historicconquest.historicconquest.controller.NotificationController;
 import com.historicconquest.historicconquest.model.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.model.network.event.RoomInfo;
-import com.historicconquest.historicconquest.view.Notification;
 import com.historicconquest.historicconquest.util.KeyLoader;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -31,6 +29,7 @@ public class RoomService {
     private final StompListener pingListener;
     private final StompListener roomListener;
     private final StompListener errorListener;
+    private final ErrorNotifier errorNotifier;
 
     private ScheduledExecutorService pingScheduler;
     private RoomEventListener listener;
@@ -38,12 +37,18 @@ public class RoomService {
 
     private static final Logger logger = LoggerFactory.getLogger(RoomService.class);
 
+    @FunctionalInterface
+    public interface ErrorNotifier {
+        void notify(String title, String message);
+    }
 
 
-    public RoomService(String token) {
+
+    public RoomService(String token, ErrorNotifier errorNotifier) {
         JwtRoomClaims claims = parseToken(token);
         this.playerId = claims.playerId();
         this.roomCode = claims.roomCode();
+        this.errorNotifier = errorNotifier;
         this.socketClient = new SocketClient(token);
         this.pingListener = buildPingListener();
         this.roomListener = buildRoomListener();
@@ -124,11 +129,7 @@ public class RoomService {
                 String title = payload.get("title").asString();
                 String message = payload.get("message").asString();
 
-                NotificationController.show(
-                    title,
-                    message,
-                    Notification.Type.ALERT
-                );
+                notifyError(title, message);
             }
         };
     }
@@ -203,15 +204,14 @@ public class RoomService {
             socketClient.sendNoData("/app/addBot");
 
         } catch (Exception e) {
-            NotificationController.show(
+            notifyError(
                 "Failed to add bot",
-                "Impossible to add bot to room, Please try again.",
-                Notification.Type.ALERT
+                "Impossible to add bot to room, Please try again."
             );
         }
     }
 
-    public void switchStatus() {
+    public String switchStatus() {
         status = status.equals(STATUS_WAITING) ? STATUS_READY : STATUS_WAITING;
 
         try {
@@ -224,12 +224,13 @@ public class RoomService {
             );
 
         } catch (Exception e) {
-            NotificationController.show(
+            notifyError(
                 "Failed to switch status",
-                "Impossible to switch status, Please try again.",
-                Notification.Type.ALERT
+                "Impossible to switch status, Please try again."
             );
         }
+
+        return status;
     }
 
     public void updatePseudo(String newPseudo) {
@@ -243,10 +244,9 @@ public class RoomService {
             );
 
         } catch (Exception e) {
-            NotificationController.show(
+            notifyError(
                 "Failed to change pseudo",
-                "Impossible to change pseudo, Please try again.",
-                Notification.Type.ALERT
+                "Impossible to change pseudo, Please try again."
             );
         }
     }
@@ -263,10 +263,9 @@ public class RoomService {
             );
 
         } catch (Exception e) {
-            NotificationController.show(
+            notifyError(
                 "Failed to kick player",
-                "Impossible to kick player, Please try again.",
-                Notification.Type.ALERT
+                "Impossible to kick player, Please try again."
             );
         }
     }
@@ -278,6 +277,15 @@ public class RoomService {
 
     public String getPlayerId() {
         return playerId;
+    }
+
+    private void notifyError(String title, String message) {
+        if (errorNotifier != null) {
+            errorNotifier.notify(title, message);
+            return;
+        }
+
+        logger.warn("{} - {}", title, message);
     }
 
     private record JwtRoomClaims(String playerId, String roomCode) { }

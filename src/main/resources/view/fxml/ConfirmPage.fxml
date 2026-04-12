@@ -13,7 +13,7 @@
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
            minWidth="-Infinity" prefHeight="370.0" prefWidth="416.0" stylesheets="@../styles/style.css"
            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.historicconquest.historicconquest.view.QuestionPage">
+           fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
    <styleClass>
       <String fx:value="button-blue"/>
       <String fx:value="HUD-border"/>

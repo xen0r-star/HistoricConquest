@@ -1,16 +1,16 @@
-package com.historicconquest.historicconquest.view;
+package com.historicconquest.historicconquest.controller.page.multiplayer;
 
-import com.historicconquest.historicconquest.app.App;
-import com.historicconquest.historicconquest.app.AppPage;
-import com.historicconquest.historicconquest.controller.MapBackgroundController;
-import com.historicconquest.historicconquest.controller.NotificationController;
+import com.historicconquest.historicconquest.controller.core.AppPage;
+import com.historicconquest.historicconquest.controller.core.AppController;
+import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
+import com.historicconquest.historicconquest.controller.overlay.Notification;
+import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.service.network.ApiService;
 import com.historicconquest.historicconquest.model.network.model.NetworkPlayer;
 import com.historicconquest.historicconquest.model.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.service.network.SocketClient;
-import com.historicconquest.historicconquest.view.multiplayer.PlayerInfo;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-public class MultiplayerPage {
-    private static final Logger logger = LoggerFactory.getLogger(MultiplayerPage.class);
+public class MultiplayerController {
+    private static final Logger logger = LoggerFactory.getLogger(MultiplayerController.class);
     private static final String PLAYER_ICON = "/images/person.png";
     private static final String ROBOT_ICON = "/images/robots.png";
     private static final String AREA_EMPTY_STYLE = "-fx-background-color: #EEDCBE88";
@@ -80,7 +80,7 @@ public class MultiplayerPage {
     @FXML private Button AddBotHost, StartGameHost;
     @FXML private Label NumberPlayerHost, CodeGameHost;
     @FXML private VBox PlayerContainerHost;
-    
+
 
     private PanelState currentPanel = PanelState.SELECT_MODE;
 
@@ -137,7 +137,7 @@ public class MultiplayerPage {
 
                     String code = response.roomCode().substring(0, 3) + " " + response.roomCode().substring(3, 6);
                     CodeGameHost.setText(code);
-                    this.roomService = new RoomService(response.token());
+                    this.roomService = new RoomService(response.token(), this::showAlert);
                     roomService.setListener(createRoomListener());
 
 
@@ -159,7 +159,7 @@ public class MultiplayerPage {
     private void configureBackHandler() {
         BackBtn.setOnAction(e -> {
             if (currentPanel == PanelState.SELECT_MODE || currentPanel == PanelState.ERROR_SERVICE) {
-                App.getInstance().showPage(AppPage.HOME);
+                AppController.getInstance().showPage(AppPage.HOME);
                 return;
             }
 
@@ -193,7 +193,7 @@ public class MultiplayerPage {
                     return;
                 }
 
-                this.roomService = new RoomService(response.token());
+                this.roomService = new RoomService(response.token(), this::showAlert);
                 roomService.setListener(createRoomListener());
 
                 for (NetworkPlayer player : response.players()) {
@@ -280,7 +280,8 @@ public class MultiplayerPage {
     private void configureJoinPanelRoomHandlers() {
         StatusJoin.setOnAction(e -> {
             if (currentPanel == PanelState.JOIN_ROOM) {
-                roomService.switchStatus();
+                String status = roomService.switchStatus();
+                StatusJoin.setText(Objects.equals(status, "Ready") ? "Cancel" : "Ready");
 
             } else if (currentPanel == PanelState.HOST_ROOM) {
                 // Check que tous les joueurs sont Ready
@@ -596,4 +597,9 @@ public class MultiplayerPage {
         HostPanel.setVisible(panel == PanelState.HOST_ROOM);
         ErrorService.setVisible(panel == PanelState.ERROR_SERVICE);
     }
+
+    private void showAlert(String title, String message) {
+        NotificationController.show(title, message, Notification.Type.ALERT);
+    }
 }
+

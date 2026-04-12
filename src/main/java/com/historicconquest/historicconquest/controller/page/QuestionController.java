@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.view;
+package com.historicconquest.historicconquest.controller.page;
 
 import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class QuestionPage {
+public class QuestionController {
     private int myAnswer = 0; // A METTRE DANS LA LOGIC GAME PLUS TARD
 
 
-    private static QuestionPage instance;
+    private static QuestionController instance;
     private Question question;
 
     @FXML public Slider slider;
@@ -31,9 +31,9 @@ public class QuestionPage {
     private static StackPane mainStackPane;
     private static Theme theme;
 
-    public QuestionPage() { instance = this; }
+    public QuestionController() { instance = this; }
 
-    public static QuestionPage getInstance() { return instance; }
+    public static QuestionController getInstance() { return instance; }
 
     public static void showChoiceDifficultPage(StackPane parent){
         List<Theme> themeList = Question.getThemesFromJsonFile("/datas/Questions.json");
@@ -42,17 +42,17 @@ public class QuestionPage {
         int random = (int) (Math.random() * 4);
         theme = themeList.get(random);
         FXMLLoader questionLoader = new FXMLLoader(
-                Objects.requireNonNull(QuestionPage.class.getResource("view/fxml/ChoiceDifficultPage.fxml")));
+                Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/ChoiceDifficultPage.fxml")));
 
         FXMLLoader confirmLoader = new FXMLLoader(
-                Objects.requireNonNull(QuestionPage.class.getResource("view/fxml/ConfirmPage.fxml")));
+                Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/ConfirmPage.fxml")));
 
         try {
             StackPane difficultStackPane = questionLoader.load();
             StackPane confirmStackPane = confirmLoader.load();
 
-            QuestionPage difficultController = questionLoader.getController();
-            QuestionPage confirmController = confirmLoader.getController();
+            QuestionController difficultController = questionLoader.getController();
+            QuestionController confirmController = confirmLoader.getController();
 
             difficultController.setMainStackPane(parent);
             confirmController.setMainStackPane(parent);
@@ -114,12 +114,12 @@ public class QuestionPage {
     public void showQuestionPage(){
         destroyStackPane();
         FXMLLoader questionLoader = new FXMLLoader(
-                Objects.requireNonNull(QuestionPage.class.getResource("view/fxml/QuestionPage.fxml")));
+                Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/QuestionPage.fxml")));
 
         try {
             StackPane questionStackPane = questionLoader.load();
 
-            QuestionPage questionController = questionLoader.getController();
+            QuestionController questionController = questionLoader.getController();
             questionController.startQuestion();
 
             StackPane stackPane = questionController.getMainStackPane();
@@ -184,3 +184,4 @@ public class QuestionPage {
     public Question getQuestion() { return this.question; }
 
 }
+
