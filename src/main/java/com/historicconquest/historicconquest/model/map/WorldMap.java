@@ -51,12 +51,12 @@ public class WorldMap {
             JsonNode root = mapper.readTree(is);
 
             for (JsonNode blocNode : root) {
-                String blocName = blocNode.get("name").asText();
+                String blocName = blocNode.get("name").asString();
                 Bloc bloc = new Bloc(TypeBloc.valueOf(blocName.toUpperCase()));
 
                 JsonNode children = blocNode.get("children");
                 for (JsonNode zoneNode : children) {
-                    String zoneName = zoneNode.get("name").asText();
+                    String zoneName = zoneNode.get("name").asString();
                     Zone zone;
 
                     if (loadIcon) {
@@ -109,9 +109,9 @@ public class WorldMap {
 
     private JsonNode searchIcon(String blocName, String zoneName) {
         for (JsonNode blocNode : iconConfig) {
-            if (blocNode.path("name").asText().equals(blocName)) {
+            if (blocNode.path("name").asString().equals(blocName)) {
                 for (JsonNode zoneNode : blocNode.path("children")) {
-                    if (zoneNode.path("name").asText().equals(zoneName)) {
+                    if (zoneNode.path("name").asString().equals(zoneName)) {
                         return zoneNode;
                     }
                 }
@@ -135,7 +135,7 @@ public class WorldMap {
 
                 if (zoneAdjacentNode != null && zoneAdjacentNode.isArray()) {
                     for (JsonNode adjacentName : zoneAdjacentNode) {
-                        String neighborName = adjacentName.asText();
+                        String neighborName = adjacentName.asString();
 
                         allZones.stream()
                                 .filter(z -> z.getName().equals(neighborName))

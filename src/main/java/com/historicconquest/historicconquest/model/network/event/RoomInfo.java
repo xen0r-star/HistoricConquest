@@ -128,7 +128,7 @@ public enum RoomInfo {
 
     private static String getText(JsonNode node, String field) {
         JsonNode value = node.get(field);
-        return value == null || value.isNull() ? "" : value.asText();
+        return value == null || value.isNull() ? "" : value.asString();
     }
 
     private static void notifyIfPresent(RoomEventListener listener, java.util.function.Consumer<RoomEventListener> callback) {

@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.view.multiplayer;
+package com.historicconquest.historicconquest.controller.page.multiplayer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -87,3 +87,5 @@ public class PlayerInfo {
         }
     }
 }
+
+

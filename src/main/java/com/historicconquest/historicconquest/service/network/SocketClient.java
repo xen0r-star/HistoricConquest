@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.service.network;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.NullNode;
@@ -122,7 +121,7 @@ public class SocketClient extends WebSocketClient {
 
 
 
-    public void sendJson(String destination, Map<String, Object> jsonBody) throws JsonProcessingException {
+    public void sendJson(String destination, Map<String, Object> jsonBody) {
         sendSafe(buildFrame(
             "SEND",
             List.of(

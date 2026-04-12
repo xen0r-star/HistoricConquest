@@ -1,10 +1,12 @@
-package com.historicconquest.historicconquest.view;
+package com.historicconquest.historicconquest.controller.page;
 
-import com.historicconquest.historicconquest.app.App;
-import com.historicconquest.historicconquest.app.AppPage;
-import com.historicconquest.historicconquest.controller.GameController;
-import com.historicconquest.historicconquest.controller.MapBackgroundController;
-import com.historicconquest.historicconquest.controller.PawnController;
+import com.historicconquest.historicconquest.controller.core.AppPage;
+import com.historicconquest.historicconquest.controller.core.AppController;
+import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.GameHUD;
+import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
+import com.historicconquest.historicconquest.controller.game.PawnController;
+import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
@@ -38,7 +40,7 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.List;
 
-public class NewGame {
+public class NewGameController {
     private static final int NB_PLAYERS = 4;
 
     @FXML private StackPane root;
@@ -66,7 +68,7 @@ public class NewGame {
         PawnError.setVisible(false);
         PawnError.setManaged(false);
 
-        BackBtn.setOnAction(e -> App.getInstance().showPage(AppPage.HOME));
+            BackBtn.setOnAction(e -> AppController.getInstance().showPage(AppPage.HOME));
         RandomName.setOnAction(e -> NameTextField.setText(NameGenerator.get()));
         NextPlayer.setOnAction(e -> handleNextPlayer());
 
@@ -348,3 +350,6 @@ public class NewGame {
         };
     }
 }
+
+
+

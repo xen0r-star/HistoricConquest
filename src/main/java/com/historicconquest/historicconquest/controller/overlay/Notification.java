@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.view;
+package com.historicconquest.historicconquest.controller.overlay;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -66,7 +66,7 @@ public class Notification {
 
             case ERROR:
                 Root.getStyleClass().add("button-red");
-                Icon.setImage(loadIcon("error-close-dark.png"));
+                Icon.setImage(loadIcon("error.png"));
                 break;
         }
     }
@@ -106,7 +106,9 @@ public class Notification {
 
     private Image loadIcon(String fileName) {
         return new Image(Objects.requireNonNull(
-            getClass().getResourceAsStream("/view/images/" + fileName)
+            getClass().getResourceAsStream("/view/icons/" + fileName)
         ));
     }
 }
+
+
