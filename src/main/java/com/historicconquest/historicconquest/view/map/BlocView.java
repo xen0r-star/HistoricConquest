@@ -15,8 +15,4 @@ public class BlocView extends Group {
         zoneViews.add(zoneView);
         getChildren().add(zoneView);
     }
-
-    public List<ZoneView> getZoneViews() {
-        return zoneViews;
-    }
 }
