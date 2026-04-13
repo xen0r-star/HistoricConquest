@@ -69,13 +69,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         String token = authHeader.substring(7);
                         Map<String, String> info = JwtService.verifyToken(token);
 
-                        if (info != null) {
-                            String playerId = info.get("playerId");
-                            String roomCode = info.get("roomCode");
+                        String playerId = info.get("playerId");
+                        String roomCode = info.get("roomCode");
 
-                            StompPrincipal principal = new StompPrincipal(playerId, roomCode);
-                            accessor.setUser(principal);
-                        }
+                        StompPrincipal principal = new StompPrincipal(playerId, roomCode);
+                        accessor.setUser(principal);
                     }
                 }
 

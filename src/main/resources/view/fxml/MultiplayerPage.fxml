@@ -167,7 +167,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -190,7 +190,24 @@
                <Font name="Georgia Bold" size="14.0" />
             </font>
          </Label>
-         <Label fx:id="NumberPlayerJoin" layoutX="32.0" layoutY="118.0" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1 / 4" />
+
+         <HBox layoutX="32.0" layoutY="118.0" prefHeight="35.0" prefWidth="131.0" spacing="15.0">
+            <Label fx:id="NumberPlayerJoin" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1 / 4" />
+            <Button fx:id="EditProfilJoin" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-radius: 5;" textOverrun="LEADING_WORD_ELLIPSIS">
+               <styleClass>
+                  <String fx:value="button-small" />
+                  <String fx:value="button-beige" />
+               </styleClass>
+               <graphic>
+                  <ImageView fitHeight="25.0" fitWidth="139.0" opacity="0.72" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../icons/pencil.png" />
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+         </HBox>
          <Button fx:id="StatusJoin" layoutX="568.0" layoutY="118.0" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-radius: 5;" text="Ready">
             <styleClass>
                <String fx:value="button-small" />
@@ -234,7 +251,21 @@
          </Label>
          <HBox layoutX="32.0" layoutY="118.0" prefHeight="35.0" spacing="15.0">
             <Label fx:id="NumberPlayerHost" style="-fx-text-fill: #675932; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #EEDCBE; -fx-padding: 5 15; -fx-background-radius: 5;" text="1 / 4" />
-            <Button fx:id="AddBotHost" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-radius: 5;" text="Bot" textOverrun="LEADING_WORD_ELLIPSIS">
+            <Button fx:id="EditProfilHost" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-radius: 5;" textOverrun="LEADING_WORD_ELLIPSIS">
+               <styleClass>
+                  <String fx:value="button-small" />
+                  <String fx:value="button-beige" />
+               </styleClass>
+               <graphic>
+                  <ImageView fitHeight="25.0" fitWidth="139.0" opacity="0.72" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../icons/pencil.png" />
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="AddBotHost" layoutX="90.0" layoutY="10.0" maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-radius: 5;" text="Bot" textOverrun="LEADING_WORD_ELLIPSIS">
                <styleClass>
                   <String fx:value="button-small" />
                   <String fx:value="button-beige" />
@@ -244,9 +275,6 @@
                      <Image url="@../icons/add.png" />
                   </ImageView>
                </graphic>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
             </Button>
          </HBox>
          <HBox layoutX="432.0" layoutY="118.0" prefHeight="35.0" spacing="15.0">
@@ -270,7 +298,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="ErrorService" alignment="TOP_CENTER" layoutX="60.0" layoutY="310.0" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+   <HBox fx:id="ErrorService" alignment="TOP_CENTER" layoutX="60.0" layoutY="310.0" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
       <padding>
          <Insets top="25.0" />
       </padding>

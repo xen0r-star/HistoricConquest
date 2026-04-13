@@ -58,6 +58,53 @@ public class RoomService {
         return rooms.get(code);
     }
 
+    public Collection<Player> getPlayers(String roomCode) throws Exception {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new Exception("Room not found");
+        }
+
+        return room.getPlayers();
+    }
+
+    public boolean pseudoIsUsed(String roomCode, String pseudo, String excludedPlayerId) {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
+        }
+
+        String normalizedPseudo = pseudo == null ? "" : pseudo.trim();
+        if (normalizedPseudo.isBlank()) {
+            return false;
+        }
+
+        for (Player player : room.getPlayers()) {
+            boolean isCurrentPlayer = excludedPlayerId != null && excludedPlayerId.equals(player.getId());
+            if (isCurrentPlayer) {
+                continue;
+            }
+
+            if (player.getPseudo() != null && player.getPseudo().equalsIgnoreCase(normalizedPseudo)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Collection<String> getUsedColors(String roomCode, String excludedPlayerId) {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
+        }
+
+        return room.getPlayers().stream()
+            .filter(player -> excludedPlayerId == null || !excludedPlayerId.equals(player.getId()))
+            .map(Player::getColor)
+            .filter(color -> color != null && !color.isBlank())
+            .toList();
+    }
+
     private String generateCode() {
         Random random = new Random();
         int number = random.nextInt(900000) + 100000;

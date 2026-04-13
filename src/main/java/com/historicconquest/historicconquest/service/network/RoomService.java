@@ -22,17 +22,17 @@ public class RoomService {
 
     private final String playerId;
     private final String roomCode;
+    private final String token;
     private long pingTime;
     private String status = STATUS_WAITING;
 
     private final SocketClient socketClient;
-    private final StompListener pingListener;
-    private final StompListener roomListener;
-    private final StompListener errorListener;
+    private final StompListener pingListener, roomListener, errorListener;
     private final ErrorNotifier errorNotifier;
 
     private ScheduledExecutorService pingScheduler;
     private RoomEventListener listener;
+    private static RoomService instance;
 
 
     private static final Logger logger = LoggerFactory.getLogger(RoomService.class);
@@ -43,11 +43,11 @@ public class RoomService {
     }
 
 
-
-    public RoomService(String token, ErrorNotifier errorNotifier) {
+    private RoomService(String token, ErrorNotifier errorNotifier) {
         JwtRoomClaims claims = parseToken(token);
         this.playerId = claims.playerId();
         this.roomCode = claims.roomCode();
+        this.token = token;
         this.errorNotifier = errorNotifier;
         this.socketClient = new SocketClient(token);
         this.pingListener = buildPingListener();
@@ -56,6 +56,33 @@ public class RoomService {
 
         subscribeAll();
         socketClient.connect();
+    }
+
+    public static synchronized void create(String token, ErrorNotifier errorNotifier) {
+        if (instance != null) {
+            instance.disconnect();
+        }
+
+        instance = new RoomService(token, errorNotifier);
+    }
+
+    public static RoomService getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("RoomService is not initialized");
+        }
+
+        return instance;
+    }
+
+    public static synchronized boolean isInitialized() {
+        return instance != null;
+    }
+
+    public static synchronized void reset() {
+        if (instance == null) return;
+
+        instance.disconnect();
+        instance = null;
     }
 
     private JwtRoomClaims parseToken(String token) {
@@ -153,11 +180,11 @@ public class RoomService {
         );
     }
 
-    public void setListener(RoomEventListener listener) {
-        this.listener = listener;
+    public static void setListener(RoomEventListener listener) {
+        getInstance().listener = listener;
     }
 
-    public void disconnect() {
+    private void disconnect() {
         stopPingScheduler();
         socketClient.allUnsubscribe();
         socketClient.close();
@@ -199,43 +226,46 @@ public class RoomService {
 
 
 
-    public void addBot() {
+    public static void addBot() {
         try {
-            socketClient.sendNoData("/app/addBot");
+            getInstance().socketClient.sendNoData("/app/addBot");
 
         } catch (Exception e) {
-            notifyError(
+            getInstance().notifyError(
                 "Failed to add bot",
                 "Impossible to add bot to room, Please try again."
             );
         }
     }
 
-    public String switchStatus() {
-        status = status.equals(STATUS_WAITING) ? STATUS_READY : STATUS_WAITING;
+    public static String switchStatus() {
+        getInstance().status =
+            getInstance().status.equals(STATUS_WAITING) ?
+            STATUS_READY :
+            STATUS_WAITING;
 
         try {
-            socketClient.sendJson(
+            getInstance().socketClient.sendJson(
                 "/app/update",
                 Map.of(
                     "type", "PLAYER_STATUS_CHANGE",
-                    "data", status
+                    "data", getInstance().status
                 )
             );
 
         } catch (Exception e) {
-            notifyError(
+            getInstance().notifyError(
                 "Failed to switch status",
                 "Impossible to switch status, Please try again."
             );
         }
 
-        return status;
+        return getInstance().status;
     }
 
-    public void updatePseudo(String newPseudo) {
+    public static void updatePseudo(String newPseudo) {
         try {
-            socketClient.sendJson(
+            getInstance().socketClient.sendJson(
                 "/app/update",
                 Map.of(
                     "type", "PLAYER_PSEUDO_CHANGE",
@@ -244,40 +274,62 @@ public class RoomService {
             );
 
         } catch (Exception e) {
-            notifyError(
+            getInstance().notifyError(
                 "Failed to change pseudo",
                 "Impossible to change pseudo, Please try again."
             );
         }
     }
 
-    public void quitRoom() {
-        socketClient.sendNoData("/app/quit");
+    public static void updateColor(String newColor) {
+        try {
+            getInstance().socketClient.sendJson(
+                "/app/update",
+                Map.of(
+                    "type", "PLAYER_COLOR_CHANGE",
+                    "data", newColor
+                )
+            );
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to change color",
+                "Impossible to change color, Please try again."
+            );
+        }
     }
 
-    public void kickPlayer(String playerId) {
+    public static void quitRoom() {
+        getInstance().socketClient.sendNoData("/app/quit");
+    }
+
+    public static void kickPlayer(String playerId) {
         try {
-            socketClient.sendJson(
+            getInstance().socketClient.sendJson(
                 "/app/kick",
                 Map.of("playerId", playerId)
             );
 
         } catch (Exception e) {
-            notifyError(
+            getInstance().notifyError(
                 "Failed to kick player",
                 "Impossible to kick player, Please try again."
             );
         }
     }
 
-    public void deleteRoom() {
-        socketClient.sendNoData("/app/delete");
+    public static void deleteRoom() {
+        getInstance().socketClient.sendNoData("/app/delete");
     }
 
-
-    public String getPlayerId() {
-        return playerId;
+    public static String getPlayerId() {
+        return getInstance().playerId;
     }
+
+    public static String getToken() {
+        return getInstance().token;
+    }
+
 
     private void notifyError(String title, String message) {
         if (errorNotifier != null) {

@@ -72,20 +72,19 @@ public class MultiplayerController {
     @FXML private TextField UsernameTF;
 
     // JoinPanel3
-    @FXML private Button StatusJoin;
+    @FXML private Button StatusJoin, EditProfilJoin;
     @FXML private Label NumberPlayerJoin;
     @FXML private VBox PlayerContainerJoin;
 
     // HostPanel
-    @FXML private Button AddBotHost, StartGameHost;
+    @FXML private Button EditProfilHost, AddBotHost, StartGameHost;
     @FXML private Label NumberPlayerHost, CodeGameHost;
     @FXML private VBox PlayerContainerHost;
 
 
     private PanelState currentPanel = PanelState.SELECT_MODE;
-
     private final List<RoomPlayer> roomPlayers = new ArrayList<>();
-    private RoomService roomService;
+    private Pane editProfilOverlay;
 
 
 
@@ -137,13 +136,13 @@ public class MultiplayerController {
 
                     String code = response.roomCode().substring(0, 3) + " " + response.roomCode().substring(3, 6);
                     CodeGameHost.setText(code);
-                    this.roomService = new RoomService(response.token(), this::showAlert);
-                    roomService.setListener(createRoomListener());
+                    RoomService.create(response.token(), this::showAlert);
+                    RoomService.setListener(createRoomListener());
 
 
                     roomPlayers.clear();
                     roomPlayers.add(new RoomPlayer(
-                        this.roomService.getPlayerId(),
+                        RoomService.getPlayerId(),
                         "Host", "#FF0000",
                         false, 0,
                         "Waiting", false
@@ -163,15 +162,15 @@ public class MultiplayerController {
                 return;
             }
 
-            if (currentPanel == PanelState.JOIN_ROOM && roomService != null) {
-                roomService.quitRoom();
-                roomService.disconnect();
+            if (currentPanel == PanelState.JOIN_ROOM && RoomService.isInitialized()) {
+                RoomService.quitRoom();
+                RoomService.reset();
                 clearPlayerAreas(PlayerContainerJoin);
             }
 
-            if (currentPanel == PanelState.HOST_ROOM && roomService != null) {
-                roomService.deleteRoom();
-                roomService.disconnect();
+            if (currentPanel == PanelState.HOST_ROOM && RoomService.isInitialized()) {
+                RoomService.deleteRoom();
+                RoomService.reset();
                 clearPlayerAreas(PlayerContainerHost);
             }
 
@@ -193,8 +192,8 @@ public class MultiplayerController {
                     return;
                 }
 
-                this.roomService = new RoomService(response.token(), this::showAlert);
-                roomService.setListener(createRoomListener());
+                RoomService.create(response.token(), this::showAlert);
+                RoomService.setListener(createRoomListener());
 
                 for (NetworkPlayer player : response.players()) {
                     roomPlayers.add(new RoomPlayer(
@@ -270,7 +269,7 @@ public class MultiplayerController {
 
     private void configureJoinPanelUsernameHandlers() {
         ViewRoomBtn.setOnAction(event -> {
-            roomService.updatePseudo(UsernameTF.getText());
+            RoomService.updatePseudo(UsernameTF.getText());
 
             refreshJoinUI();
             setPanel(PanelState.JOIN_ROOM);
@@ -280,16 +279,20 @@ public class MultiplayerController {
     private void configureJoinPanelRoomHandlers() {
         StatusJoin.setOnAction(e -> {
             if (currentPanel == PanelState.JOIN_ROOM) {
-                String status = roomService.switchStatus();
+                String status = RoomService.switchStatus();
                 StatusJoin.setText(Objects.equals(status, "Ready") ? "Cancel" : "Ready");
 
             } else if (currentPanel == PanelState.HOST_ROOM) {
                 // Check que tous les joueurs sont Ready
             }
         });
+
+        EditProfilJoin.setOnAction(e -> openEditProfilOverlay(false));
     }
 
     private void configureHostPanelHandlers() {
+        EditProfilHost.setOnAction(e -> openEditProfilOverlay(true));
+
         StartGameHost.setOnAction(e -> {
             logger.debug("Start game button clicked in host panel");
         });
@@ -302,7 +305,7 @@ public class MultiplayerController {
 
         AddBotHost.setOnAction(e -> {
             if (roomPlayers.size() < MAX_PLAYERS) {
-                roomService.addBot();
+                RoomService.addBot();
 
             } else {
                 NotificationController.show(
@@ -356,14 +359,14 @@ public class MultiplayerController {
             @Override
             public void onPlayerKick(String playerId) {
                 Platform.runLater(() -> {
-                    if (Objects.equals(playerId, roomService.getPlayerId())) {
+                    if (Objects.equals(playerId, RoomService.getPlayerId())) {
                         setPanel(PanelState.SELECT_MODE);
 
                         clearPlayerAreas(PlayerContainerJoin);
                         clearPlayerAreas(PlayerContainerHost);
 
-                        roomService.quitRoom();
-                        roomService.disconnect();
+                        RoomService.quitRoom();
+                        RoomService.reset();
 
                     } else {
                         removePlayerAndRefreshUi(playerId);
@@ -440,8 +443,8 @@ public class MultiplayerController {
                         AddBotHost.setDisable(false);
                     }
 
-                    roomService.quitRoom();
-                    roomService.disconnect();
+                    RoomService.quitRoom();
+                    RoomService.reset();
                     setPanel(PanelState.SELECT_MODE);
                 });
             }
@@ -490,13 +493,13 @@ public class MultiplayerController {
                     player.getName(),
                     player.getStatus(),
                     player.getPing() + "ms",
-                    player.getId().equals(roomService.getPlayerId()),
+                    player.getId().equals(RoomService.getPlayerId()),
                     player.isRobot(),
                     (isHost && player.isRemovable()) ? () -> {
                         roomPlayers.remove(player);
                         renderPlayerAreas(container, true);
                         updateNumberPlayer(NumberPlayerHost);
-                        roomService.kickPlayer(player.getId());
+                        RoomService.kickPlayer(player.getId());
                     } : null
                 );
             }
@@ -537,20 +540,20 @@ public class MultiplayerController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/multiplayer/PlayerInfo.fxml"));
             Pane node = loader.load();
-            PlayerInfo playerInfo = loader.getController();
+            PlayerInfoController playerInfoController = loader.getController();
 
-            if (playerInfo != null) {
-                playerInfo.setPlayerName(playerName);
-                playerInfo.setAnnotation(isMe ? "(you)" : null);
-                playerInfo.setPlayerStatus(status);
+            if (playerInfoController != null) {
+                playerInfoController.setPlayerName(playerName);
+                playerInfoController.setAnnotation(isMe ? "(you)" : null);
+                playerInfoController.setPlayerStatus(status);
 
-                if (!isRobot) playerInfo.setPlayerPing(ping);
-                else playerInfo.showPing(false);
+                if (!isRobot) playerInfoController.setPlayerPing(ping);
+                else playerInfoController.showPing(false);
 
-                playerInfo.setPlayerIcon(isRobot ? ROBOT_ICON : PLAYER_ICON);
+                playerInfoController.setPlayerIcon(isRobot ? ROBOT_ICON : PLAYER_ICON);
 
-                if (onRemove != null) playerInfo.setOnRemove(onRemove);
-                else playerInfo.removeOnRemove();
+                if (onRemove != null) playerInfoController.setOnRemove(onRemove);
+                else playerInfoController.removeOnRemove();
             }
 
             node.setLayoutX(14.0);
@@ -561,6 +564,43 @@ public class MultiplayerController {
         } catch (IOException e) {
             System.err.println("Error loading PlayerInfo FXML");
         }
+    }
+
+    private void openEditProfilOverlay(boolean isHost) {
+        if (editProfilOverlay != null) {
+            editProfilOverlay.toFront();
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/multiplayer/EditProfil.fxml"));
+            Pane overlay = loader.load();
+            EditProfilController controller = loader.getController();
+
+            if (controller != null) {
+                controller.setOnClose(this::closeEditProfilOverlay);
+                controller.setBackground(isHost ? "button-green" : "button-blue");
+            }
+
+            editProfilOverlay = overlay;
+            root.getChildren().add(overlay);
+            overlay.toFront();
+
+        } catch (IOException e) {
+            logger.error("Unable to load EditProfil overlay", e);
+            NotificationController.show(
+                "Display error",
+                "Unable to open edit profile panel.",
+                Notification.Type.ERROR
+            );
+        }
+    }
+
+    private void closeEditProfilOverlay() {
+        if (editProfilOverlay == null) return;
+
+        root.getChildren().remove(editProfilOverlay);
+        editProfilOverlay = null;
     }
 
 

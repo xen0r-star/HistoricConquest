@@ -10,7 +10,7 @@ import javafx.scene.layout.Pane;
 import java.net.URL;
 import java.util.Objects;
 
-public class PlayerInfo {
+public class PlayerInfoController {
     @FXML private Pane root;
     @FXML private Label PlayerName;
     @FXML private Label Annotation;

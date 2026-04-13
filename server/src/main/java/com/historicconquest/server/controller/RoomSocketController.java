@@ -90,6 +90,22 @@ public class RoomSocketController {
 
         switch (type) {
             case "PLAYER_COLOR_CHANGE":
+                boolean colorIsUsed = roomService.getUsedColors(roomCode, playerId).stream()
+                    .anyMatch(usedColor -> usedColor.equalsIgnoreCase(data));
+
+                if (colorIsUsed) {
+                    messagingTemplate.convertAndSendToUser(
+                        playerId,
+                        "/queue/errors",
+                        Map.of(
+                            "type", "PLAYER_COLOR_CHANGE",
+                            "title", "Failed to change color",
+                            "message", "This color is already taken"
+                        )
+                    );
+                    return;
+                }
+
                 player.setColor(data);
                 break;
 
@@ -191,7 +207,7 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
-        if (!room.isHost(player.getId())) {
+        if (room.isHost(player.getId())) {
             roomService.deleteRoom(roomCode);
 
             messagingTemplate.convertAndSend(

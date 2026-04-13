@@ -2,9 +2,11 @@ package com.historicconquest.server.controller;
 
 import com.historicconquest.server.model.Room;
 import com.historicconquest.server.model.Player;
+import com.historicconquest.server.security.JwtHttpPrincipal;
 import com.historicconquest.server.service.RoomService;
 import com.historicconquest.server.util.NameGenerator;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -84,6 +86,84 @@ public class HttpController {
                 "error", Map.of(
                     "title", "Impossible to join",
                     "message", "You cannot join this room as it is not available or is full."
+                )
+            );
+        }
+    }
+
+    @GetMapping("/gameroom/players")
+    public Map<String, Object> getPlayers(Authentication authentication) {
+        JwtHttpPrincipal principal = (JwtHttpPrincipal) authentication.getPrincipal();
+
+        if (principal == null) return Map.of(
+            "error", Map.of(
+                "title", "Error connecting to the server",
+                "message", "An error has occurred! Please try again."
+            )
+        );
+
+        try {
+            return Map.of(
+                "players", roomService.getPlayers(principal.roomCode())
+            );
+
+        } catch (Exception e) {
+            return Map.of(
+                "error", Map.of(
+                    "title", "Room not found",
+                    "message", "Unable to retrieve players for this room."
+                )
+            );
+        }
+    }
+
+    @PostMapping("/gameroom/pseudo/isUsed")
+    public Map<String, Object> pseudoIsUsed(@RequestParam String pseudo, Authentication authentication) {
+        JwtHttpPrincipal principal = (JwtHttpPrincipal) authentication.getPrincipal();
+
+        if (principal == null) return Map.of(
+            "error", Map.of(
+                "title", "Error connecting to the server",
+                "message", "An error has occurred! Please try again."
+            )
+        );
+
+        try {
+            return Map.of(
+                "isUsed", roomService.pseudoIsUsed(principal.roomCode(), pseudo, principal.playerId())
+            );
+
+        } catch (Exception e) {
+            return Map.of(
+                "error", Map.of(
+                    "title", "Error connecting to the server",
+                    "message", "An error has occurred! Please try again."
+                )
+            );
+        }
+    }
+
+    @GetMapping("/gameroom/colors/used")
+    public Map<String, Object> usedColors(Authentication authentication) {
+        JwtHttpPrincipal principal = (JwtHttpPrincipal) authentication.getPrincipal();
+
+        if (principal == null) return Map.of(
+            "error", Map.of(
+                "title", "Error connecting to the server",
+                "message", "An error has occurred! Please try again."
+            )
+        );
+
+        try {
+            return Map.of(
+                "colors", roomService.getUsedColors(principal.roomCode(), principal.playerId())
+            );
+
+        } catch (Exception e) {
+            return Map.of(
+                "error", Map.of(
+                    "title", "Error connecting to the server",
+                    "message", "An error has occurred! Please try again."
                 )
             );
         }

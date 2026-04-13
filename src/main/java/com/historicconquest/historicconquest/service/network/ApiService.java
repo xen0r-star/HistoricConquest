@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 public class ApiService {
-    private static final String API_BASE_URL = "http://localhost:8080/api";
+    private static final String API_BASE_URL = "http://localhost:8081/api";
 
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -47,15 +47,49 @@ public class ApiService {
 
     public static HttpRequest joinRoom(String roomCode) {
         roomCode = URLEncoder.encode(roomCode, StandardCharsets.UTF_8);
-
         return buildPost("/gameroom/join?roomCode=%s".formatted(roomCode));
+    }
+
+    public static HttpRequest getPlayersRoom(String token) {
+        return buildGet("/gameroom/players", token);
+    }
+
+    public static HttpRequest pseudoIsUsed(String token, String pseudo) {
+        String encodedPseudo = URLEncoder.encode(pseudo, StandardCharsets.UTF_8);
+        return buildPost("/gameroom/pseudo/isUsed?pseudo=%s".formatted(encodedPseudo), token);
+    }
+
+    public static HttpRequest getUsedColors(String token) {
+        return buildGet("/gameroom/colors/used", token);
     }
 
 
 
+    private static HttpRequest buildGet(String endpoint) {
+        return HttpRequest.newBuilder()
+            .uri(URI.create(API_BASE_URL + endpoint))
+            .build();
+    }
+
+    private static HttpRequest buildGet(String endpoint, String token) {
+        return HttpRequest.newBuilder()
+            .uri(URI.create(API_BASE_URL + endpoint))
+            .header("Authorization", "Bearer " + token)
+            .GET()
+            .build();
+    }
+
     private static HttpRequest buildPost(String endpoint) {
         return HttpRequest.newBuilder()
             .uri(URI.create(API_BASE_URL + endpoint))
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .build();
+    }
+
+    private static HttpRequest buildPost(String endpoint, String token) {
+        return HttpRequest.newBuilder()
+            .uri(URI.create(API_BASE_URL + endpoint))
+            .header("Authorization", "Bearer " + token)
             .POST(HttpRequest.BodyPublishers.noBody())
             .build();
     }
@@ -99,5 +133,29 @@ public class ApiService {
         Collection<NetworkPlayer> players,
 
         ErrorRequest error
+    ) {}
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GetPlayersRoomResponse(
+            Collection<NetworkPlayer> players,
+
+            ErrorRequest error
+    ) {}
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record PseudoIsUsedResponse(
+            Boolean isUsed,
+
+            ErrorRequest error
+    ) {}
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record UsedColorsResponse(
+            Collection<String> colors,
+
+            ErrorRequest error
     ) {}
 }

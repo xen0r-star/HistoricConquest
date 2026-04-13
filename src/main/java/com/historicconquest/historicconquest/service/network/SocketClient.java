@@ -14,7 +14,7 @@ import java.util.*;
 
 
 public class SocketClient extends WebSocketClient {
-    private static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:8080/ws";
+    private static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:8081/ws";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);

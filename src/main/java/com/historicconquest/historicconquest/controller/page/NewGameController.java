@@ -68,7 +68,7 @@ public class NewGameController {
         PawnError.setVisible(false);
         PawnError.setManaged(false);
 
-            BackBtn.setOnAction(e -> AppController.getInstance().showPage(AppPage.HOME));
+        BackBtn.setOnAction(e -> AppController.getInstance().showPage(AppPage.HOME));
         RandomName.setOnAction(e -> NameTextField.setText(NameGenerator.get()));
         NextPlayer.setOnAction(e -> handleNextPlayer());
 
