@@ -48,7 +48,7 @@ public class SocketClient extends WebSocketClient {
 
     public static boolean serverIsUp() {
         try {
-            SocketClient tempClient = new SocketClient("ws://localhost:8080/ws", null);
+            SocketClient tempClient = new SocketClient(DEFAULT_WEBSOCKET_URL, null);
             tempClient.connectBlocking();
             tempClient.close();
             return true;

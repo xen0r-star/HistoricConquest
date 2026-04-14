@@ -2,6 +2,7 @@
 
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
@@ -131,7 +132,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="JoinPanel2" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+   <HBox fx:id="JoinPanel2" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -161,13 +162,23 @@
                <String fx:value="button-beige" />
             </styleClass>
          </Button>
+         <Button fx:id="SkipJoinBtn" layoutX="640.0" layoutY="18.0" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: null; -fx-border-width: 0;">
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+            <graphic>
+               <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@../icons/skip.png"/>
+               </ImageView>
+            </graphic>
+         </Button>
          <styleClass>
             <String fx:value="button-blue" />
             <String fx:value="not-hover" />
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+   <HBox fx:id="JoinPanel3" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>

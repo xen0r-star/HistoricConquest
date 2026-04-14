@@ -86,6 +86,21 @@ public class EditProfilController {
         root.getStyleClass().setAll(background, "not-hover");
     }
 
+    public void setInitialProfile(String pseudo, String rawColor) {
+        if (NameTextField != null && pseudo != null && !pseudo.isBlank()) {
+            String trimmedPseudo = pseudo.trim();
+            NameTextField.setText(trimmedPseudo);
+            lastCheckedPseudo = trimmedPseudo;
+            lastCheckedPseudoIsUsed = false;
+            hideNameError();
+        }
+
+        PlayerColor color = parsePlayerColor(rawColor);
+        if (color != null) {
+            selectColorCircle(color);
+        }
+    }
+
     private void handleClose() {
         nameDebounce.stop();
         roomRefreshTimeline.stop();
@@ -145,6 +160,7 @@ public class EditProfilController {
 
                 if (isUsed) {
                     showNameError("This name is already taken.");
+
                 } else {
                     hideNameError();
                 }
@@ -167,8 +183,14 @@ public class EditProfilController {
         bindCircle(Color8, PlayerColor.PINK);
         bindCircle(Color9, PlayerColor.PURPLE);
 
+        PlayerColor initialColor = parsePlayerColor(RoomService.getCurrentColor());
+        if (initialColor != null) {
+            selectColorCircle(initialColor);
+            return;
+        }
+
         circleColorMap.keySet().stream().findFirst()
-                .ifPresent(firstCircle -> selectColorCircle(circleColorMap.get(firstCircle)));
+            .ifPresent(firstCircle -> selectColorCircle(circleColorMap.get(firstCircle)));
     }
 
     private void bindCircle(Circle circle, PlayerColor color) {
@@ -248,19 +270,22 @@ public class EditProfilController {
 
     private void saveProfil() {
         String name = NameTextField.getText().trim();
+        String currentPseudo = RoomService.getCurrentPseudo();
+        String currentColor = RoomService.getCurrentColor();
+        boolean pseudoChanged = currentPseudo == null || !currentPseudo.equalsIgnoreCase(name);
 
         if (name.isEmpty()) {
             showNameError("Name is required.");
             return;
         }
 
-        if (!name.equals(lastCheckedPseudo)) {
+        if (pseudoChanged && !name.equals(lastCheckedPseudo)) {
             onNameInputStopped(name);
             showNameError("Checking name availability...");
             return;
         }
 
-        if (lastCheckedPseudoIsUsed) {
+        if (pseudoChanged && lastCheckedPseudoIsUsed) {
             showNameError("This name is already taken.");
             return;
         }
@@ -273,8 +298,11 @@ public class EditProfilController {
         hideNameError();
         hidePawnError();
 
-        RoomService.updatePseudo(name);
-        if (selectedPawnColor != null) {
+        if (pseudoChanged) {
+            RoomService.updatePseudo(name);
+        }
+
+        if (selectedPawnColor != null && (!selectedPawnColor.name().equalsIgnoreCase(currentColor))) {
             RoomService.updateColor(selectedPawnColor.name());
         }
 
@@ -311,6 +339,7 @@ public class EditProfilController {
 
                 if (selectedPawnColor == null || usedPawnColors.contains(selectedPawnColor)) {
                     showPawnError();
+
                 } else {
                     hidePawnError();
                 }
@@ -330,11 +359,13 @@ public class EditProfilController {
             circle.setOpacity(isUsed ? 0.35 : 1.0);
 
             if (isSelected) {
-                circle.setStroke(Color.web("#636363"));
+                circle.setStroke(Color.web("#292929"));
                 circle.setStrokeWidth(3.0);
+
             } else if (!isUsed && circle.isHover()) {
                 circle.setStroke(Color.web("#8A8A8A"));
                 circle.setStrokeWidth(1.5);
+
             } else {
                 circle.setStroke(Color.TRANSPARENT);
                 circle.setStrokeWidth(0.0);
@@ -348,6 +379,7 @@ public class EditProfilController {
         String normalized = rawColor.trim().toUpperCase(Locale.ROOT);
         try {
             return PlayerColor.valueOf(normalized);
+
         } catch (IllegalArgumentException ignored) {
             return switch (normalized) {
                 case "#FF0000" -> PlayerColor.RED;

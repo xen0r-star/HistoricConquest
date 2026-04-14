@@ -110,7 +110,7 @@ public class RoomSocketController {
                 break;
 
             case "PLAYER_PSEUDO_CHANGE":
-                if (room.isPseudoAvailable(data)) {
+                if (!roomService.pseudoIsUsed(roomCode, data, playerId)) {
                     player.setPseudo(data);
 
                 } else {

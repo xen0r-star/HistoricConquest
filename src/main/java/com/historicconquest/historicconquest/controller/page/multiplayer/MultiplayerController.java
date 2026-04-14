@@ -11,9 +11,13 @@ import com.historicconquest.historicconquest.model.network.event.RoomEventListen
 import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.service.network.SocketClient;
+import com.historicconquest.historicconquest.util.NameGenerator;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -68,7 +72,7 @@ public class MultiplayerController {
     @FXML private Button JoinBtn;
 
     // JoinPanel2
-    @FXML private Button ViewRoomBtn;
+    @FXML private Button ViewRoomBtn, SkipJoinBtn;
     @FXML private TextField UsernameTF;
 
     // JoinPanel3
@@ -139,11 +143,18 @@ public class MultiplayerController {
                     RoomService.create(response.token(), this::showAlert);
                     RoomService.setListener(createRoomListener());
 
+                    String hostPseudo = response.pseudo() != null && !response.pseudo().isBlank() ?
+                            response.pseudo() :
+                            NameGenerator.get();
+                    String hostColor = response.color();
+                    RoomService.setCurrentPseudo(hostPseudo);
+                    RoomService.setCurrentColor(hostColor);
+
 
                     roomPlayers.clear();
                     roomPlayers.add(new RoomPlayer(
                         RoomService.getPlayerId(),
-                        "Host", "#FF0000",
+                        hostPseudo, hostColor,
                         false, 0,
                         "Waiting", false
                     ));
@@ -194,6 +205,8 @@ public class MultiplayerController {
 
                 RoomService.create(response.token(), this::showAlert);
                 RoomService.setListener(createRoomListener());
+                RoomService.setCurrentPseudo(response.pseudo());
+                RoomService.setCurrentColor(response.color());
 
                 for (NetworkPlayer player : response.players()) {
                     roomPlayers.add(new RoomPlayer(
@@ -268,6 +281,11 @@ public class MultiplayerController {
     }
 
     private void configureJoinPanelUsernameHandlers() {
+        SkipJoinBtn.setOnAction(e -> {
+            refreshJoinUI();
+            setPanel(PanelState.JOIN_ROOM);
+        });
+
         ViewRoomBtn.setOnAction(event -> {
             RoomService.updatePseudo(UsernameTF.getText());
 
@@ -281,9 +299,6 @@ public class MultiplayerController {
             if (currentPanel == PanelState.JOIN_ROOM) {
                 String status = RoomService.switchStatus();
                 StatusJoin.setText(Objects.equals(status, "Ready") ? "Cancel" : "Ready");
-
-            } else if (currentPanel == PanelState.HOST_ROOM) {
-                // Check que tous les joueurs sont Ready
             }
         });
 
@@ -301,6 +316,13 @@ public class MultiplayerController {
             ClipboardContent content = new ClipboardContent();
             content.putString(CodeGameHost.getText().replace(" ", ""));
             Clipboard.getSystemClipboard().setContent(content);
+
+            NotificationController.show(
+                "Code copied",
+                "The room code has been copied to the clipboard.",
+                Notification.Type.SUCCESS,
+                5000
+            );
         });
 
         AddBotHost.setOnAction(e -> {
@@ -380,6 +402,9 @@ public class MultiplayerController {
                     for (RoomPlayer player : roomPlayers) {
                         if (player.getId().equals(playerId)) {
                             player.setColor(newColor);
+                            if (playerId.equals(RoomService.getPlayerId())) {
+                                RoomService.setCurrentColor(newColor);
+                            }
                             break;
                         }
                     }
@@ -395,6 +420,9 @@ public class MultiplayerController {
                     for (RoomPlayer player : roomPlayers) {
                         if (player.getId().equals(playerId)) {
                             player.setName(newPseudo);
+                            if (playerId.equals(RoomService.getPlayerId())) {
+                                RoomService.setCurrentPseudo(newPseudo);
+                            }
                             break;
                         }
                     }
@@ -580,11 +608,25 @@ public class MultiplayerController {
             if (controller != null) {
                 controller.setOnClose(this::closeEditProfilOverlay);
                 controller.setBackground(isHost ? "button-green" : "button-blue");
+                controller.setInitialProfile(RoomService.getCurrentPseudo(), RoomService.getCurrentColor());
             }
 
-            editProfilOverlay = overlay;
-            root.getChildren().add(overlay);
-            overlay.toFront();
+            Pane backdrop = new Pane();
+            backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.33);");
+            backdrop.setPickOnBounds(true);
+            backdrop.setOnMouseClicked(Event::consume);
+
+            StackPane modalLayer = new StackPane(backdrop, overlay);
+            modalLayer.setPickOnBounds(true);
+            modalLayer.prefWidthProperty().bind(root.widthProperty());
+            modalLayer.prefHeightProperty().bind(root.heightProperty());
+
+            StackPane.setAlignment(overlay, Pos.TOP_CENTER);
+            StackPane.setMargin(overlay, new Insets(250, 0, 0, 0));
+
+            editProfilOverlay = modalLayer;
+            root.getChildren().add(modalLayer);
+            modalLayer.toFront();
 
         } catch (IOException e) {
             logger.error("Unable to load EditProfil overlay", e);

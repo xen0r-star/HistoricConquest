@@ -121,6 +121,8 @@ public class ApiService {
     public record CreateRoomResponse(
         String roomCode,
         String token,
+        String pseudo,
+        String color,
 
         ErrorRequest error
     ) {}
@@ -130,6 +132,7 @@ public class ApiService {
     public record JoinRoomResponse(
         String token,
         String pseudo,
+        String color,
         Collection<NetworkPlayer> players,
 
         ErrorRequest error

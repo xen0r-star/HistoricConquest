@@ -128,7 +128,7 @@ public class NewGameController {
         }
 
         if (!selectedCircle.isDisable()) {
-            selectedCircle.setStroke(Color.web("#636363"));
+            selectedCircle.setStroke(Color.web("#292929"));
             selectedCircle.setStrokeWidth(3.0);
         }
 

@@ -4,13 +4,22 @@ import com.historicconquest.server.model.Player;
 import com.historicconquest.server.model.Room;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
+    private static final List<String> AVAILABLE_COLORS = List.of(
+        "RED", "ORANGE", "YELLOW", "LIME", "GREEN",
+        "LIGHT_BLUE", "BLUE", "PINK", "PURPLE"
+    );
+
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();
 
     public Room createRoom() {
@@ -29,6 +38,7 @@ public class RoomService {
     public void addHost(String roomCode, Player player) throws Exception {
         Room room = rooms.get(roomCode);
         if (room != null) {
+            assignRandomAvailableColor(room, player);
             room.addPlayer(player);
             room.setHostId(player.getId());
         }
@@ -37,8 +47,35 @@ public class RoomService {
     public void addPlayer(String roomCode, Player player) throws Exception {
         Room room = rooms.get(roomCode);
         if (room != null) {
+            assignRandomAvailableColor(room, player);
             room.addPlayer(player);
         }
+    }
+
+    private void assignRandomAvailableColor(Room room, Player player) {
+        if (player.getColor() != null && !player.getColor().isBlank()) {
+            return;
+        }
+
+        Set<String> usedColors = room.getPlayers().stream()
+            .map(Player::getColor)
+            .filter(color -> color != null && !color.isBlank())
+            .map(String::toUpperCase)
+            .collect(Collectors.toSet());
+
+        List<String> freeColors = new ArrayList<>();
+        for (String color : AVAILABLE_COLORS) {
+            if (!usedColors.contains(color)) {
+                freeColors.add(color);
+            }
+        }
+
+        if (freeColors.isEmpty()) {
+            player.setColor(AVAILABLE_COLORS.get(new Random().nextInt(AVAILABLE_COLORS.size())));
+            return;
+        }
+
+        player.setColor(freeColors.get(new Random().nextInt(freeColors.size())));
     }
 
     public void removePlayer(String roomCode, String playerId) {

@@ -25,6 +25,8 @@ public class RoomService {
     private final String token;
     private long pingTime;
     private String status = STATUS_WAITING;
+    private String pseudo;
+    private String color;
 
     private final SocketClient socketClient;
     private final StompListener pingListener, roomListener, errorListener;
@@ -328,6 +330,22 @@ public class RoomService {
 
     public static String getToken() {
         return getInstance().token;
+    }
+
+    public static void setCurrentPseudo(String pseudo) {
+        getInstance().pseudo = pseudo;
+    }
+
+    public static String getCurrentPseudo() {
+        return getInstance().pseudo;
+    }
+
+    public static void setCurrentColor(String color) {
+        getInstance().color = color;
+    }
+
+    public static String getCurrentColor() {
+        return getInstance().color;
     }
 
 

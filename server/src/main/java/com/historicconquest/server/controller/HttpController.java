@@ -43,7 +43,9 @@ public class HttpController {
 
             return Map.of(
                 "roomCode", room.getCode(),
-                "token", player.getToken()
+                "token", player.getToken(),
+                "pseudo", player.getPseudo(),
+                "color", player.getColor()
             );
 
         } catch (Exception e) {
@@ -78,6 +80,7 @@ public class HttpController {
             return Map.of(
                 "token", player.getToken(),
                 "pseudo", player.getPseudo(),
+                "color", player.getColor(),
                 "players", room.getPlayers()
             );
 
