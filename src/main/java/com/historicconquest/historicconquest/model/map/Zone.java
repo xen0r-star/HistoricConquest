@@ -15,6 +15,7 @@ public class Zone {
 
     private final List<Pawn> pawns;
     private final List<Zone> adjacentZones;
+    private final List<Zone> adjacentBoatZones;
 
     private final ZoneIcon icon;
 
@@ -40,6 +41,7 @@ public class Zone {
         this.borderColor = borderColor;
         this.pawns = new ArrayList<>();
         this.adjacentZones = new ArrayList<>();
+        this.adjacentBoatZones = new ArrayList<>();
     }
 
 
@@ -49,9 +51,19 @@ public class Zone {
         zone.addAdjacentZone(this);
     }
 
+    public void addAdjacentBoatZone(Zone zone) {
+        if (zone == null || adjacentBoatZones.contains(zone)) return;
+        adjacentBoatZones.add(zone);
+        zone.addAdjacentBoatZone(this);
+    }
+
 
     public List<Zone> getAdjacentZones() {
         return adjacentZones;
+    }
+
+    public List<Zone> getAdjacentBoatZones() {
+        return adjacentBoatZones;
     }
 
     public void setColor(Color color) {

@@ -26,7 +26,7 @@ public class Game {
 
         ZonePathfinder.PathResult result = ZonePathfinder.findPath(current.getCurrentZone(), targetZone);
 
-        if (result.type() == ZonePathfinder.PathType.DIRECT) {
+        if (result.type() == ZonePathfinder.PathType.DIRECT || result.type() == ZonePathfinder.PathType.BOAT) {
             current.setCurrentZone(targetZone);
 
             if (current.getPawnNode() == null) return;

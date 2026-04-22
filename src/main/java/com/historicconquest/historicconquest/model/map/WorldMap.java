@@ -2,13 +2,16 @@ package com.historicconquest.historicconquest.model.map;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import javafx.scene.paint.Color;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorldMap {
     private final List<Bloc> blocs = new ArrayList<>();
@@ -126,26 +129,64 @@ public class WorldMap {
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null) return;
 
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode adjacencyData = mapper.readTree(is);
 
             List<Zone> allZones = getAllZones();
+            Map<String, Zone> zonesByName = new HashMap<>();
             for (Zone zone : allZones) {
-                JsonNode zoneAdjacentNode = adjacencyData.get(zone.getName());
+                zonesByName.put(zone.getName(), zone);
+            }
 
-                if (zoneAdjacentNode != null && zoneAdjacentNode.isArray()) {
-                    for (JsonNode adjacentName : zoneAdjacentNode) {
-                        String neighborName = adjacentName.asString();
+            JsonNode zonesNode = adjacencyData.get("zones");
+            Map<String, List<String>> landAdjacencies = mapper.convertValue(
+                zonesNode != null ? zonesNode : adjacencyData,
+                new TypeReference<>() {}
+            );
+            if (landAdjacencies != null) {
+                landAdjacencies.forEach((zoneName, adjacentNames) -> connectLandAdjacencies(zonesByName, zoneName, adjacentNames));
+            }
 
-                        allZones.stream()
-                                .filter(z -> z.getName().equals(neighborName))
-                                .findFirst().ifPresent(zone::addAdjacentZone);
-                    }
-                }
+            JsonNode oceansNode = adjacencyData.get("oceans");
+            Map<String, List<String>> oceanAdjacencies = mapper.convertValue(
+                oceansNode,
+                new TypeReference<>() {}
+            );
+            if (oceanAdjacencies != null) {
+                oceanAdjacencies.values().forEach(zoneNames -> connectBoatAdjacencies(zonesByName, zoneNames));
             }
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load adjacency data");
+        }
+    }
+
+    private void connectLandAdjacencies(Map<String, Zone> zonesByName, String zoneName, List<String> adjacentNames) {
+        Zone zone = zonesByName.get(zoneName);
+        if (zone == null || adjacentNames == null) return;
+
+        for (String adjacentName : adjacentNames) {
+            Zone neighbor = zonesByName.get(adjacentName);
+            if (neighbor != null) {
+                zone.addAdjacentZone(neighbor);
+            }
+        }
+    }
+
+    private void connectBoatAdjacencies(Map<String, Zone> zonesByName, List<String> zoneNames) {
+        if (zoneNames == null) return;
+
+        List<Zone> oceanZones = new ArrayList<>();
+        for (String zoneName : zoneNames) {
+            Zone zone = zonesByName.get(zoneName);
+            if (zone != null) {
+                oceanZones.add(zone);
+            }
+        }
+
+        for (int i = 0; i < oceanZones.size(); i++) {
+            for (int j = i + 1; j < oceanZones.size(); j++) {
+                oceanZones.get(i).addAdjacentBoatZone(oceanZones.get(j));
+            }
         }
     }
 
