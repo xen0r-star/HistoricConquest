@@ -95,6 +95,49 @@ public class RoomService {
         return rooms.get(code);
     }
 
+    public boolean canStartGame(String roomCode) {
+        Room room = rooms.get(roomCode);
+        return room != null && room.canStartGame();
+    }
+
+    public long startGame(String roomCode) throws Exception {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new Exception("Room not found");
+        }
+
+        if (room.isGameStarting()) {
+            throw new Exception("Game start is already in progress");
+        }
+
+        if (!room.hasLaunchConditions()) {
+            throw new Exception("Room must contain 4 players and everyone except the host must be ready");
+        }
+
+        long startAt = System.currentTimeMillis() + 5000;
+        room.markGameStarting(startAt);
+        return startAt;
+    }
+
+    public boolean stillCanStartGame(String roomCode) {
+        Room room = rooms.get(roomCode);
+        return room != null && room.hasLaunchConditions();
+    }
+
+    public void cancelGameStart(String roomCode) {
+        Room room = rooms.get(roomCode);
+        if (room != null) {
+            room.cancelGameStarting();
+        }
+    }
+
+    public void finishGameStart(String roomCode) {
+        Room room = rooms.get(roomCode);
+        if (room != null) {
+            room.markGameStarted();
+        }
+    }
+
     public Collection<Player> getPlayers(String roomCode) throws Exception {
         Room room = rooms.get(roomCode);
         if (room == null) {

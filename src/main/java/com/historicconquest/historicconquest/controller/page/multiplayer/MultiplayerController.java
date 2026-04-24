@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.controller.page.multiplayer;
 
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
+import com.historicconquest.historicconquest.controller.game.GameBootstrapper;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
@@ -12,6 +13,10 @@ import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.service.network.SocketClient;
 import com.historicconquest.historicconquest.util.NameGenerator;
+import com.historicconquest.historicconquest.model.player.Player;
+import com.historicconquest.historicconquest.model.player.PlayerColor;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -29,6 +34,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +95,9 @@ public class MultiplayerController {
     private PanelState currentPanel = PanelState.SELECT_MODE;
     private final List<RoomPlayer> roomPlayers = new ArrayList<>();
     private Pane editProfilOverlay;
-
+    private StackPane countdownOverlay;
+    private Label countdownLabel;
+    private Timeline countdownTimeline;
 
 
     @FXML
@@ -104,6 +112,7 @@ public class MultiplayerController {
             configureJoinPanelRoomHandlers();
 
             configureHostPanelHandlers();
+            configureHostStatusPolling();
 
         } else {
             setPanel(PanelState.ERROR_SERVICE);
@@ -159,6 +168,7 @@ public class MultiplayerController {
                         "Waiting", false
                     ));
                     refreshHostUI();
+                    refreshHostStartState();
                 }
             );
 
@@ -308,9 +318,7 @@ public class MultiplayerController {
     private void configureHostPanelHandlers() {
         EditProfilHost.setOnAction(e -> openEditProfilOverlay(true));
 
-        StartGameHost.setOnAction(e -> {
-            logger.debug("Start game button clicked in host panel");
-        });
+        StartGameHost.setOnAction(e -> RoomService.startGame());
 
         CodeGameHost.setOnMouseClicked(e -> {
             ClipboardContent content = new ClipboardContent();
@@ -339,6 +347,12 @@ public class MultiplayerController {
         });
     }
 
+    private void configureHostStatusPolling() {
+        Timeline hostStatusTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> refreshHostStartState()));
+        hostStatusTimeline.setCycleCount(Timeline.INDEFINITE);
+        hostStatusTimeline.play();
+    }
+
 
 
     private RoomEventListener createRoomListener() {
@@ -365,6 +379,7 @@ public class MultiplayerController {
                         ));
 
                         refreshHostUI();
+                        refreshHostStartState();
 
                         if (roomPlayers.size() >= MAX_PLAYERS) {
                             AddBotHost.setDisable(true);
@@ -410,7 +425,10 @@ public class MultiplayerController {
                     }
 
                     if (currentPanel == PanelState.JOIN_ROOM)      refreshJoinUI();
-                    else if (currentPanel == PanelState.HOST_ROOM) refreshHostUI();
+                    else if (currentPanel == PanelState.HOST_ROOM) {
+                        refreshHostUI();
+                        refreshHostStartState();
+                    }
                 });
             }
 
@@ -428,7 +446,10 @@ public class MultiplayerController {
                     }
 
                     if (currentPanel == PanelState.JOIN_ROOM)      refreshJoinUI();
-                    else if (currentPanel == PanelState.HOST_ROOM) refreshHostUI();
+                    else if (currentPanel == PanelState.HOST_ROOM) {
+                        refreshHostUI();
+                        refreshHostStartState();
+                    }
                 });
             }
 
@@ -443,7 +464,10 @@ public class MultiplayerController {
                     }
 
                     if (currentPanel == PanelState.JOIN_ROOM)      refreshJoinUI();
-                    else if (currentPanel == PanelState.HOST_ROOM) refreshHostUI();
+                    else if (currentPanel == PanelState.HOST_ROOM) {
+                        refreshHostUI();
+                        refreshHostStartState();
+                    }
                 });
             }
 
@@ -456,13 +480,43 @@ public class MultiplayerController {
                     }
 
                     if (currentPanel == PanelState.JOIN_ROOM)      refreshJoinUI();
-                    else if (currentPanel == PanelState.HOST_ROOM) refreshHostUI();
+                    else if (currentPanel == PanelState.HOST_ROOM) {
+                        refreshHostUI();
+                        refreshHostStartState();
+                    }
+                });
+            }
+
+            @Override
+            public void onGameCountdownStarted(int seconds, long startAt) {
+                Platform.runLater(() -> showCountdownOverlay(seconds));
+            }
+
+            @Override
+            public void onGameStartCancelled(String reason) {
+                Platform.runLater(() -> {
+                    hideCountdownOverlay();
+                    NotificationController.show(
+                        "Start cancelled",
+                        reason == null || reason.isBlank() ? "The game could not start." : reason,
+                        Notification.Type.INFORMATION
+                    );
+                    refreshHostStartState();
+                });
+            }
+
+            @Override
+            public void onGameStarted() {
+                Platform.runLater(() -> {
+                    hideCountdownOverlay();
+                    GameBootstrapper.launchGame(root, toGamePlayers());
                 });
             }
 
             @Override
             public void onRoomDeleted() {
                 Platform.runLater(() -> {
+                    hideCountdownOverlay();
                     if (currentPanel == PanelState.JOIN_ROOM) {
                         clearPlayerAreas(PlayerContainerJoin);
 
@@ -492,6 +546,7 @@ public class MultiplayerController {
 
         } else if (currentPanel == PanelState.HOST_ROOM) {
             refreshHostUI();
+            refreshHostStartState();
 
             if (roomPlayers.size() < MAX_PLAYERS) {
                 AddBotHost.setDisable(false);
@@ -548,6 +603,129 @@ public class MultiplayerController {
     private void refreshHostUI() {
         renderPlayerAreas(PlayerContainerHost, true);
         updateNumberPlayer(NumberPlayerHost);
+    }
+
+    private void refreshHostStartState() {
+        if (currentPanel != PanelState.HOST_ROOM || !RoomService.isInitialized()) {
+            StartGameHost.setDisable(true);
+            return;
+        }
+
+        String token = RoomService.getToken();
+        if (token == null || token.isBlank()) {
+            StartGameHost.setDisable(true);
+            return;
+        }
+
+        ApiService.request(
+            ApiService.getGameStartStatus(token),
+            ApiService.GameStartStatusResponse.class,
+            response -> {
+                if (response.error() != null) {
+                    StartGameHost.setDisable(true);
+                    return;
+                }
+
+                boolean canStart = Boolean.TRUE.equals(response.canStart());
+                boolean isStarting = Boolean.TRUE.equals(response.isStarting());
+                StartGameHost.setDisable(!canStart || isStarting);
+            }
+        );
+    }
+
+    private void showCountdownOverlay(int seconds) {
+        hideCountdownOverlay();
+
+        countdownLabel = new Label(String.valueOf(Math.max(seconds, 0)));
+        countdownLabel.setStyle("-fx-text-fill: #FFF8ED; -fx-font-size: 96px; -fx-font-weight: bold;");
+
+        Label subtitle = new Label("Game starting soon");
+        subtitle.setStyle("-fx-text-fill: #FFF8ED; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+        VBox box = new VBox(8, countdownLabel, subtitle);
+        box.setAlignment(Pos.CENTER);
+
+        Pane backdrop = new Pane();
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.45);");
+        backdrop.prefWidthProperty().bind(root.widthProperty());
+        backdrop.prefHeightProperty().bind(root.heightProperty());
+
+        countdownOverlay = new StackPane(backdrop, box);
+        countdownOverlay.prefWidthProperty().bind(root.widthProperty());
+        countdownOverlay.prefHeightProperty().bind(root.heightProperty());
+        countdownOverlay.setPickOnBounds(true);
+        StackPane.setAlignment(box, Pos.CENTER);
+
+        root.getChildren().add(countdownOverlay);
+        countdownOverlay.toFront();
+
+        if (countdownTimeline != null) {
+            countdownTimeline.stop();
+        }
+
+        countdownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            int current = parseCountdownValue();
+            if (current <= 0) {
+                countdownTimeline.stop();
+                updateCountdownLabel(0);
+                return;
+            }
+
+            updateCountdownLabel(current - 1);
+        }));
+        countdownTimeline.setCycleCount(Math.max(seconds, 1));
+        countdownTimeline.playFromStart();
+    }
+
+    private int parseCountdownValue() {
+        if (countdownLabel == null) return 0;
+
+        try {
+            return Integer.parseInt(countdownLabel.getText().trim());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private void updateCountdownLabel(int seconds) {
+        if (countdownLabel != null) {
+            countdownLabel.setText(String.valueOf(Math.max(seconds, 0)));
+        }
+    }
+
+    private void hideCountdownOverlay() {
+        if (countdownTimeline != null) {
+            countdownTimeline.stop();
+            countdownTimeline = null;
+        }
+
+        if (countdownOverlay != null) {
+            root.getChildren().remove(countdownOverlay);
+            countdownOverlay = null;
+            countdownLabel = null;
+        }
+    }
+
+    private List<Player> toGamePlayers() {
+        List<Player> players = new ArrayList<>();
+        for (int i = 0; i < roomPlayers.size(); i++) {
+            RoomPlayer roomPlayer = roomPlayers.get(i);
+            PlayerColor color = parsePlayerColor(roomPlayer.getColor());
+            if (color == null) continue;
+
+            players.add(new Player(i, roomPlayer.getName(), color));
+        }
+        return players;
+    }
+
+    private PlayerColor parsePlayerColor(String rawColor) {
+        if (rawColor == null || rawColor.isBlank()) return null;
+
+        try {
+            return PlayerColor.valueOf(rawColor.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private void refreshJoinUI() {
@@ -678,6 +856,10 @@ public class MultiplayerController {
         JoinPanel3.setVisible(panel == PanelState.JOIN_ROOM);
         HostPanel.setVisible(panel == PanelState.HOST_ROOM);
         ErrorService.setVisible(panel == PanelState.ERROR_SERVICE);
+
+        if (panel != PanelState.JOIN_ROOM && panel != PanelState.HOST_ROOM) {
+            hideCountdownOverlay();
+        }
     }
 
     private void showAlert(String title, String message) {

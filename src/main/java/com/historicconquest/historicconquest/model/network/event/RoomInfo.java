@@ -90,6 +90,33 @@ public enum RoomInfo {
         }
     },
 
+    GAME_COUNTDOWN_STARTED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            JsonNode secondsNode = node.get("seconds");
+            JsonNode startAtNode = node.get("startAt");
+
+            int seconds = secondsNode == null || secondsNode.isNull() ? 5 : secondsNode.asInt(5);
+            long startAt = startAtNode == null || startAtNode.isNull() ? 0L : startAtNode.asLong(0L);
+
+            notifyIfPresent(listener, l -> l.onGameCountdownStarted(seconds, startAt));
+        }
+    },
+
+    GAME_START_CANCELLED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onGameStartCancelled(getText(node, "reason")));
+        }
+    },
+
+    GAME_STARTED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, RoomEventListener::onGameStarted);
+        }
+    },
+
     ROOM_DELETED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {

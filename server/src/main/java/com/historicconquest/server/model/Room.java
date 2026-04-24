@@ -10,6 +10,9 @@ public class Room {
 
     private final String code;
     private String hostId;
+    private boolean gameStarting;
+    private boolean gameStarted;
+    private long gameStartAt;
 
     private final Map<String, Player> players = new ConcurrentHashMap<>();
 
@@ -20,6 +23,52 @@ public class Room {
 
     public boolean isHost(String playerId) {
         return hostId != null && hostId.equals(playerId);
+    }
+
+    public synchronized boolean canStartGame() {
+        return !gameStarting && hasLaunchConditions();
+    }
+
+    public synchronized boolean hasLaunchConditions() {
+        if (gameStarted) return false;
+        if (players.size() != MAX_PLAYER) return false;
+        if (hostId == null || !players.containsKey(hostId)) return false;
+
+        for (Player player : players.values()) {
+            if (isHost(player.getId())) continue;
+            if (!isPlayerReady(player)) return false;
+        }
+
+        return true;
+    }
+
+    public synchronized boolean isGameStarting() {
+        return gameStarting;
+    }
+
+    public synchronized boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    public synchronized long getGameStartAt() {
+        return gameStartAt;
+    }
+
+    public synchronized void markGameStarting(long gameStartAt) {
+        this.gameStarting = true;
+        this.gameStarted = false;
+        this.gameStartAt = gameStartAt;
+    }
+
+    public synchronized void cancelGameStarting() {
+        this.gameStarting = false;
+        this.gameStartAt = 0L;
+    }
+
+    public synchronized void markGameStarted() {
+        this.gameStarting = false;
+        this.gameStarted = true;
+        this.gameStartAt = 0L;
     }
 
     public boolean isPseudoAvailable(String pseudo) {
@@ -61,6 +110,12 @@ public class Room {
 
     public Collection<Player> getPlayers() {
         return players.values();
+    }
+
+    private boolean isPlayerReady(Player player) {
+        if (player == null) return false;
+        if ("bot".equalsIgnoreCase(player.getType())) return true;
+        return "Ready".equalsIgnoreCase(player.getStatus());
     }
 
     public Player getPlayerById(String playerId) {

@@ -63,6 +63,7 @@ public class HttpController {
         try {
             Room room = roomService.getRoom(roomCode);
             if (room == null) throw new RuntimeException("Room not found");
+            if (room.isGameStarting()) throw new RuntimeException("Game is starting");
 
             Player player = new Player(NameGenerator.get(), "player", room.getCode());
 
@@ -89,6 +90,45 @@ public class HttpController {
                 "error", Map.of(
                     "title", "Impossible to join",
                     "message", "You cannot join this room as it is not available or is full."
+                )
+            );
+        }
+    }
+
+    @GetMapping("/gameroom/start/status")
+    public Map<String, Object> getStartStatus(Authentication authentication) {
+        JwtHttpPrincipal principal = (JwtHttpPrincipal) authentication.getPrincipal();
+
+        if (principal == null) return Map.of(
+            "error", Map.of(
+                "title", "Error connecting to the server",
+                "message", "An error has occurred! Please try again."
+            )
+        );
+
+        try {
+            Room room = roomService.getRoom(principal.roomCode());
+            if (room == null) {
+                return Map.of(
+                    "error", Map.of(
+                        "title", "Room not found",
+                        "message", "Unable to retrieve start status for this room."
+                    )
+                );
+            }
+
+            return Map.of(
+                "canStart", roomService.canStartGame(principal.roomCode()),
+                "isStarting", room.isGameStarting(),
+                "playerCount", room.getPlayers().size(),
+                "requiredPlayers", 4
+            );
+
+        } catch (Exception e) {
+            return Map.of(
+                "error", Map.of(
+                    "title", "Error connecting to the server",
+                    "message", "An error has occurred! Please try again."
                 )
             );
         }

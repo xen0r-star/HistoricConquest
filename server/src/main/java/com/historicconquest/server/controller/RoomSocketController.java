@@ -11,13 +11,23 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.Map;
 
 
 @Controller
 public class RoomSocketController {
+    private static final int GAME_COUNTDOWN_SECONDS = 5;
+
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread thread = new Thread(r, "room-start-scheduler");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     public RoomSocketController(RoomService roomService,
                                 SimpMessagingTemplate messagingTemplate) {
@@ -36,8 +46,24 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
+        if (room.isGameStarting() || room.isGameStarted()) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "ADD_BOT",
+                    "title", "Failed to add bot",
+                    "message", room.isGameStarting() ?
+                            "A game countdown is already in progress" :
+                            "A game is already started"
+                )
+            );
+
+            return;
+        }
+
         if (room.isHost(player.getId())) {
-            Player newBot = new Player(NameGenerator.get(), "bot", room.getCode());
+            Player newBot = new Player(NameGenerator.get(), "bot", room.getCode(), Player.Status.Ready);
 
             try {
                 roomService.addPlayer(room.getCode(),  newBot);
@@ -75,6 +101,106 @@ public class RoomSocketController {
         }
     }
 
+    @MessageMapping("/start")
+    public void startGame(Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "START_GAME",
+                    "title", "Failed to start game",
+                    "message", "Room does not exist"
+                )
+            );
+            return;
+        }
+
+        if (room.isGameStarting() || room.isGameStarted()) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "START_GAME",
+                    "title", "Failed to start game",
+                    "message", room.isGameStarting() ?
+                            "A game countdown is already in progress" :
+                            "A game is already started"
+                )
+            );
+            return;
+        }
+
+        Player player = room.getPlayerById(playerId);
+        if (player == null || !room.isHost(player.getId())) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "START_GAME",
+                    "title", "Failed to start game",
+                    "message", "Only the host can start the game"
+                )
+            );
+            return;
+        }
+
+        try {
+            long startAt = roomService.startGame(roomCode);
+
+            messagingTemplate.convertAndSend(
+                "/topic/room-" + roomCode,
+                (Object) Map.of(
+                    "type", "GAME_COUNTDOWN_STARTED",
+                    "seconds", GAME_COUNTDOWN_SECONDS,
+                    "startAt", startAt
+                )
+            );
+
+            scheduler.schedule(() -> {
+                Room currentRoom = roomService.getRoom(roomCode);
+                if (currentRoom == null) {
+                    return;
+                }
+
+                if (!roomService.stillCanStartGame(roomCode)) {
+                    roomService.cancelGameStart(roomCode);
+                    messagingTemplate.convertAndSend(
+                        "/topic/room-" + roomCode,
+                        (Object) Map.of(
+                            "type", "GAME_START_CANCELLED",
+                            "reason", "The room is no longer full and ready"
+                        )
+                    );
+                    return;
+                }
+
+                roomService.finishGameStart(roomCode);
+                messagingTemplate.convertAndSend(
+                    "/topic/room-" + roomCode,
+                    (Object) Map.of("type", "GAME_STARTED")
+                );
+                roomService.deleteRoom(roomCode);
+            }, GAME_COUNTDOWN_SECONDS, TimeUnit.SECONDS);
+
+        } catch (Exception e) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "START_GAME",
+                    "title", "Failed to start game",
+                    "message", "An error has occurred"
+                )
+            );
+        }
+    }
+
 
     @MessageMapping("/update")
     public void updateData(@Payload Map<String, String> payload, Principal principal) {
@@ -87,6 +213,21 @@ public class RoomSocketController {
 
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
+
+        if (room.isGameStarting() || room.isGameStarted()) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", type,
+                    "title", "Action unavailable",
+                    "message", room.isGameStarting() ?
+                            "A game countdown is already in progress" :
+                            "A game is already started"
+                )
+            );
+            return;
+        }
 
         switch (type) {
             case "PLAYER_COLOR_CHANGE":
@@ -128,7 +269,7 @@ public class RoomSocketController {
                 break;
 
             case "PLAYER_STATUS_CHANGE":
-                player.setStatus(data);
+                player.setStatus(Player.Status.valueOf(data));
                 break;
         }
 
@@ -172,6 +313,21 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
+        if (room.isGameStarting() || room.isGameStarted()) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "KICK_PLAYER",
+                    "title", "Action unavailable",
+                    "message", room.isGameStarting() ?
+                            "A game countdown is already in progress" :
+                            "A game is already started"
+                )
+            );
+            return;
+        }
+
         if (room.isHost(player.getId())) {
             String playerIdToKick = payload.get("playerId");
             roomService.removePlayer(roomCode, playerIdToKick);
@@ -207,6 +363,21 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         Player player = room.getPlayerById(playerId);
 
+        if (room.isGameStarting() || room.isGameStarted()) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "DELETE_ROOM",
+                    "title", "Action unavailable",
+                    "message", room.isGameStarting() ?
+                            "A game countdown is already in progress" :
+                            "A game is already started"
+                )
+            );
+            return;
+        }
+
         if (room.isHost(player.getId())) {
             roomService.deleteRoom(roomCode);
 
@@ -228,7 +399,5 @@ public class RoomSocketController {
                 )
             );
         }
-
-
     }
 }

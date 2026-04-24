@@ -13,7 +13,7 @@ public class Player {
     private String pseudo;
     private String color;
     private final String type;
-    private String status;
+    private Status status;
     private int ping;
 
 
@@ -22,14 +22,22 @@ public class Player {
         this.token = JwtService.generateToken(id, roomCode);
         this.pseudo = pseudo;
         this.type = type;
-        this.status = "Waiting";
+        this.status = Status.Waiting;
     }
+
+    public Player(String pseudo, String type, String roomCode, Status status) {
+        this.id = UUID.randomUUID().toString();
+        this.token = JwtService.generateToken(id, roomCode);
+        this.pseudo = pseudo;
+        this.type = type;
+        this.status = status;
+    }
+
 
     @JsonProperty public String getId() {
         return id;
     }
-    @JsonProperty
-    public String getType() {
+    @JsonProperty public String getType() {
         return type;
     }
     @JsonProperty public String getPseudo() {
@@ -39,7 +47,7 @@ public class Player {
         return color;
     }
     @JsonProperty public String getStatus() {
-        return status;
+        return status.getLabel();
     }
     @JsonProperty public int getPing() {
         return ping;
@@ -56,10 +64,27 @@ public class Player {
     public void setColor(String color) {
         this.color = color;
     }
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
     public void setPing(int ping) {
         this.ping = ping;
+    }
+
+
+
+    public enum Status {
+        Ready("Ready"),
+        Waiting("Waiting");
+
+        private final String label;
+
+        Status(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 }

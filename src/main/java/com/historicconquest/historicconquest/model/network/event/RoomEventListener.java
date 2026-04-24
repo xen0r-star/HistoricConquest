@@ -12,6 +12,9 @@ public interface RoomEventListener {
     void onPlayerPseudoChange(String playerId, String newPseudo);
     void onPlayerStatusChange(String playerId, String newStatus);
     void onPlayerPings(Map<String, Integer> pings);
+    void onGameCountdownStarted(int seconds, long startAt);
+    void onGameStartCancelled(String reason);
+    void onGameStarted();
 
     void onRoomDeleted();
 }

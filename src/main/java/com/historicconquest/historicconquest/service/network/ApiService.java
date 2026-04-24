@@ -63,6 +63,10 @@ public class ApiService {
         return buildGet("/gameroom/colors/used", token);
     }
 
+    public static HttpRequest getGameStartStatus(String token) {
+        return buildGet("/gameroom/start/status", token);
+    }
+
 
 
     private static HttpRequest buildGet(String endpoint) {
@@ -160,5 +164,16 @@ public class ApiService {
             Collection<String> colors,
 
             ErrorRequest error
+    ) {}
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GameStartStatusResponse(
+        Boolean canStart,
+        Boolean isStarting,
+        Integer playerCount,
+        Integer requiredPlayers,
+
+        ErrorRequest error
     ) {}
 }

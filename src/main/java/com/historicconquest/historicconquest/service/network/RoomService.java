@@ -240,6 +240,18 @@ public class RoomService {
         }
     }
 
+    public static void startGame() {
+        try {
+            getInstance().socketClient.sendNoData("/app/start");
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to start game",
+                "Impossible to start game, Please try again."
+            );
+        }
+    }
+
     public static String switchStatus() {
         getInstance().status =
             getInstance().status.equals(STATUS_WAITING) ?
