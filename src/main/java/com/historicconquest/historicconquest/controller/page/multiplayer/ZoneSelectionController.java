@@ -213,7 +213,7 @@ public class ZoneSelectionController {
         MapView mapView = MapViewFactory.build(worldMap, true);
         Group mapInterface = mapView.getRoot();
 
-        MapBackgroundController.show(root, mapViewport, -55, -30, -0.03);
+        MapBackgroundController.show(root, mapViewport, -400, -150, 0);
 
         Group backgroundMapInterface = null;
         if (!mapViewport.getChildren().isEmpty() && mapViewport.getChildren().getFirst() instanceof Group group) {
@@ -293,8 +293,8 @@ public class ZoneSelectionController {
             playerLabel.setWrapText(true);
             playerLabel.setMaxWidth(Double.MAX_VALUE);
             playerLabel.setStyle(
-                "-fx-background-color: rgba(238,220,190,0.85);" +
-                "-fx-text-fill: #463d2a;" +
+                "-fx-background-color: " + mapPlayerColorHex(player.getColor()) + ";" +
+                "-fx-text-fill: #FFF8ED;" +
                 "-fx-font-size: 14px;" +
                 "-fx-font-weight: bold;" +
                 "-fx-background-radius: 8;" +
@@ -386,6 +386,30 @@ public class ZoneSelectionController {
 
         } catch (Exception e) {
             return Color.web(DEFAULT_ZONE_COLOR);
+        }
+    }
+
+    private String mapPlayerColorHex(String rawColor) {
+        if (rawColor == null || rawColor.isBlank()) {
+            return DEFAULT_ZONE_COLOR;
+        }
+
+        try {
+            return switch (PlayerColor.valueOf(rawColor.trim().toUpperCase())) {
+                case RED ->"#A2383A";
+                case ORANGE -> "#B9693E";
+                case YELLOW -> "#B68D3B";
+                case GREEN -> "#61712A";
+                case LIME -> "#89A238";
+                case CYAN -> "#38A270";
+                case BLUE -> "#389BA2";
+                case LIGHT_BLUE -> "#385BA2";
+                case PURPLE -> "#6838A2";
+                case PINK -> "#A23887";
+            };
+
+        } catch (Exception e) {
+            return DEFAULT_ZONE_COLOR;
         }
     }
 }

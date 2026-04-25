@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest.app;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
@@ -31,6 +32,12 @@ public class App extends Application {
 
         appController.initialize(stage, root);
         appController.showPage(AppPage.HOME);
+
+        Platform.setImplicitExit(true);
+        stage.setOnCloseRequest(event -> {
+            event.consume();
+            appController.exit();
+        });
 
         stage.setScene(scene);
         stage.setMaximized(true);

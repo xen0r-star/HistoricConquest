@@ -4,6 +4,8 @@ import com.historicconquest.historicconquest.controller.game.MapBackgroundContro
 import com.historicconquest.historicconquest.controller.overlay.HelpController;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.controller.overlay.SettingsController;
+import com.historicconquest.historicconquest.service.network.RoomService;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -86,7 +88,22 @@ public class AppController {
 	}
 
 	public void exit() {
-		if (stage != null) stage.close();
+		try {
+			if (RoomService.isInitialized()) {
+				RoomService.reset();
+			}
+
+			if (stage != null) {
+				stage.close();
+			}
+
+			Platform.exit();
+			System.exit(0);
+
+		} catch (Exception e) {
+			System.err.println("Error while exiting application: " + e.getMessage());
+			System.exit(0);
+		}
 	}
 
 	private StackPane loadPage(AppPage page) {
