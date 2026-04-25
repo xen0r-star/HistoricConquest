@@ -13,8 +13,10 @@ public interface RoomEventListener {
     void onPlayerStatusChange(String playerId, String newStatus);
     void onPlayerPings(Map<String, Integer> pings);
     void onGameCountdownStarted(int seconds, long startAt);
+    void onZoneSelectionStarted(int seconds, long startAt, Map<String, String> selectedZones);
+    void onZoneSelectionUpdated(Map<String, String> selectedZones);
     void onGameStartCancelled(String reason);
-    void onGameStarted();
+    void onGameStarted(Map<String, String> selectedZones);
 
     void onRoomDeleted();
 }

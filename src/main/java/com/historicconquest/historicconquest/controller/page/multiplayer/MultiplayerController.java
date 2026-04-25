@@ -47,8 +47,8 @@ import java.util.function.UnaryOperator;
 
 public class MultiplayerController {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerController.class);
-    private static final String PLAYER_ICON = "/images/person.png";
-    private static final String ROBOT_ICON = "/images/robots.png";
+    private static final String PLAYER_ICON = "/view/icons/person.png";
+    private static final String ROBOT_ICON = "/view/icons/robots.png";
     private static final String AREA_EMPTY_STYLE = "-fx-background-color: #EEDCBE88";
     private static final String AREA_FILLED_STYLE = "-fx-background-color: #EEDCBEDC";
     private static final int MAX_PLAYERS = 4;
@@ -95,6 +95,8 @@ public class MultiplayerController {
     private PanelState currentPanel = PanelState.SELECT_MODE;
     private final List<RoomPlayer> roomPlayers = new ArrayList<>();
     private Pane editProfilOverlay;
+    private ZoneSelectionController zoneSelectionController;
+    private boolean gameStarted;
     private StackPane countdownOverlay;
     private Label countdownLabel;
     private Timeline countdownTimeline;
@@ -221,7 +223,7 @@ public class MultiplayerController {
                 for (NetworkPlayer player : response.players()) {
                     roomPlayers.add(new RoomPlayer(
                         player.id(),     player.pseudo(),
-                        player.color(), !player.type().equals("player"),
+                        player.color(), !player.type().equals("Player"),
                         player.ping(),   player.status(),
                         false
                     ));
@@ -363,7 +365,7 @@ public class MultiplayerController {
                     if (currentPanel == PanelState.JOIN_ROOM) {
                         roomPlayers.add(new RoomPlayer(
                             newPlayer.id(),     newPlayer.pseudo(),
-                            newPlayer.color(), !newPlayer.type().equals("player"),
+                            newPlayer.color(), !newPlayer.type().equals("Player"),
                             newPlayer.ping(),   newPlayer.status(),
                             false
                         ));
@@ -373,7 +375,7 @@ public class MultiplayerController {
                     } else if (currentPanel == PanelState.HOST_ROOM) {
                         roomPlayers.add(new RoomPlayer(
                             newPlayer.id(),     newPlayer.pseudo(),
-                            newPlayer.color(), !newPlayer.type().equals("player"),
+                            newPlayer.color(), !newPlayer.type().equals("Player"),
                             newPlayer.ping(),   newPlayer.status(),
                             true
                         ));
@@ -385,12 +387,23 @@ public class MultiplayerController {
                             AddBotHost.setDisable(true);
                         }
                     }
+
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handlePlayerJoin(new RoomPlayer(
+                            newPlayer.id(), newPlayer.pseudo(), newPlayer.color(), !newPlayer.type().equals("Player"), newPlayer.ping(), newPlayer.status(), false
+                        ));
+                    }
                 });
             }
 
             @Override
             public void onPlayerQuit(String playerId) {
-                Platform.runLater(() -> removePlayerAndRefreshUi(playerId));
+                Platform.runLater(() -> {
+                    removePlayerAndRefreshUi(playerId);
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handlePlayerQuit(playerId);
+                    }
+                });
             }
 
             @Override
@@ -402,11 +415,19 @@ public class MultiplayerController {
                         clearPlayerAreas(PlayerContainerJoin);
                         clearPlayerAreas(PlayerContainerHost);
 
+                        if (zoneSelectionController != null) {
+                            zoneSelectionController.handleGameStartCancelled("You were removed from the room.");
+                            zoneSelectionController = null;
+                        }
+
                         RoomService.quitRoom();
                         RoomService.reset();
 
                     } else {
                         removePlayerAndRefreshUi(playerId);
+                        if (zoneSelectionController != null) {
+                            zoneSelectionController.handlePlayerKick(playerId);
+                        }
                     }
                 });
             }
@@ -429,6 +450,10 @@ public class MultiplayerController {
                         refreshHostUI();
                         refreshHostStartState();
                     }
+
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handlePlayerColorChange(playerId, newColor);
+                    }
                 });
             }
 
@@ -450,6 +475,10 @@ public class MultiplayerController {
                         refreshHostUI();
                         refreshHostStartState();
                     }
+
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handlePlayerPseudoChange(playerId, newPseudo);
+                    }
                 });
             }
 
@@ -468,6 +497,10 @@ public class MultiplayerController {
                         refreshHostUI();
                         refreshHostStartState();
                     }
+
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handlePlayerStatusChange(playerId, newStatus);
+                    }
                 });
             }
 
@@ -484,6 +517,10 @@ public class MultiplayerController {
                         refreshHostUI();
                         refreshHostStartState();
                     }
+
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handlePlayerPings(pings);
+                    }
                 });
             }
 
@@ -493,30 +530,74 @@ public class MultiplayerController {
             }
 
             @Override
+            public void onZoneSelectionStarted(int seconds, long startAt, Map<String, String> selectedZones) {
+                Platform.runLater(() -> showZoneSelectionOverlay(seconds, startAt, selectedZones));
+            }
+
+            @Override
+            public void onZoneSelectionUpdated(Map<String, String> selectedZones) {
+                Platform.runLater(() -> {
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handleZoneSelectionUpdated(selectedZones);
+                    }
+                });
+            }
+
+            @Override
             public void onGameStartCancelled(String reason) {
                 Platform.runLater(() -> {
+                    if (gameStarted) {
+                        return;
+                    }
+
                     hideCountdownOverlay();
-                    NotificationController.show(
-                        "Start cancelled",
-                        reason == null || reason.isBlank() ? "The game could not start." : reason,
-                        Notification.Type.INFORMATION
-                    );
+                    boolean handledBySelection = zoneSelectionController != null;
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handleGameStartCancelled(reason);
+                        zoneSelectionController = null;
+                    }
+
+                    if (!handledBySelection) {
+                        NotificationController.show(
+                            "Start cancelled",
+                            reason == null || reason.isBlank() ? "The game could not start." : reason,
+                            Notification.Type.INFORMATION
+                        );
+                    }
+
                     refreshHostStartState();
                 });
             }
 
             @Override
-            public void onGameStarted() {
+            public void onGameStarted(Map<String, String> selectedZones) {
                 Platform.runLater(() -> {
+                    gameStarted = true;
                     hideCountdownOverlay();
-                    GameBootstrapper.launchGame(root, toGamePlayers());
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handleGameStarted(selectedZones);
+                        zoneSelectionController = null;
+
+                    } else {
+                        GameBootstrapper.launchGame(root, toGamePlayers());
+                    }
                 });
             }
 
             @Override
             public void onRoomDeleted() {
                 Platform.runLater(() -> {
+                    if (gameStarted) {
+                        return;
+                    }
+
                     hideCountdownOverlay();
+                    if (zoneSelectionController != null) {
+                        zoneSelectionController.handleRoomDeleted();
+                        zoneSelectionController = null;
+                        return;
+                    }
+
                     if (currentPanel == PanelState.JOIN_ROOM) {
                         clearPlayerAreas(PlayerContainerJoin);
 
@@ -628,9 +709,36 @@ public class MultiplayerController {
 
                 boolean canStart = Boolean.TRUE.equals(response.canStart());
                 boolean isStarting = Boolean.TRUE.equals(response.isStarting());
-                StartGameHost.setDisable(!canStart || isStarting);
+                boolean isSelecting = Boolean.TRUE.equals(response.isSelecting());
+                StartGameHost.setDisable(!canStart || isStarting || isSelecting);
             }
         );
+    }
+
+    private void showZoneSelectionOverlay(int seconds, long startAt, Map<String, String> selectedZones) {
+        try {
+            if (zoneSelectionController == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/multiplayer/ZoneSelection.fxml"));
+                loader.load();
+                zoneSelectionController = loader.getController();
+
+                if (zoneSelectionController == null) {
+                    return;
+                }
+
+                zoneSelectionController.attach(root, new ArrayList<>(roomPlayers));
+            }
+
+            zoneSelectionController.handleZoneSelectionStarted(seconds, startAt, selectedZones);
+
+        } catch (IOException e) {
+            logger.error("Unable to load ZoneSelection overlay", e);
+            NotificationController.show(
+                "Display error",
+                "Unable to open zone selection panel.",
+                Notification.Type.ERROR
+            );
+        }
     }
 
     private void showCountdownOverlay(int seconds) {

@@ -35,6 +35,22 @@ public class RoomSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    private boolean isGameFlowLocked(Room room) {
+        return room != null && (room.isGameStarting() || room.isZoneSelectionStarted() || room.isGameStarted());
+    }
+
+    private void sendActionUnavailable(String playerId, String action, String message) {
+        messagingTemplate.convertAndSendToUser(
+            playerId,
+            "/queue/errors",
+            Map.of(
+                "type", action,
+                "title", "Action unavailable",
+                "message", message
+            )
+        );
+    }
+
 
 
     @MessageMapping("/addBot")
@@ -44,26 +60,27 @@ public class RoomSocketController {
         String roomCode = sp.getRoomCode();
 
         Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, "ADD_BOT", "Room does not exist");
+            return;
+        }
+
         Player player = room.getPlayerById(playerId);
 
-        if (room.isGameStarting() || room.isGameStarted()) {
-            messagingTemplate.convertAndSendToUser(
+        if (isGameFlowLocked(room)) {
+            sendActionUnavailable(
                 playerId,
-                "/queue/errors",
-                Map.of(
-                    "type", "ADD_BOT",
-                    "title", "Failed to add bot",
-                    "message", room.isGameStarting() ?
-                            "A game countdown is already in progress" :
-                            "A game is already started"
-                )
+                "ADD_BOT",
+                room.isGameStarting() ? "A game countdown is already in progress" :
+                    room.isZoneSelectionStarted() ? "Zone selection is already in progress" :
+                        "A game is already started"
             );
 
             return;
         }
 
         if (room.isHost(player.getId())) {
-            Player newBot = new Player(NameGenerator.get(), "bot", room.getCode(), Player.Status.Ready);
+            Player newBot = new Player(NameGenerator.get(), Player.Type.Bot, room.getCode(), Player.Status.Ready);
 
             try {
                 roomService.addPlayer(room.getCode(),  newBot);
@@ -122,16 +139,10 @@ public class RoomSocketController {
         }
 
         if (room.isGameStarting() || room.isGameStarted()) {
-            messagingTemplate.convertAndSendToUser(
+            sendActionUnavailable(
                 playerId,
-                "/queue/errors",
-                Map.of(
-                    "type", "START_GAME",
-                    "title", "Failed to start game",
-                    "message", room.isGameStarting() ?
-                            "A game countdown is already in progress" :
-                            "A game is already started"
-                )
+                "START_GAME",
+                room.isGameStarting() ? "A game countdown is already in progress" : "A game is already started"
             );
             return;
         }
@@ -180,23 +191,97 @@ public class RoomSocketController {
                     return;
                 }
 
-                roomService.finishGameStart(roomCode);
-                messagingTemplate.convertAndSend(
-                    "/topic/room-" + roomCode,
-                    (Object) Map.of("type", "GAME_STARTED")
-                );
-                roomService.deleteRoom(roomCode);
+                try {
+                    RoomService.ZoneSelectionStart selectionStart = roomService.startZoneSelection(roomCode);
+
+                    messagingTemplate.convertAndSend(
+                        "/topic/room-" + roomCode,
+                        (Object) Map.of(
+                            "type", "ZONE_SELECTION_STARTED",
+                            "seconds", 30,
+                            "startAt", selectionStart.startAt(),
+                            "selectedZones", selectionStart.selectedZones()
+                        )
+                    );
+
+                    scheduler.schedule(() -> {
+                        Room latestRoom = roomService.getRoom(roomCode);
+                        if (latestRoom == null || latestRoom.isGameStarted()) {
+                            return;
+                        }
+
+                        if (!latestRoom.isZoneSelectionStarted()) {
+                            return;
+                        }
+
+                        try {
+                            RoomService.ZoneSelectionUpdate finalSelection = roomService.completeZoneSelection(roomCode);
+                            messagingTemplate.convertAndSend(
+                                "/topic/room-" + roomCode,
+                                (Object) Map.of(
+                                    "type", "GAME_STARTED",
+                                    "selectedZones", finalSelection.selectedZones()
+                                )
+                            );
+                            roomService.deleteRoom(roomCode);
+
+                        } catch (Exception ignored) {
+                        }
+                    }, 30, TimeUnit.SECONDS);
+
+                } catch (Exception e) {
+                    roomService.cancelGameStart(roomCode);
+                    messagingTemplate.convertAndSendToUser(
+                        playerId,
+                        "/queue/errors",
+                        Map.of(
+                            "type", "START_GAME",
+                            "title", "Failed to start game",
+                            "message", e.getMessage() == null ? "An error has occurred" : e.getMessage()
+                        )
+                    );
+                }
             }, GAME_COUNTDOWN_SECONDS, TimeUnit.SECONDS);
 
         } catch (Exception e) {
-            messagingTemplate.convertAndSendToUser(
-                playerId,
-                "/queue/errors",
-                Map.of(
-                    "type", "START_GAME",
-                    "title", "Failed to start game",
-                    "message", "An error has occurred"
+            sendActionUnavailable(playerId, "START_GAME", "An error has occurred");
+        }
+    }
+
+
+    @MessageMapping("/zone/select")
+    public void selectZone(@Payload Map<String, String> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, "ZONE_SELECT", "Room does not exist");
+            return;
+        }
+
+        if (!room.isZoneSelectionStarted()) {
+            sendActionUnavailable(playerId, "ZONE_SELECT", "Zone selection is not active");
+            return;
+        }
+
+        try {
+            RoomService.ZoneSelectionUpdate update = roomService.selectZone(roomCode, playerId, payload.get("zone"));
+
+            messagingTemplate.convertAndSend(
+                "/topic/room-" + roomCode,
+                (Object) Map.of(
+                    "type", "ZONE_SELECTION_UPDATED",
+                    "selectedZones", update.selectedZones()
                 )
+            );
+
+        } catch (Exception e) {
+            sendActionUnavailable(
+                playerId,
+                "ZONE_SELECT",
+                e.getMessage() == null ? "Unable to select this zone" : e.getMessage()
             );
         }
     }
@@ -210,21 +295,28 @@ public class RoomSocketController {
 
         String type = payload.get("type");
         String data = payload.get("data");
+        String action = type == null ? "UPDATE_DATA" : type;
 
         Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, type == null ? "UPDATE_DATA" : type, "Room does not exist");
+            return;
+        }
+
         Player player = room.getPlayerById(playerId);
 
-        if (room.isGameStarting() || room.isGameStarted()) {
-            messagingTemplate.convertAndSendToUser(
+        if (type == null || type.isBlank()) {
+            sendActionUnavailable(playerId, "UPDATE_DATA", "Invalid action payload");
+            return;
+        }
+
+        if (isGameFlowLocked(room)) {
+            sendActionUnavailable(
                 playerId,
-                "/queue/errors",
-                Map.of(
-                    "type", type,
-                    "title", "Action unavailable",
-                    "message", room.isGameStarting() ?
-                            "A game countdown is already in progress" :
-                            "A game is already started"
-                )
+                action,
+                room.isGameStarting() ? "A game countdown is already in progress" :
+                    room.isZoneSelectionStarted() ? "Zone selection is already in progress" :
+                        "A game is already started"
             );
             return;
         }
@@ -291,6 +383,9 @@ public class RoomSocketController {
         String playerId = sp.getName();
         String roomCode = sp.getRoomCode();
 
+        Room room = roomService.getRoom(roomCode);
+        boolean cancelFlow = isGameFlowLocked(room);
+
         roomService.removePlayer(roomCode, playerId);
 
 
@@ -301,6 +396,17 @@ public class RoomSocketController {
                 "playerId", playerId
             )
         );
+
+        if (cancelFlow && roomService.getRoom(roomCode) != null) {
+            roomService.cancelGameStart(roomCode);
+            messagingTemplate.convertAndSend(
+                "/topic/room-" + roomCode,
+                (Object) Map.of(
+                    "type", "GAME_START_CANCELLED",
+                    "reason", "A player left the room"
+                )
+            );
+        }
     }
 
 
@@ -311,19 +417,20 @@ public class RoomSocketController {
         String roomCode = sp.getRoomCode();
 
         Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, "KICK_PLAYER", "Room does not exist");
+            return;
+        }
+
         Player player = room.getPlayerById(playerId);
 
-        if (room.isGameStarting() || room.isGameStarted()) {
-            messagingTemplate.convertAndSendToUser(
+        if (isGameFlowLocked(room)) {
+            sendActionUnavailable(
                 playerId,
-                "/queue/errors",
-                Map.of(
-                    "type", "KICK_PLAYER",
-                    "title", "Action unavailable",
-                    "message", room.isGameStarting() ?
-                            "A game countdown is already in progress" :
-                            "A game is already started"
-                )
+                "KICK_PLAYER",
+                room.isGameStarting() ? "A game countdown is already in progress" :
+                    room.isZoneSelectionStarted() ? "Zone selection is already in progress" :
+                        "A game is already started"
             );
             return;
         }
@@ -361,19 +468,20 @@ public class RoomSocketController {
         String roomCode = sp.getRoomCode();
 
         Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, "DELETE_ROOM", "Room does not exist");
+            return;
+        }
+
         Player player = room.getPlayerById(playerId);
 
-        if (room.isGameStarting() || room.isGameStarted()) {
-            messagingTemplate.convertAndSendToUser(
+        if (isGameFlowLocked(room)) {
+            sendActionUnavailable(
                 playerId,
-                "/queue/errors",
-                Map.of(
-                    "type", "DELETE_ROOM",
-                    "title", "Action unavailable",
-                    "message", room.isGameStarting() ?
-                            "A game countdown is already in progress" :
-                            "A game is already started"
-                )
+                "DELETE_ROOM",
+                room.isGameStarting() ? "A game countdown is already in progress" :
+                    room.isZoneSelectionStarted() ? "Zone selection is already in progress" :
+                        "A game is already started"
             );
             return;
         }

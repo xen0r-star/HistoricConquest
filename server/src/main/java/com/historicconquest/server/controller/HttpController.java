@@ -37,7 +37,7 @@ public class HttpController {
     public Map<String, Object> createRoom(@RequestParam String playerName) {
         try {
             Room room = roomService.createRoom();
-            Player player = new Player(playerName, "player", room.getCode());
+            Player player = new Player(playerName, room.getCode());
 
             roomService.addHost(room.getCode(), player);
 
@@ -63,9 +63,11 @@ public class HttpController {
         try {
             Room room = roomService.getRoom(roomCode);
             if (room == null) throw new RuntimeException("Room not found");
-            if (room.isGameStarting()) throw new RuntimeException("Game is starting");
+            if (room.isGameStarting() || room.isZoneSelectionStarted() || room.isGameStarted()) {
+                throw new RuntimeException("Game is starting");
+            }
 
-            Player player = new Player(NameGenerator.get(), "player", room.getCode());
+            Player player = new Player(NameGenerator.get(), room.getCode());
 
 
             roomService.addPlayer(roomCode,  player);
@@ -120,6 +122,7 @@ public class HttpController {
             return Map.of(
                 "canStart", roomService.canStartGame(principal.roomCode()),
                 "isStarting", room.isGameStarting(),
+                "isSelecting", room.isZoneSelectionStarted(),
                 "playerCount", room.getPlayers().size(),
                 "requiredPlayers", 4
             );

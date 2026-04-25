@@ -103,6 +103,28 @@ public enum RoomInfo {
         }
     },
 
+    ZONE_SELECTION_STARTED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            JsonNode secondsNode = node.get("seconds");
+            JsonNode startAtNode = node.get("startAt");
+            JsonNode selectedZonesNode = node.get("selectedZones");
+
+            int seconds = secondsNode == null || secondsNode.isNull() ? 30 : secondsNode.asInt(30);
+            long startAt = startAtNode == null || startAtNode.isNull() ? 0L : startAtNode.asLong(0L);
+            Map<String, String> selectedZones = readStringMap(selectedZonesNode);
+
+            notifyIfPresent(listener, l -> l.onZoneSelectionStarted(seconds, startAt, selectedZones));
+        }
+    },
+
+    ZONE_SELECTION_UPDATED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onZoneSelectionUpdated(readStringMap(node.get("selectedZones"))));
+        }
+    },
+
     GAME_START_CANCELLED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {
@@ -113,7 +135,7 @@ public enum RoomInfo {
     GAME_STARTED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {
-            notifyIfPresent(listener, RoomEventListener::onGameStarted);
+            notifyIfPresent(listener, l -> l.onGameStarted(readStringMap(node.get("selectedZones"))));
         }
     },
 
@@ -156,6 +178,19 @@ public enum RoomInfo {
     private static String getText(JsonNode node, String field) {
         JsonNode value = node.get(field);
         return value == null || value.isNull() ? "" : value.asString();
+    }
+
+    private static Map<String, String> readStringMap(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return Map.of();
+        }
+
+        try {
+            return MAPPER.convertValue(node, new TypeReference<>() { });
+
+        } catch (Exception e) {
+            return Map.of();
+        }
     }
 
     private static void notifyIfPresent(RoomEventListener listener, java.util.function.Consumer<RoomEventListener> callback) {

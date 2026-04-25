@@ -11,10 +11,12 @@ public class Room {
     private final String code;
     private String hostId;
     private boolean gameStarting;
+    private boolean zoneSelectionStarted;
     private boolean gameStarted;
     private long gameStartAt;
 
     private final Map<String, Player> players = new ConcurrentHashMap<>();
+    private final Map<String, String> selectedZones = new ConcurrentHashMap<>();
 
     public Room(String code) {
         this.code = code;
@@ -26,11 +28,11 @@ public class Room {
     }
 
     public synchronized boolean canStartGame() {
-        return !gameStarting && hasLaunchConditions();
+        return !gameStarting && !zoneSelectionStarted && hasLaunchConditions();
     }
 
     public synchronized boolean hasLaunchConditions() {
-        if (gameStarted) return false;
+        if (gameStarted || zoneSelectionStarted) return false;
         if (players.size() != MAX_PLAYER) return false;
         if (hostId == null || !players.containsKey(hostId)) return false;
 
@@ -57,28 +59,62 @@ public class Room {
     public synchronized void markGameStarting(long gameStartAt) {
         this.gameStarting = true;
         this.gameStarted = false;
+        this.zoneSelectionStarted = false;
         this.gameStartAt = gameStartAt;
+        this.selectedZones.clear();
+    }
+
+    public synchronized void markZoneSelectionStarted(long gameStartAt) {
+        this.gameStarting = false;
+        this.gameStarted = false;
+        this.zoneSelectionStarted = true;
+        this.gameStartAt = gameStartAt;
+        this.selectedZones.clear();
     }
 
     public synchronized void cancelGameStarting() {
         this.gameStarting = false;
+        this.zoneSelectionStarted = false;
         this.gameStartAt = 0L;
+        this.selectedZones.clear();
     }
 
     public synchronized void markGameStarted() {
         this.gameStarting = false;
+        this.zoneSelectionStarted = false;
         this.gameStarted = true;
         this.gameStartAt = 0L;
     }
 
-    public boolean isPseudoAvailable(String pseudo) {
-        for (Player player : players.values()) {
-            if (player.getPseudo().equals(pseudo)) {
-                return false;
-            }
+    public synchronized boolean isZoneSelectionStarted() {
+        return zoneSelectionStarted;
+    }
+
+    public synchronized boolean selectZone(String playerId, String zoneName) {
+        if (!zoneSelectionStarted || gameStarted) return false;
+        if (playerId == null || zoneName == null || zoneName.isBlank()) return false;
+        if (!players.containsKey(playerId)) return false;
+
+        String normalizedZone = zoneName.trim();
+        for (Map.Entry<String, String> entry : selectedZones.entrySet()) {
+            if (playerId.equals(entry.getKey())) continue;
+            if (normalizedZone.equalsIgnoreCase(entry.getValue())) return false;
         }
 
+        selectedZones.put(playerId, normalizedZone);
         return true;
+    }
+
+    public synchronized Map<String, String> getSelectedZones() {
+        return new HashMap<>(selectedZones);
+    }
+
+    public synchronized boolean areAllPlayersAssigned() {
+        return players.size() == MAX_PLAYER && selectedZones.size() == players.size();
+    }
+
+    public synchronized void removeSelectedZone(String playerId) {
+        selectedZones.remove(playerId);
     }
 
     public void addPlayer(Player player) throws Exception {
@@ -90,6 +126,7 @@ public class Room {
 
     public void removePlayer(String playerId) {
         players.remove(playerId);
+        selectedZones.remove(playerId);
     }
 
 
@@ -114,8 +151,8 @@ public class Room {
 
     private boolean isPlayerReady(Player player) {
         if (player == null) return false;
-        if ("bot".equalsIgnoreCase(player.getType())) return true;
-        return "Ready".equalsIgnoreCase(player.getStatus());
+        if (Player.Type.Bot == player.getType()) return true;
+        return (Player.Status.Ready == player.getStatus());
     }
 
     public Player getPlayerById(String playerId) {

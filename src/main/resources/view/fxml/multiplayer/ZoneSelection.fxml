@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #F7E7CE;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.multiplayer.ZoneSelectionController">
+    <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #907f66; -fx-border-width: 2;">
+        <StackPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </StackPane.margin>
+    </Pane>
+    <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" styleClass="map-grid-transparent">
+        <StackPane.margin>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+        </StackPane.margin>
+    </Region>
+    <Region mouseTransparent="true" prefHeight="400.0" prefWidth="290.0" styleClass="HUD-border" StackPane.alignment="CENTER">
+        <StackPane.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </StackPane.margin>
+    </Region>
+
+    <AnchorPane maxHeight="1030.0" maxWidth="1863.0" prefHeight="1030.0" prefWidth="1863.0" style="-fx-background-color: transparent;">
+        <VBox alignment="TOP_CENTER" spacing="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+            <Label style="-fx-font-size: 32px; -fx-font-weight: bold;" text="ZONE SELECTION" textFill="#3b3936" />
+            <Label fx:id="StatusLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Select a starting zone before the timer reaches zero." textFill="#3b3936" />
+        </VBox>
+
+        <Pane fx:id="mapViewport" style="-fx-border-color: transparent;" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="420.0" AnchorPane.topAnchor="140.0" />
+
+        <VBox alignment="TOP_CENTER" prefWidth="350.0" spacing="18.0" style="-fx-background-color: rgba(69, 61, 42, 0.70); -fx-background-radius: 18; -fx-padding: 22;" AnchorPane.bottomAnchor="100.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="140.0">
+
+            <Label style="-fx-text-fill: #FFF8ED; -fx-font-size: 22px; -fx-font-weight: bold;" text="ROOM PLAYERS" />
+            <VBox fx:id="PlayersBox" spacing="10.0" VBox.vgrow="ALWAYS" />
+
+            <VBox alignment="CENTER">
+                <Label fx:id="CountdownLabel" style="-fx-text-fill: #FFF8ED; -fx-font-size: 64px; -fx-font-weight: bold;" text="30" />
+                <Label style="-fx-text-fill: #FFF8ED; -fx-font-size: 14px; -fx-font-weight: bold;" text="Click on a free zone to claim it." textAlignment="CENTER" wrapText="true" />
+            </VBox>
+        </VBox>
+
+        <HBox alignment="CENTER" prefHeight="50.0" AnchorPane.bottomAnchor="28.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <Label style="-fx-text-fill: #3b3936; -fx-font-size: 14px;" />
+        </HBox>
+      <StackPane.margin>
+         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+      </StackPane.margin>
+    </AnchorPane>
+</StackPane>

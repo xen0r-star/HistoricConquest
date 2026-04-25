@@ -252,6 +252,29 @@ public class RoomService {
         }
     }
 
+    public static void selectZone(String zoneName) {
+        if (zoneName == null || zoneName.isBlank()) {
+            getInstance().notifyError(
+                "Failed to select zone",
+                "Impossible to select the chosen zone, Please try again."
+            );
+            return;
+        }
+
+        try {
+            getInstance().socketClient.sendJson(
+                "/app/zone/select",
+                Map.of("zone", zoneName)
+            );
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to select zone",
+                "Impossible to select the chosen zone, Please try again."
+            );
+        }
+    }
+
     public static String switchStatus() {
         getInstance().status =
             getInstance().status.equals(STATUS_WAITING) ?

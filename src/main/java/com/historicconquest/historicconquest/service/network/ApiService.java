@@ -171,6 +171,7 @@ public class ApiService {
     public record GameStartStatusResponse(
         Boolean canStart,
         Boolean isStarting,
+        Boolean isSelecting,
         Integer playerCount,
         Integer requiredPlayers,
 

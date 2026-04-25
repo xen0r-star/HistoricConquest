@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -18,6 +19,17 @@ public class RoomService {
     private static final List<String> AVAILABLE_COLORS = List.of(
         "RED", "ORANGE", "YELLOW", "LIME", "GREEN",
         "LIGHT_BLUE", "BLUE", "PINK", "PURPLE"
+    );
+
+    private static final List<String> AVAILABLE_ZONES = List.of(
+        "Australasia", "Southeast Asia", "Mainland Southeast Asia", "Indian subcontinent", "North-East Archipelagos",
+        "East Asia", "Central Asia", "Eastern Middle East", "Arabian Peninsula", "Middle East",
+        "Mercosur", "Great Chaco", "Southern Cone", "South Central", "South America North",
+        "Central America and the Caribbean", "Mexico", "United States", "Canada", "Alaska",
+        "Southern Africa", "Indian Ocean", "Congo Basin", "East Africa", "Horn of Africa",
+        "Gulf of Guinea", "West Africa", "Sahel", "Nile Valley", "Maghreb",
+        "Russia", "Eurasia & Caucasus", "Eastern Europe", "Balkans & Greece", "Central Europe - Alpine",
+        "Iberian Peninsula", "Western Europe", "Scandinavia", "British Isles - Iceland", "Greenland"
     );
 
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();
@@ -119,6 +131,72 @@ public class RoomService {
         return startAt;
     }
 
+    public ZoneSelectionStart startZoneSelection(String roomCode) throws Exception {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new Exception("Room not found");
+        }
+
+        if (room.isGameStarted()) {
+            throw new Exception("Game is already started");
+        }
+
+        if (room.isZoneSelectionStarted()) {
+            throw new Exception("Zone selection is already in progress");
+        }
+
+        long startAt = System.currentTimeMillis() + 30_000L;
+        room.markZoneSelectionStarted(startAt);
+
+        autoAssignBotZones(room);
+        return new ZoneSelectionStart(startAt, room.getSelectedZones());
+    }
+
+    public ZoneSelectionUpdate selectZone(String roomCode, String playerId, String zoneName) throws Exception {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new Exception("Room not found");
+        }
+
+        if (!room.isZoneSelectionStarted()) {
+            throw new Exception("Zone selection is not active");
+        }
+
+        if (room.getPlayerById(playerId) == null) {
+            throw new Exception("Player not found in room");
+        }
+
+        String normalizedZone = normalizeZoneName(zoneName);
+        if (normalizedZone == null) {
+            throw new Exception("Unknown zone");
+        }
+
+        boolean accepted = room.selectZone(playerId, normalizedZone);
+        if (!accepted) {
+            throw new Exception("This zone is already taken");
+        }
+
+        return new ZoneSelectionUpdate(room.getSelectedZones(), room.areAllPlayersAssigned());
+    }
+
+    public ZoneSelectionUpdate completeZoneSelection(String roomCode) throws Exception {
+        Room room = rooms.get(roomCode);
+        if (room == null) {
+            throw new Exception("Room not found");
+        }
+
+        if (!room.isZoneSelectionStarted() && !room.isGameStarted()) {
+            throw new Exception("Zone selection is not active");
+        }
+
+        if (!room.isGameStarted()) {
+            fillMissingZones(room);
+            room.markGameStarted();
+        }
+
+        return new ZoneSelectionUpdate(room.getSelectedZones(), true);
+    }
+
     public boolean stillCanStartGame(String roomCode) {
         Room room = rooms.get(roomCode);
         return room != null && room.hasLaunchConditions();
@@ -185,6 +263,78 @@ public class RoomService {
             .toList();
     }
 
+    private void autoAssignBotZones(Room room) throws Exception {
+        Set<String> alreadySelected = room.getSelectedZones().values().stream()
+            .filter(zone -> zone != null && !zone.isBlank())
+            .map(String::toUpperCase)
+            .collect(Collectors.toSet());
+
+        for (Player player : room.getPlayers()) {
+            if (!(Player.Type.Bot == player.getType())) {
+                continue;
+            }
+
+            if (room.getSelectedZones().containsKey(player.getId())) {
+                continue;
+            }
+
+            String freeZone = pickFreeZone(alreadySelected);
+            if (freeZone == null) {
+                throw new Exception("Not enough free zones for every player");
+            }
+
+            room.selectZone(player.getId(), freeZone);
+            alreadySelected.add(freeZone.toUpperCase());
+        }
+    }
+
+    private void fillMissingZones(Room room) throws Exception {
+        Set<String> occupied = room.getSelectedZones().values().stream()
+            .filter(zone -> zone != null && !zone.isBlank())
+            .map(String::toUpperCase)
+            .collect(Collectors.toSet());
+
+        for (Player player : room.getPlayers()) {
+            if (room.getSelectedZones().containsKey(player.getId())) {
+                continue;
+            }
+
+            String freeZone = pickFreeZone(occupied);
+            if (freeZone == null) {
+                throw new Exception("Not enough free zones for every player");
+            }
+
+            room.selectZone(player.getId(), freeZone);
+            occupied.add(freeZone.toUpperCase());
+        }
+    }
+
+    private String pickFreeZone(Set<String> occupiedZones) {
+        List<String> freeZones = AVAILABLE_ZONES.stream()
+            .filter(zone -> !occupiedZones.contains(zone.toUpperCase()))
+            .toList();
+
+        if (freeZones.isEmpty()) {
+            return null;
+        }
+
+        return freeZones.get(new Random().nextInt(freeZones.size()));
+    }
+
+    private String normalizeZoneName(String zoneName) {
+        if (zoneName == null || zoneName.isBlank()) {
+            return null;
+        }
+
+        for (String availableZone : AVAILABLE_ZONES) {
+            if (availableZone.equalsIgnoreCase(zoneName.trim())) {
+                return availableZone;
+            }
+        }
+
+        return null;
+    }
+
     private String generateCode() {
         Random random = new Random();
         int number = random.nextInt(900000) + 100000;
@@ -195,4 +345,8 @@ public class RoomService {
     public Collection<Room> getAllRooms() {
         return rooms.values();
     }
+
+    public record ZoneSelectionStart(long startAt, Map<String, String> selectedZones) {}
+
+    public record ZoneSelectionUpdate(Map<String, String> selectedZones, boolean completed) {}
 }

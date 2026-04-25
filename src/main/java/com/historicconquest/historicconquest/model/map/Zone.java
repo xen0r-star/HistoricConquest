@@ -2,6 +2,8 @@ package com.historicconquest.historicconquest.model.map;
 
 import com.historicconquest.historicconquest.model.player.Pawn;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -20,7 +22,8 @@ public class Zone {
 
     private final double x;
     private final double y;
-    private Color color;
+    private final Color baseColor;
+    private final ObjectProperty<Color> colorProperty;
     private final Color borderColor;
 
 
@@ -36,7 +39,8 @@ public class Zone {
         this.icon = icon;
         this.x = x;
         this.y = y;
-        this.color = color;
+        this.baseColor = color;
+        this.colorProperty = new SimpleObjectProperty<>(color);
         this.borderColor = borderColor;
         this.pawns = new ArrayList<>();
         this.adjacentZones = new ArrayList<>();
@@ -55,11 +59,19 @@ public class Zone {
     }
 
     public void setColor(Color color) {
-        this.color = color;
+        colorProperty.set(color);
     }
 
     public Color getColor() {
-        return color;
+        return colorProperty.get();
+    }
+
+    public ObjectProperty<Color> colorProperty() {
+        return colorProperty;
+    }
+
+    public Color getBaseColor() {
+        return baseColor;
     }
 
     public Color getBorderColor() {
