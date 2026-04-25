@@ -9,8 +9,8 @@ import com.historicconquest.historicconquest.controller.overlay.NotificationCont
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
-import com.historicconquest.historicconquest.model.player.PlayerColor;
 import com.historicconquest.historicconquest.service.network.RoomService;
+import com.historicconquest.historicconquest.util.MapPlayerColor;
 import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.MapViewFactory;
 import com.historicconquest.historicconquest.view.map.ZoneView;
@@ -276,7 +276,7 @@ public class ZoneSelectionController {
             if (zone == null || zoneView == null) continue;
 
             RoomPlayer player = findPlayer(entry.getKey());
-            zone.setColor(mapPlayerColor(player == null ? null : player.getColor()));
+            zone.setColor(MapPlayerColor.color(player == null ? null : player.getColor()));
             zoneView.setBlockHover(true);
         }
     }
@@ -293,7 +293,7 @@ public class ZoneSelectionController {
             playerLabel.setWrapText(true);
             playerLabel.setMaxWidth(Double.MAX_VALUE);
             playerLabel.setStyle(
-                "-fx-background-color: " + mapPlayerColorHex(player.getColor()) + ";" +
+                "-fx-background-color: " + MapPlayerColor.hex(player.getColor()) + ";" +
                 "-fx-text-fill: #FFF8ED;" +
                 "-fx-font-size: 14px;" +
                 "-fx-font-weight: bold;" +
@@ -363,54 +363,6 @@ public class ZoneSelectionController {
         }
 
         return null;
-    }
-
-    private Color mapPlayerColor(String rawColor) {
-        if (rawColor == null || rawColor.isBlank()) {
-            return Color.web(DEFAULT_ZONE_COLOR);
-        }
-
-        try {
-            return switch (PlayerColor.valueOf(rawColor.trim().toUpperCase())) {
-                case RED -> Color.web("#A2383A");
-                case ORANGE -> Color.web("#B9693E");
-                case YELLOW -> Color.web("#B68D3B");
-                case GREEN -> Color.web("#61712A");
-                case LIME -> Color.web("#89A238");
-                case CYAN -> Color.web("#38A270");
-                case BLUE -> Color.web("#389BA2");
-                case LIGHT_BLUE -> Color.web("#385BA2");
-                case PURPLE -> Color.web("#6838A2");
-                case PINK -> Color.web("#A23887");
-            };
-
-        } catch (Exception e) {
-            return Color.web(DEFAULT_ZONE_COLOR);
-        }
-    }
-
-    private String mapPlayerColorHex(String rawColor) {
-        if (rawColor == null || rawColor.isBlank()) {
-            return DEFAULT_ZONE_COLOR;
-        }
-
-        try {
-            return switch (PlayerColor.valueOf(rawColor.trim().toUpperCase())) {
-                case RED ->"#A2383A";
-                case ORANGE -> "#B9693E";
-                case YELLOW -> "#B68D3B";
-                case GREEN -> "#61712A";
-                case LIME -> "#89A238";
-                case CYAN -> "#38A270";
-                case BLUE -> "#389BA2";
-                case LIGHT_BLUE -> "#385BA2";
-                case PURPLE -> "#6838A2";
-                case PINK -> "#A23887";
-            };
-
-        } catch (Exception e) {
-            return DEFAULT_ZONE_COLOR;
-        }
     }
 }
 

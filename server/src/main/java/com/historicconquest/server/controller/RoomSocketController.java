@@ -310,13 +310,13 @@ public class RoomSocketController {
             return;
         }
 
-        if (isGameFlowLocked(room)) {
+
+        if (room.isZoneSelectionStarted() || room.isGameStarted()) {
             sendActionUnavailable(
                 playerId,
                 action,
-                room.isGameStarting() ? "A game countdown is already in progress" :
-                    room.isZoneSelectionStarted() ? "Zone selection is already in progress" :
-                        "A game is already started"
+                room.isZoneSelectionStarted() ? "Zone selection is already in progress" :
+                    "A game is already started"
             );
             return;
         }

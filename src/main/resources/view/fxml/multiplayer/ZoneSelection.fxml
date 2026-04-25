@@ -29,7 +29,7 @@
 
         <Pane fx:id="mapViewport" style="-fx-border-color: transparent;" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="420.0" AnchorPane.topAnchor="140.0" />
 
-        <VBox alignment="TOP_CENTER" prefWidth="350.0" spacing="18.0" style="-fx-background-color: rgba(69, 61, 42, 0.70); -fx-background-radius: 18; -fx-padding: 22;" AnchorPane.bottomAnchor="100.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="140.0">
+        <VBox alignment="TOP_CENTER" prefWidth="350.0" spacing="18.0" style="-fx-background-color: rgba(69, 61, 42, 0.70); -fx-background-radius: 18; -fx-padding: 22;" AnchorPane.bottomAnchor="70.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="140.0">
 
             <Label style="-fx-text-fill: #FFF8ED; -fx-font-size: 22px; -fx-font-weight: bold;" text="ROOM PLAYERS" />
             <VBox fx:id="PlayersBox" spacing="10.0" VBox.vgrow="ALWAYS" />

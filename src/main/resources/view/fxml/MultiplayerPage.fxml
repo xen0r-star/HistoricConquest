@@ -168,7 +168,7 @@
             </cursor>
             <graphic>
                <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-                  <Image url="@../icons/skip.png"/>
+                  <Image url="@../icons/skip.png" />
                </ImageView>
             </graphic>
          </Button>
@@ -366,4 +366,9 @@
          <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
       </padding>
    </Button>
+   <Label fx:id="countdownLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="80.0" maxWidth="80.0" minHeight="80.0" minWidth="80.0" mouseTransparent="true" prefHeight="80.0" prefWidth="80.0" style="-fx-text-fill: #FFF8ED; -fx-font-size: 42px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.58); -fx-background-radius: 10; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.35), 10, 0, 0, 2);" text="5" textAlignment="CENTER" visible="true" StackPane.alignment="BOTTOM_RIGHT">
+      <StackPane.margin>
+         <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+      </StackPane.margin>
+   </Label>
 </StackPane>

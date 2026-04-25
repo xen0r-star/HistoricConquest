@@ -276,10 +276,17 @@ public class RoomService {
     }
 
     public static String switchStatus() {
-        getInstance().status =
-            getInstance().status.equals(STATUS_WAITING) ?
-            STATUS_READY :
-            STATUS_WAITING;
+        String nextStatus = getInstance().status.equals(STATUS_WAITING) ? STATUS_READY : STATUS_WAITING;
+        return setStatus(nextStatus);
+    }
+
+    public static String setStatus(String newStatus) {
+        String normalizedStatus = normalizeStatus(newStatus);
+        if (normalizedStatus == null) {
+            return getInstance().status;
+        }
+
+        getInstance().status = normalizedStatus;
 
         try {
             getInstance().socketClient.sendJson(
@@ -381,6 +388,23 @@ public class RoomService {
 
     public static String getCurrentColor() {
         return getInstance().color;
+    }
+
+    private static String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+
+        String normalized = status.trim();
+        if (STATUS_WAITING.equalsIgnoreCase(normalized)) {
+            return STATUS_WAITING;
+        }
+
+        if (STATUS_READY.equalsIgnoreCase(normalized)) {
+            return STATUS_READY;
+        }
+
+        return null;
     }
 
 

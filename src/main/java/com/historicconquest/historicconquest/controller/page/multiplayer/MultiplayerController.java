@@ -12,6 +12,7 @@ import com.historicconquest.historicconquest.model.network.event.RoomEventListen
 import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.service.network.SocketClient;
+import com.historicconquest.historicconquest.util.MapPlayerColor;
 import com.historicconquest.historicconquest.util.NameGenerator;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
@@ -34,6 +35,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +49,6 @@ import java.util.function.UnaryOperator;
 
 public class MultiplayerController {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerController.class);
-    private static final String PLAYER_ICON = "/view/icons/person.png";
-    private static final String ROBOT_ICON = "/view/icons/robots.png";
     private static final String AREA_EMPTY_STYLE = "-fx-background-color: #EEDCBE88";
     private static final String AREA_FILLED_STYLE = "-fx-background-color: #EEDCBEDC";
     private static final int MAX_PLAYERS = 4;
@@ -90,6 +90,7 @@ public class MultiplayerController {
     @FXML private Button EditProfilHost, AddBotHost, StartGameHost;
     @FXML private Label NumberPlayerHost, CodeGameHost;
     @FXML private VBox PlayerContainerHost;
+    @FXML private Label countdownLabel;
 
 
     private PanelState currentPanel = PanelState.SELECT_MODE;
@@ -97,8 +98,6 @@ public class MultiplayerController {
     private Pane editProfilOverlay;
     private ZoneSelectionController zoneSelectionController;
     private boolean gameStarted;
-    private StackPane countdownOverlay;
-    private Label countdownLabel;
     private Timeline countdownTimeline;
 
 
@@ -526,7 +525,10 @@ public class MultiplayerController {
 
             @Override
             public void onGameCountdownStarted(int seconds, long startAt) {
-                Platform.runLater(() -> showCountdownOverlay(seconds));
+                Platform.runLater(() -> {
+                    syncHostCountdownStatus("Ready");
+                    showCountdownOverlay(seconds);
+                });
             }
 
             @Override
@@ -550,6 +552,7 @@ public class MultiplayerController {
                         return;
                     }
 
+                    syncHostCountdownStatus("Waiting");
                     hideCountdownOverlay();
                     boolean handledBySelection = zoneSelectionController != null;
                     if (zoneSelectionController != null) {
@@ -656,6 +659,7 @@ public class MultiplayerController {
                     area,
                     player.getName(),
                     player.getStatus(),
+                    MapPlayerColor.color(player.getColor()),
                     player.getPing() + "ms",
                     player.getId().equals(RoomService.getPlayerId()),
                     player.isRobot(),
@@ -742,30 +746,10 @@ public class MultiplayerController {
     }
 
     private void showCountdownOverlay(int seconds) {
-        hideCountdownOverlay();
+        if (countdownLabel == null) return;
 
-        countdownLabel = new Label(String.valueOf(Math.max(seconds, 0)));
-        countdownLabel.setStyle("-fx-text-fill: #FFF8ED; -fx-font-size: 96px; -fx-font-weight: bold;");
-
-        Label subtitle = new Label("Game starting soon");
-        subtitle.setStyle("-fx-text-fill: #FFF8ED; -fx-font-size: 24px; -fx-font-weight: bold;");
-
-        VBox box = new VBox(8, countdownLabel, subtitle);
-        box.setAlignment(Pos.CENTER);
-
-        Pane backdrop = new Pane();
-        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.45);");
-        backdrop.prefWidthProperty().bind(root.widthProperty());
-        backdrop.prefHeightProperty().bind(root.heightProperty());
-
-        countdownOverlay = new StackPane(backdrop, box);
-        countdownOverlay.prefWidthProperty().bind(root.widthProperty());
-        countdownOverlay.prefHeightProperty().bind(root.heightProperty());
-        countdownOverlay.setPickOnBounds(true);
-        StackPane.setAlignment(box, Pos.CENTER);
-
-        root.getChildren().add(countdownOverlay);
-        countdownOverlay.toFront();
+        countdownLabel.setText(String.valueOf(Math.max(seconds, 0)));
+        countdownLabel.setVisible(true);
 
         if (countdownTimeline != null) {
             countdownTimeline.stop();
@@ -807,11 +791,37 @@ public class MultiplayerController {
             countdownTimeline = null;
         }
 
-        if (countdownOverlay != null) {
-            root.getChildren().remove(countdownOverlay);
-            countdownOverlay = null;
-            countdownLabel = null;
+        if (countdownLabel != null) {
+            countdownLabel.setText("");
+            countdownLabel.setVisible(false);
         }
+    }
+
+    private void syncHostCountdownStatus(String targetStatus) {
+        if (currentPanel != PanelState.HOST_ROOM || !RoomService.isInitialized()) {
+            return;
+        }
+
+        RoomPlayer currentPlayer = findPlayer(RoomService.getPlayerId());
+        if (currentPlayer == null || Objects.equals(currentPlayer.getStatus(), targetStatus)) {
+            return;
+        }
+
+        RoomService.setStatus(targetStatus);
+        currentPlayer.setStatus(targetStatus);
+        refreshHostUI();
+    }
+
+    private RoomPlayer findPlayer(String playerId) {
+        if (playerId == null) return null;
+
+        for (RoomPlayer player : roomPlayers) {
+            if (playerId.equals(player.getId())) {
+                return player;
+            }
+        }
+
+        return null;
     }
 
     private List<Player> toGamePlayers() {
@@ -846,6 +856,7 @@ public class MultiplayerController {
         Pane area,
         String playerName,
         String status,
+        Color color,
         String ping,
         boolean isMe,
         boolean isRobot,
@@ -864,7 +875,12 @@ public class MultiplayerController {
                 if (!isRobot) playerInfoController.setPlayerPing(ping);
                 else playerInfoController.showPing(false);
 
-                playerInfoController.setPlayerIcon(isRobot ? ROBOT_ICON : PLAYER_ICON);
+                playerInfoController.setPlayerIcon(
+                    isRobot ?
+                        PlayerInfoController.Icon.ROBOT :
+                        PlayerInfoController.Icon.PERSON,
+                    color
+                );
 
                 if (onRemove != null) playerInfoController.setOnRemove(onRemove);
                 else playerInfoController.removeOnRemove();
