@@ -263,8 +263,11 @@ public class NewGameController {
                 FXMLLoader infoLoader = new FXMLLoader(getClass().getResource("/view/fxml/zoneInfoPanel.fxml"));
                 Parent infoVisual = infoLoader.load();
                 ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
+                ZoneInfoPanel.setInstance(zoneInfoPanel);
                 infoVisual.setPickOnBounds(false);
+
                 root.getChildren().add(infoVisual);
+                StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
                 zoneInfoPanel.hide();
 
                 GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
@@ -272,35 +275,14 @@ public class NewGameController {
                 MapNavigationService mapNavigationService = new MapNavigationService();
                 mapNavigationService.attachNavigation(root, mapInterface);
 
-                List<Zone> allZones = worldMap.getAllZones();
-                for (int i = 0; i < listPlayer.size(); i++) {
-                    Player player = listPlayer.get(i);
-                    Zone startZone = allZones.get(i * 10);
-                    ZoneView startZoneView = mapView.getViewFor(startZone);
-                    if (startZoneView == null) continue;
+                gameController.initializeGameState(listPlayer, worldMap , mapView , mapInterface);
 
-                    Group pawnGroup = PawnController.createPawn(player.getColor(), 40.0);
-                    pawnGroup.setMouseTransparent(true);
-
-                    Bounds zoneBounds = startZoneView.getZoneSVGGroup().getBoundsInParent();
-                    Bounds pawnBounds = pawnGroup.getBoundsInParent();
-                    double pawnCenterX = pawnBounds.getMinX() + pawnBounds.getWidth() / 2.0;
-                    double pawnCenterY = pawnBounds.getMinY() + pawnBounds.getHeight() / 2.0;
-
-                    pawnGroup.setTranslateX(zoneBounds.getCenterX() - pawnCenterX);
-                    pawnGroup.setTranslateY(zoneBounds.getCenterY() - pawnCenterY);
-                    mapInterface.getChildren().add(pawnGroup);
-
-                    player.setCurrentZone(startZone);
-                    player.setPawnNode(pawnGroup);
-                }
-
-                Game gameEngine = new Game(listPlayer, worldMap, gameController);
+                Game gameEngine = new Game(listPlayer, worldMap, gameController , zoneInfoPanel);
                 worldMap.getAllZones().forEach(zone -> {
                     ZoneView zoneView = mapView.getViewFor(zone);
                     if (zoneView == null) return;
 
-                    zoneView.setPickOnBounds(true);
+                    zoneView.setPickOnBounds(false);
                     zoneView.setOnMouseClicked(event -> {
                         gameEngine.handleZoneSelection(zone);
                         event.consume();

@@ -14,6 +14,9 @@ public class Zone {
     private final String blocName;
     private final TypeThemes themes;
     private int power;
+    private final int MAX_POWER_ZONE = 8 ;
+
+    private String nameOwner ="Nobody" ;
 
     private final List<Pawn> pawns;
     private final List<Zone> adjacentZones;
@@ -82,6 +85,15 @@ public class Zone {
         return name;
     }
 
+    public void setNameOwner(String nameOwner) {
+        this.nameOwner = nameOwner;
+    }
+
+    public String getNameOwner()
+    {
+        return nameOwner ;
+    }
+
     public String getBlocName() {
         return blocName;
     }
@@ -90,8 +102,8 @@ public class Zone {
         return themes;
     }
 
-    public int getPower() {
-        return power;
+    public String getPowertext() {
+        return ""+power+"";
     }
 
     public void setPower(int power) {
@@ -114,6 +126,13 @@ public class Zone {
         return y;
     }
 
+    public int getMAX_POWER_ZONE() {
+        return MAX_POWER_ZONE;
+    }
+
+    public int getPower() {
+        return power ;
+    }
 
 
     public record ZoneIcon(double x, double y, double width, double height) {}

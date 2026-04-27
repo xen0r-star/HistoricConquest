@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest.model.player;
 import com.historicconquest.historicconquest.model.map.Zone;
 import javafx.scene.Node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
@@ -23,8 +24,26 @@ public class Player {
         this.color = color;
         this.consecutiveSuccesses = 0;
         this.consecutiveFailures = 0;
+
+        zones = new ArrayList<>() ;
     }
 
+
+    public int getConsecutiveSuccesses() {
+        return consecutiveSuccesses;
+    }
+
+    public void setConsecutiveSuccesses(int consecutiveSuccesses) {
+        this.consecutiveSuccesses = consecutiveSuccesses;
+    }
+
+    public int getConsecutiveFailures() {
+        return consecutiveFailures;
+    }
+
+    public void setConsecutiveFailures(int consecutiveFailures) {
+        this.consecutiveFailures = consecutiveFailures;
+    }
 
     public void setAlliance(Alliance alliance) {
         this.alliance = alliance;
@@ -43,6 +62,8 @@ public class Player {
         return color;
     }
 
+
+
     public Zone getCurrentZone() {
         return currentZone;
     }
@@ -57,5 +78,26 @@ public class Player {
 
     public void setPawnNode(Node pawnNode) {
         this.pawnNode = pawnNode;
+    }
+
+
+    public void addZone(Zone zone)
+    {
+       zones.add(zone);
+       //zone.setColor(color.getJavafxColor());
+    }
+
+
+    public List<Zone> getZones() {
+        return zones;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Player p)
+        {
+            return p.getPseudo().equalsIgnoreCase(this.pseudo);
+        }
+        return false ;
     }
 }

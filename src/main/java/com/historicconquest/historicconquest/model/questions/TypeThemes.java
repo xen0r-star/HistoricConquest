@@ -10,7 +10,10 @@ public enum TypeThemes {
     NONE("None");
 
 
-    TypeThemes(String label) { }
+    private final String label ;
+    TypeThemes(String label) {
+        this.label  = label ;
+    }
 
     public static TypeThemes getRandom() {
         TypeThemes[] valid = java.util.Arrays.stream(values())
@@ -18,5 +21,9 @@ public enum TypeThemes {
                 .toArray(TypeThemes[]::new);
 
         return valid[ThreadLocalRandom.current().nextInt(valid.length)];
+    }
+
+    public String getLabel() {
+        return label;
     }
 }
