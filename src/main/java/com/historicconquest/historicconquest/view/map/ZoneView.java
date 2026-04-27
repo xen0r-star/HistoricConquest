@@ -19,13 +19,12 @@ import java.io.InputStream;
 public class ZoneView extends Group {
     private final Zone zone;
     private final Group zoneSVGGroup;
-    private Color currentColor;
+    private boolean hovered;
     private boolean focused;
     private boolean blockHover;
 
     public ZoneView(Zone zone) {
         this.zone = zone;
-        this.currentColor = zone.getColor();
 
         setCursor(Cursor.HAND);
         setPickOnBounds(false);
@@ -36,15 +35,18 @@ public class ZoneView extends Group {
             throw new IllegalStateException("Failed to load zone SVG for: " + zone.getName());
         }
         getChildren().add(zoneSVGGroup);
+        applyCurrentDisplayColor();
+
+        zone.colorProperty().addListener((observable, oldColor, newColor) -> applyCurrentDisplayColor());
 
         if (zone.getIcon() != null) {
             String iconSVG = "/map/icons/" + zone.getThemes() + ".svg";
             Group iconSVGGroup = loadSVG(
-                iconSVG,
-                zone.getIcon().x(), zone.getIcon().y(),
-                zone.getIcon().width(), zone.getIcon().height(),
-                Color.web("#635341"),
-                Color.web("#635341")
+                    iconSVG,
+                    zone.getIcon().x(), zone.getIcon().y(),
+                    zone.getIcon().width(), zone.getIcon().height(),
+                    Color.web("#635341"),
+                    Color.web("#635341")
             );
 
             if (iconSVGGroup != null) {
@@ -68,26 +70,39 @@ public class ZoneView extends Group {
 
     public void setFocusedZone(boolean focused) {
         this.focused = focused;
+        applyCurrentDisplayColor();
     }
 
     public void setBlockHover(boolean blockHover) {
         this.blockHover = blockHover;
         setCursor(blockHover ? Cursor.DEFAULT : Cursor.HAND);
+        applyCurrentDisplayColor();
     }
 
     public void setColor(Color color) {
-        this.currentColor = color;
-        updateColor(color);
+        zone.setColor(color);
     }
 
     public Color getColor() {
-        return currentColor;
+        return zone.getColor();
     }
 
     private void setHovered(boolean hovered) {
-        if (blockHover || focused) return;
-        if (hovered) updateColor(currentColor.deriveColor(0, 1.0, 0.85, 1.0));
-        else updateColor(currentColor);
+        this.hovered = hovered;
+        applyCurrentDisplayColor();
+    }
+
+    private void applyCurrentDisplayColor() {
+        Color baseColor = zone.getColor();
+        if (baseColor == null) {
+            return;
+        }
+
+        if (hovered && !blockHover && !focused) {
+            updateColor(baseColor.deriveColor(0, 1.0, 0.85, 1.0));
+        } else {
+            updateColor(baseColor);
+        }
     }
 
     private void updateColor(Color newColor) {

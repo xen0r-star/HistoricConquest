@@ -1,15 +1,20 @@
 package com.historicconquest.historicconquest.model.map;
 
+import com.historicconquest.historicconquest.controller.game.GameController;
+
 import java.util.*;
 
 public class ZonePathfinder {
-    private final static int MAX_PATH_LENGTH = 5;
+    private static int MAX_PATH_LENGTH = 5;
     private final static int MAX_SEARCH_DEPTH = 10;
 
     public static PathResult findPath(Zone start, Zone end) {
         if (start == end) {
+            System.out.println("Resultat : SAME_ZONE");
             return new PathResult(List.of(start), PathType.SAME_ZONE);
+
         }
+
 
         Queue<Zone> queue = new LinkedList<>();
         Map<Zone, Zone> parent = new HashMap<>();
@@ -27,8 +32,13 @@ public class ZonePathfinder {
             if (current == end) {
                 List<Zone> path = reconstructPath(parent, end);
 
-                if (path.size() <= MAX_PATH_LENGTH) return new PathResult(path, PathType.DIRECT);
-                else                                return new PathResult(path, PathType.IMPOSSIBLE);  // Too far
+                if (path.size() <= MAX_PATH_LENGTH) {
+                    System.out.println("Resultat : DIRECT (Distance: " + (path.size() - 1) + ")");
+                    return new PathResult(path, PathType.DIRECT);
+                } else {
+                    System.out.println("Resultat : IMPOSSIBLE (Trop loin : " + (path.size() - 1) + " zones)");
+                    return new PathResult(path, PathType.IMPOSSIBLE);
+                }
             }
 
             if (currentDepth >= MAX_SEARCH_DEPTH) continue;
@@ -46,6 +56,7 @@ public class ZonePathfinder {
             }
         }
 
+        GameController.getInstance().nextPlayer();
         return new PathResult(null, PathType.IMPOSSIBLE);
     }
 
@@ -68,5 +79,12 @@ public class ZonePathfinder {
         IMPOSSIBLE      // Case 5 (water or > 4 zones)
     }
 
+
+
     public record PathResult(List<Zone> zones, PathType type) {}
+
+
+    public static void setMaxPathLength(int maxPathLength) {
+        MAX_PATH_LENGTH = maxPathLength;
+    }
 }

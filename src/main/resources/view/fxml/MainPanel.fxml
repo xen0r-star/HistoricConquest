@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<Pane id="class" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="92.0" prefWidth="602.0" style="-fx-background-color: transparent;" styleClass="class" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllerClass">
+   <children>
+      <Button id="btn" fx:id="buttonTravel" layoutX="218.0" layoutY="19.0" mnemonicParsing="false" onAction="#startTravel" prefHeight="54.0" prefWidth="164.0" styleClass="class" text="Start" />
+      <Button id="btn" fx:id="buttonPower" layoutX="395.0" layoutY="19.0" mnemonicParsing="false" onAction="#startPower" prefHeight="54.0" prefWidth="164.0" styleClass="class" text="Alliance" />
+      <Button fx:id="buttonAttack2" layoutX="43.0" layoutY="127.0" onAction="#startAttack" prefHeight="54.0" prefWidth="170.0" text="Show Player">
+         <styleClass>
+            <String fx:value="button-red" />
+            <String fx:value="button-small" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+      </Button>
+   </children>
+</Pane>
