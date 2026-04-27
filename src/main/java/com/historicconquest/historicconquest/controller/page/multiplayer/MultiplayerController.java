@@ -99,6 +99,8 @@ public class MultiplayerController {
     private ZoneSelectionController zoneSelectionController;
     private boolean gameStarted;
     private Timeline countdownTimeline;
+    private boolean hostCanCancelStart;
+    private boolean joinStatusLocked;
 
 
     @FXML
@@ -307,7 +309,7 @@ public class MultiplayerController {
 
     private void configureJoinPanelRoomHandlers() {
         StatusJoin.setOnAction(e -> {
-            if (currentPanel == PanelState.JOIN_ROOM) {
+            if (currentPanel == PanelState.JOIN_ROOM && !joinStatusLocked) {
                 String status = RoomService.switchStatus();
                 StatusJoin.setText(Objects.equals(status, "Ready") ? "Cancel" : "Ready");
             }
@@ -319,7 +321,13 @@ public class MultiplayerController {
     private void configureHostPanelHandlers() {
         EditProfilHost.setOnAction(e -> openEditProfilOverlay(true));
 
-        StartGameHost.setOnAction(e -> RoomService.startGame());
+        StartGameHost.setOnAction(e -> {
+            if (hostCanCancelStart) {
+                RoomService.cancelGameStart();
+            } else {
+                RoomService.startGame();
+            }
+        });
 
         CodeGameHost.setOnMouseClicked(e -> {
             ClipboardContent content = new ClipboardContent();
@@ -526,6 +534,10 @@ public class MultiplayerController {
             @Override
             public void onGameCountdownStarted(int seconds, long startAt) {
                 Platform.runLater(() -> {
+                    joinStatusLocked = true;
+                    updateJoinStatusButton();
+                    hostCanCancelStart = true;
+                    updateHostStartButton(true, false, false);
                     syncHostCountdownStatus("Ready");
                     showCountdownOverlay(seconds);
                 });
@@ -533,7 +545,11 @@ public class MultiplayerController {
 
             @Override
             public void onZoneSelectionStarted(int seconds, long startAt, Map<String, String> selectedZones) {
-                Platform.runLater(() -> showZoneSelectionOverlay(seconds, startAt, selectedZones));
+                Platform.runLater(() -> {
+                    joinStatusLocked = true;
+                    updateJoinStatusButton();
+                    showZoneSelectionOverlay(seconds, startAt, selectedZones);
+                });
             }
 
             @Override
@@ -548,6 +564,11 @@ public class MultiplayerController {
             @Override
             public void onGameStartCancelled(String reason) {
                 Platform.runLater(() -> {
+                    joinStatusLocked = false;
+                    updateJoinStatusButton();
+                    hostCanCancelStart = false;
+                    updateHostStartButton(false, false, false);
+
                     if (gameStarted) {
                         return;
                     }
@@ -576,6 +597,10 @@ public class MultiplayerController {
             public void onGameStarted(Map<String, String> selectedZones) {
                 Platform.runLater(() -> {
                     gameStarted = true;
+                    joinStatusLocked = true;
+                    updateJoinStatusButton();
+                    hostCanCancelStart = false;
+                    updateHostStartButton(false, false, false);
                     hideCountdownOverlay();
                     if (zoneSelectionController != null) {
                         zoneSelectionController.handleGameStarted(selectedZones);
@@ -594,6 +619,10 @@ public class MultiplayerController {
                         return;
                     }
 
+                    joinStatusLocked = false;
+                    updateJoinStatusButton();
+                    hostCanCancelStart = false;
+                    updateHostStartButton(false, false, false);
                     hideCountdownOverlay();
                     if (zoneSelectionController != null) {
                         zoneSelectionController.handleRoomDeleted();
@@ -693,12 +722,16 @@ public class MultiplayerController {
     private void refreshHostStartState() {
         if (currentPanel != PanelState.HOST_ROOM || !RoomService.isInitialized()) {
             StartGameHost.setDisable(true);
+            StartGameHost.setText("Start Game");
+            hostCanCancelStart = false;
             return;
         }
 
         String token = RoomService.getToken();
         if (token == null || token.isBlank()) {
             StartGameHost.setDisable(true);
+            StartGameHost.setText("Start Game");
+            hostCanCancelStart = false;
             return;
         }
 
@@ -708,15 +741,23 @@ public class MultiplayerController {
             response -> {
                 if (response.error() != null) {
                     StartGameHost.setDisable(true);
+                    StartGameHost.setText("Start Game");
+                    hostCanCancelStart = false;
                     return;
                 }
 
                 boolean canStart = Boolean.TRUE.equals(response.canStart());
                 boolean isStarting = Boolean.TRUE.equals(response.isStarting());
                 boolean isSelecting = Boolean.TRUE.equals(response.isSelecting());
-                StartGameHost.setDisable(!canStart || isStarting || isSelecting);
+                updateHostStartButton(isStarting, canStart, isSelecting);
             }
         );
+    }
+
+    private void updateHostStartButton(boolean isStarting, boolean canStart, boolean isSelecting) {
+        hostCanCancelStart = isStarting;
+        StartGameHost.setText(isStarting ? "Cancel Start" : "Start Game");
+        StartGameHost.setDisable(isSelecting || (!isStarting && !canStart));
     }
 
     private void showZoneSelectionOverlay(int seconds, long startAt, Map<String, String> selectedZones) {
@@ -981,9 +1022,21 @@ public class MultiplayerController {
         HostPanel.setVisible(panel == PanelState.HOST_ROOM);
         ErrorService.setVisible(panel == PanelState.ERROR_SERVICE);
 
+        if (panel == PanelState.JOIN_ROOM) {
+            updateJoinStatusButton();
+        }
+
         if (panel != PanelState.JOIN_ROOM && panel != PanelState.HOST_ROOM) {
             hideCountdownOverlay();
         }
+    }
+
+    private void updateJoinStatusButton() {
+        if (StatusJoin == null) {
+            return;
+        }
+
+        StatusJoin.setDisable(joinStatusLocked);
     }
 
     private void showAlert(String title, String message) {

@@ -252,6 +252,18 @@ public class RoomService {
         }
     }
 
+    public static void cancelGameStart() {
+        try {
+            getInstance().socketClient.sendNoData("/app/start/cancel");
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to cancel game start",
+                "Impossible to cancel game start, Please try again."
+            );
+        }
+    }
+
     public static void selectZone(String zoneName) {
         if (zoneName == null || zoneName.isBlank()) {
             getInstance().notifyError(

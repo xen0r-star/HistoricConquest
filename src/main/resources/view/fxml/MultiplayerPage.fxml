@@ -237,7 +237,7 @@
          </styleClass>
       </Pane>
    </HBox>
-   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" visible="false">
+   <HBox fx:id="HostPanel" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
       <StackPane.margin>
          <Insets bottom="50.0" left="50.0" right="50.0" top="300.0" />
       </StackPane.margin>
@@ -288,9 +288,9 @@
                </graphic>
             </Button>
          </HBox>
-         <HBox layoutX="432.0" layoutY="118.0" prefHeight="35.0" spacing="15.0">
+         <HBox alignment="CENTER_RIGHT" layoutX="359.0" layoutY="118.0" prefHeight="35.0" prefWidth="309.0" spacing="15.0">
             <Label fx:id="CodeGameHost" style="-fx-text-fill: #443b20; -fx-font-weight: bold; -fx-font-size: 16; -fx-background-color: #faefd9; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand" text="000 000" />
-            <Button fx:id="StartGameHost" mnemonicParsing="false" style="-fx-background-radius: 5;" text="Start Game">
+            <Button fx:id="StartGameHost" minWidth="140.0" mnemonicParsing="false" style="-fx-background-radius: 5;" text="Start Game">
                <styleClass>
                   <String fx:value="button-small" />
                   <String fx:value="button-beige" />

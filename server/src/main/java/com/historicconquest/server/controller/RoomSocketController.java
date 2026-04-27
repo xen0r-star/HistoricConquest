@@ -179,6 +179,10 @@ public class RoomSocketController {
                     return;
                 }
 
+                if (!currentRoom.isGameStarting()) {
+                    return;
+                }
+
                 if (!roomService.stillCanStartGame(roomCode)) {
                     roomService.cancelGameStart(roomCode);
                     messagingTemplate.convertAndSend(
@@ -246,6 +250,52 @@ public class RoomSocketController {
         } catch (Exception e) {
             sendActionUnavailable(playerId, "START_GAME", "An error has occurred");
         }
+    }
+
+    @MessageMapping("/start/cancel")
+    public void cancelGameStart(Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, "CANCEL_START", "Room does not exist");
+            return;
+        }
+
+        Player player = room.getPlayerById(playerId);
+        if (player == null || !room.isHost(player.getId())) {
+            messagingTemplate.convertAndSendToUser(
+                playerId,
+                "/queue/errors",
+                Map.of(
+                    "type", "CANCEL_START",
+                    "title", "Failed to cancel game start",
+                    "message", "Only the host can cancel the game launch"
+                )
+            );
+            return;
+        }
+
+        if (!room.isGameStarting()) {
+            sendActionUnavailable(
+                playerId,
+                "CANCEL_START",
+                room.isZoneSelectionStarted() ? "Zone selection is already in progress" : "There is no game countdown to cancel"
+            );
+            return;
+        }
+
+        roomService.cancelGameStart(roomCode);
+
+        messagingTemplate.convertAndSend(
+            "/topic/room-" + roomCode,
+            (Object) Map.of(
+                "type", "GAME_START_CANCELLED",
+                "reason", "The host cancelled the game launch"
+            )
+        );
     }
 
 
