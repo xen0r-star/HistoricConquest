@@ -39,8 +39,15 @@ public class GameController implements GameAnimationPort {
     }
 
 
-    public void initializeGameState(List<Player> playersData , WorldMap worldmap ,MapView mapView , Group mapInterface)
-    {
+    public void initializeGameState(List<Player> playersData, WorldMap worldmap, MapView mapView, Group mapInterface) {
+        initializeGameState(playersData, worldmap, mapView, mapInterface, null);
+    }
+
+    public void initializeGameState(List<Player> playersData, WorldMap worldmap, MapView mapView, Group mapInterface, List<Zone> preferredStartZones) {
+        if (playersData == null || worldmap == null || mapView == null || mapInterface == null) {
+            return;
+        }
+
         List<Zone> allZones = worldmap.getAllZones();
 
         for (int i = 0; i < playersData.size(); i++) {
@@ -51,7 +58,19 @@ public class GameController implements GameAnimationPort {
                 System.out.println("Joueur " + player.getPseudo() + " ajouté au controller." + player.getColor());
             }
 
-            Zone startZone = allZones.get(i * 10);
+            Zone startZone = null;
+            if (preferredStartZones != null && i < preferredStartZones.size()) {
+                startZone = preferredStartZones.get(i);
+            }
+
+            int defaultStartIndex = i * 10;
+            if (startZone == null && defaultStartIndex < allZones.size()) {
+                startZone = allZones.get(defaultStartIndex);
+            }
+
+            if (startZone == null) {
+                continue;
+            }
 
             //startZone.setPlayer(player);
 

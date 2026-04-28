@@ -2,28 +2,16 @@ package com.historicconquest.historicconquest.controller.page;
 
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
-import com.historicconquest.historicconquest.controller.game.GameController;
-import com.historicconquest.historicconquest.controller.game.GameHUD;
+import com.historicconquest.historicconquest.controller.game.GameBootstrapper;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.game.PawnController;
-import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
-import com.historicconquest.historicconquest.model.game.Game;
-import com.historicconquest.historicconquest.model.map.WorldMap;
-import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
-import com.historicconquest.historicconquest.service.map.MapNavigationService;
 import com.historicconquest.historicconquest.util.NameGenerator;
-import com.historicconquest.historicconquest.view.map.MapView;
-import com.historicconquest.historicconquest.view.map.MapViewFactory;
-import com.historicconquest.historicconquest.view.map.ZoneView;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -246,53 +234,7 @@ public class NewGameController {
     }
 
     private void launchGame() {
-        Platform.runLater(() -> {
-            try {
-                root.getChildren().clear();
-
-                WorldMap worldMap = new WorldMap(true, true, true, Color.web("#f2e1bf"), Color.web("#C5A682"));
-                MapView mapView = MapViewFactory.build(worldMap, true);
-                Group mapInterface = mapView.getRoot();
-
-                FXMLLoader hudLoader = new FXMLLoader(getClass().getResource("/view/fxml/GameHUD.fxml"));
-                Parent hudVisual = hudLoader.load();
-                GameHUD gameHUD = hudLoader.getController();
-                hudVisual.setPickOnBounds(false);
-                root.getChildren().add(hudVisual);
-
-                FXMLLoader infoLoader = new FXMLLoader(getClass().getResource("/view/fxml/zoneInfoPanel.fxml"));
-                Parent infoVisual = infoLoader.load();
-                ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
-                ZoneInfoPanel.setInstance(zoneInfoPanel);
-                infoVisual.setPickOnBounds(false);
-
-                root.getChildren().add(infoVisual);
-                StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
-                zoneInfoPanel.hide();
-
-                GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
-
-                MapNavigationService mapNavigationService = new MapNavigationService();
-                mapNavigationService.attachNavigation(root, mapInterface);
-
-                gameController.initializeGameState(listPlayer, worldMap , mapView , mapInterface);
-
-                Game gameEngine = new Game(listPlayer, worldMap, gameController , zoneInfoPanel);
-                worldMap.getAllZones().forEach(zone -> {
-                    ZoneView zoneView = mapView.getViewFor(zone);
-                    if (zoneView == null) return;
-
-                    zoneView.setPickOnBounds(false);
-                    zoneView.setOnMouseClicked(event -> {
-                        gameEngine.handleZoneSelection(zone);
-                        event.consume();
-                    });
-                });
-
-            } catch (Exception exception) {
-                System.err.println("Error New Game");
-            }
-        });
+        GameBootstrapper.launchGame(root, new ArrayList<>(listPlayer));
     }
 
     private void showNameError(String message) {

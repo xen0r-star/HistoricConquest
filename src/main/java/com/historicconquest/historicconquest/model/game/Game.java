@@ -28,7 +28,6 @@ public class Game {
 
 
     public void handleZoneSelection(Zone targetZone) {
-
         if (!gameController.isHasAnsweredCorrectly()) {
            gameController.showZoneInfo(targetZone);
             return;

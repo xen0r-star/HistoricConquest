@@ -12,6 +12,7 @@ import com.historicconquest.historicconquest.view.map.MapViewFactory;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
@@ -75,8 +76,10 @@ public final class GameBootstrapper {
             FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/zoneInfoPanel.fxml"));
             Parent infoVisual = infoLoader.load();
             ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
+            ZoneInfoPanel.setInstance(zoneInfoPanel);
             infoVisual.setPickOnBounds(false);
             root.getChildren().add(infoVisual);
+            StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
             zoneInfoPanel.hide();
 
             GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
@@ -84,51 +87,16 @@ public final class GameBootstrapper {
             MapNavigationService mapNavigationService = new MapNavigationService();
             mapNavigationService.attachNavigation(root, mapInterface);
 
-            List<Zone> allZones = worldMap.getAllZones();
-            Map<String, Zone> zonesByName = allZones.stream()
-                .collect(Collectors.toMap(Zone::getName, zone -> zone, (left, right) -> left, HashMap::new));
-
             List<Player> playersSnapshot = new ArrayList<>(players);
-            for (int i = 0; i < playersSnapshot.size() && i * 10 < allZones.size(); i++) {
-                Player player = playersSnapshot.get(i);
-                Zone startZone = null;
+            List<Zone> preferredStartZones = buildPreferredStartZones(playersSnapshot, roomPlayers, selectedZonesByPlayerId, worldMap.getAllZones());
+            gameController.initializeGameState(playersSnapshot, worldMap, mapView, mapInterface, preferredStartZones);
 
-                if (roomPlayers != null && selectedZonesByPlayerId != null && i < roomPlayers.size()) {
-                    String selectedZoneName = selectedZonesByPlayerId.get(roomPlayers.get(i).getId());
-                    if (selectedZoneName != null) {
-                        startZone = zonesByName.get(selectedZoneName);
-                    }
-                }
-
-                if (startZone == null) {
-                    startZone = allZones.get(i * 10);
-                }
-
-                ZoneView startZoneView = mapView.getViewFor(startZone);
-                if (startZoneView == null) continue;
-
-                Group pawnGroup = PawnController.createPawn(player.getColor(), 40.0);
-                pawnGroup.setMouseTransparent(true);
-
-                Bounds zoneBounds = startZoneView.getZoneSVGGroup().getBoundsInParent();
-                Bounds pawnBounds = pawnGroup.getBoundsInParent();
-                double pawnCenterX = pawnBounds.getMinX() + pawnBounds.getWidth() / 2.0;
-                double pawnCenterY = pawnBounds.getMinY() + pawnBounds.getHeight() / 2.0;
-
-                pawnGroup.setTranslateX(zoneBounds.getCenterX() - pawnCenterX);
-                pawnGroup.setTranslateY(zoneBounds.getCenterY() - pawnCenterY);
-                mapInterface.getChildren().add(pawnGroup);
-
-                player.setCurrentZone(startZone);
-                player.setPawnNode(pawnGroup);
-            }
-
-            Game gameEngine = new Game(playersSnapshot, worldMap, gameController);
+            Game gameEngine = new Game(playersSnapshot, worldMap, gameController, zoneInfoPanel);
             worldMap.getAllZones().forEach(zone -> {
                 ZoneView zoneView = mapView.getViewFor(zone);
                 if (zoneView == null) return;
 
-                zoneView.setPickOnBounds(true);
+                zoneView.setPickOnBounds(false);
                 zoneView.setOnMouseClicked(event -> {
                     gameEngine.handleZoneSelection(zone);
                     event.consume();
@@ -151,6 +119,29 @@ public final class GameBootstrapper {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    private static List<Zone> buildPreferredStartZones(List<Player> playersSnapshot, List<RoomPlayer> roomPlayers, Map<String, String> selectedZonesByPlayerId, List<Zone> allZones) {
+        if (playersSnapshot == null || playersSnapshot.isEmpty() || roomPlayers == null || roomPlayers.isEmpty() || selectedZonesByPlayerId == null || selectedZonesByPlayerId.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Zone> zonesByName = allZones.stream()
+            .collect(Collectors.toMap(Zone::getName, zone -> zone, (left, right) -> left, HashMap::new));
+
+        List<Zone> preferredStartZones = new ArrayList<>();
+        for (int i = 0; i < playersSnapshot.size(); i++) {
+            Zone preferredStartZone = null;
+            if (i < roomPlayers.size()) {
+                String selectedZoneName = selectedZonesByPlayerId.get(roomPlayers.get(i).getId());
+                if (selectedZoneName != null) {
+                    preferredStartZone = zonesByName.get(selectedZoneName);
+                }
+            }
+            preferredStartZones.add(preferredStartZone);
+        }
+
+        return preferredStartZones;
     }
 }
 
