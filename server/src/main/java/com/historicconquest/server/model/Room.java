@@ -2,6 +2,7 @@ package com.historicconquest.server.model;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,6 +18,8 @@ public class Room {
 
     private final Map<String, Player> players = new ConcurrentHashMap<>();
     private final Map<String, String> selectedZones = new ConcurrentHashMap<>();
+    private final java.util.List<String> playerOrder = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private int currentPlayerIndex;
 
     public Room(String code) {
         this.code = code;
@@ -84,6 +87,7 @@ public class Room {
         this.zoneSelectionStarted = false;
         this.gameStarted = true;
         this.gameStartAt = 0L;
+        this.currentPlayerIndex = 0;
     }
 
     public synchronized boolean isZoneSelectionStarted() {
@@ -122,11 +126,22 @@ public class Room {
         if (players.size() >= MAX_PLAYER) throw new Exception("Room is full");
 
         players.put(player.getId(), player);
+        playerOrder.add(player.getId());
     }
 
     public void removePlayer(String playerId) {
         players.remove(playerId);
         selectedZones.remove(playerId);
+
+        int removedIndex = playerOrder.indexOf(playerId);
+        if (removedIndex >= 0) {
+            playerOrder.remove(removedIndex);
+            if (removedIndex < currentPlayerIndex) {
+                currentPlayerIndex = Math.max(0, currentPlayerIndex - 1);
+            } else if (currentPlayerIndex >= playerOrder.size()) {
+                currentPlayerIndex = 0;
+            }
+        }
     }
 
 
@@ -167,5 +182,29 @@ public class Room {
         }
 
         return pings;
+    }
+
+    public List<String> getPlayerOrder() {
+        return List.copyOf(playerOrder);
+    }
+
+    public String getCurrentPlayerId() {
+        if (playerOrder.isEmpty()) return null;
+        if (currentPlayerIndex < 0 || currentPlayerIndex >= playerOrder.size()) {
+            currentPlayerIndex = 0;
+        }
+        return playerOrder.get(currentPlayerIndex);
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public void advanceTurn() {
+        if (playerOrder.isEmpty()) {
+            currentPlayerIndex = 0;
+            return;
+        }
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerOrder.size();
     }
 }

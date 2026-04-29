@@ -51,6 +51,26 @@ public class RoomSocketController {
         );
     }
 
+    private void broadcastTurnChanged(String roomCode, Room room) {
+        if (room == null) return;
+
+        messagingTemplate.convertAndSend(
+            "/topic/room-" + roomCode,
+            (Object) Map.of(
+                "type", "TURN_CHANGED",
+                "currentPlayerId", room.getCurrentPlayerId(),
+                "currentPlayerIndex", room.getCurrentPlayerIndex()
+            )
+        );
+    }
+
+    private void broadcastGameAction(String roomCode, Map<String, Object> payload) {
+        messagingTemplate.convertAndSend(
+            "/topic/room-" + roomCode,
+                (Object) payload
+        );
+    }
+
 
 
     @MessageMapping("/addBot")
@@ -224,10 +244,12 @@ public class RoomSocketController {
                                 "/topic/room-" + roomCode,
                                 (Object) Map.of(
                                     "type", "GAME_STARTED",
-                                    "selectedZones", finalSelection.selectedZones()
+                                    "selectedZones", finalSelection.selectedZones(),
+                                    "turnOrder", latestRoom.getPlayerOrder(),
+                                    "currentPlayerId", latestRoom.getCurrentPlayerId()
                                 )
                             );
-                            roomService.deleteRoom(roomCode);
+                            broadcastTurnChanged(roomCode, latestRoom);
 
                         } catch (Exception ignored) {
                         }
@@ -556,6 +578,69 @@ public class RoomSocketController {
                     "message", "Only the host can delete the room"
                 )
             );
+        }
+    }
+
+    @MessageMapping("/game/action")
+    public void handleGameAction(@Payload Map<String, Object> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, "GAME_ACTION", "Room does not exist");
+            return;
+        }
+
+        if (!room.isGameStarted()) {
+            sendActionUnavailable(playerId, "GAME_ACTION", "Game is not started");
+            return;
+        }
+
+        String currentPlayerId = room.getCurrentPlayerId();
+        if (currentPlayerId == null || !currentPlayerId.equals(playerId)) {
+            sendActionUnavailable(playerId, "GAME_ACTION", "It is not your turn");
+            return;
+        }
+
+        String action = payload == null ? null : String.valueOf(payload.get("action"));
+        if (action == null || action.isBlank()) {
+            sendActionUnavailable(playerId, "GAME_ACTION", "Invalid action payload");
+            return;
+        }
+
+        Map<String, Object> message = new java.util.HashMap<>();
+        message.put("type", "GAME_ACTION");
+        message.put("action", action);
+        message.put("playerId", playerId);
+
+        Object zone = payload.get("zone");
+        if (zone != null) {
+            message.put("zone", zone.toString());
+        }
+
+        Object difficulty = payload.get("difficulty");
+        if (difficulty instanceof Number number) {
+            message.put("difficulty", number.intValue());
+        }
+
+        Object correct = payload.get("correct");
+        if (correct instanceof Boolean bool) {
+            message.put("correct", bool);
+        }
+
+        broadcastGameAction(roomCode, message);
+
+        boolean advanceTurn = switch (action) {
+            case "TRAVEL", "ATTACK", "POWER_UP" -> true;
+            case "ANSWER_RESULT" -> Boolean.FALSE.equals(correct);
+            default -> false;
+        };
+
+        if (advanceTurn) {
+            room.advanceTurn();
+            broadcastTurnChanged(roomCode, room);
         }
     }
 }

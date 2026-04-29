@@ -11,14 +11,15 @@ import javafx.animation.PathTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class GameController implements GameAnimationPort {
@@ -31,6 +32,7 @@ public class GameController implements GameAnimationPort {
     private int nbPlayer = 4 ;
     private List<Player> players ;
     public ZonePathfinder zonePathfinder;
+    private final Map<String, Zone> zonesByName = new HashMap<>();
 
     private PendingAction selectedAction = PendingAction.NONE ;
 
@@ -46,6 +48,12 @@ public class GameController implements GameAnimationPort {
     public void initializeGameState(List<Player> playersData, WorldMap worldmap, MapView mapView, Group mapInterface, List<Zone> preferredStartZones) {
         if (playersData == null || worldmap == null || mapView == null || mapInterface == null) {
             return;
+        }
+
+        this.nbPlayer = playersData.size();
+        zonesByName.clear();
+        for (Zone zone : worldmap.getAllZones()) {
+            zonesByName.put(zone.getName(), zone);
         }
 
         List<Zone> allZones = worldmap.getAllZones();
@@ -178,9 +186,20 @@ public class GameController implements GameAnimationPort {
     }
 
 
-    /*la logique du jeu ici */
-
     public void handleQuestionResult(int level , boolean correct)
+    {
+        if (GameNetworkService.isEnabled()) {
+            if (!GameNetworkService.isLocalTurn()) {
+                return;
+            }
+            GameNetworkService.sendAnswerResult(level, correct);
+            return;
+        }
+
+        applyQuestionResult(level, correct, true);
+    }
+
+    public void applyQuestionResult(int level, boolean correct, boolean advanceTurn)
     {
         this.currentDifficulty = level ;
         this.hasAnsweredCorrectly= correct ;
@@ -200,7 +219,9 @@ public class GameController implements GameAnimationPort {
                 //TODO : ici faire les malus
                 current.setConsecutiveFailures(3);
             }
-            nextPlayer();
+            if (advanceTurn) {
+                nextPlayer();
+            }
         }
         else
         {
@@ -222,6 +243,19 @@ public class GameController implements GameAnimationPort {
 
     public void travel(Zone targetZone)
     {
+        if (GameNetworkService.isEnabled()) {
+            if (!GameNetworkService.isLocalTurn()) {
+                return;
+            }
+            GameNetworkService.sendZoneAction("TRAVEL", targetZone == null ? null : targetZone.getName());
+            return;
+        }
+
+        applyTravel(targetZone, true);
+    }
+
+    public void applyTravel(Zone targetZone, boolean advanceTurn)
+    {
         Player current = getCurrentPlayer() ;
 
         ZonePathfinder.PathResult result = ZonePathfinder.findPath(current.getCurrentZone() , targetZone);
@@ -235,7 +269,7 @@ public class GameController implements GameAnimationPort {
                 animatePawnMove(
                         current.getPawnNode(),
                         result.zones(),
-                        this::nextPlayer
+                        advanceTurn ? this::nextPlayer : null
                 );
 
                 current.setCurrentZone(targetZone);
@@ -246,6 +280,18 @@ public class GameController implements GameAnimationPort {
 
 
     public void attackZone(Zone targetZone) {
+        if (GameNetworkService.isEnabled()) {
+            if (!GameNetworkService.isLocalTurn()) {
+                return;
+            }
+            GameNetworkService.sendZoneAction("ATTACK", targetZone == null ? null : targetZone.getName());
+            return;
+        }
+
+        applyAttackZone(targetZone, true);
+    }
+
+    public void applyAttackZone(Zone targetZone, boolean advanceTurn) {
         Player current = getCurrentPlayer();
         Zone currentZone = current.getCurrentZone();
 
@@ -284,11 +330,25 @@ public class GameController implements GameAnimationPort {
 
         // 4. Fin du tour
         this.selectedAction = PendingAction.NONE;
-        nextPlayer();
+        if (advanceTurn) {
+            nextPlayer();
+        }
     }
 
 
     public void powerUp(Zone targetZone) {
+        if (GameNetworkService.isEnabled()) {
+            if (!GameNetworkService.isLocalTurn()) {
+                return;
+            }
+            GameNetworkService.sendZoneAction("POWER_UP", targetZone == null ? null : targetZone.getName());
+            return;
+        }
+
+        applyPowerUp(targetZone, true);
+    }
+
+    public void applyPowerUp(Zone targetZone, boolean advanceTurn) {
         Player current = getCurrentPlayer();
 
         if (!current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
@@ -305,7 +365,9 @@ public class GameController implements GameAnimationPort {
             targetZone.setPower(newPower);
 
             this.selectedAction = PendingAction.NONE;
-            nextPlayer();
+            if (advanceTurn) {
+                nextPlayer();
+            }
         } else {
             System.out.println("Cette zone est déjà au maximum de sa puissance.");
         }
@@ -320,26 +382,30 @@ public class GameController implements GameAnimationPort {
         this.currentDifficulty =0 ;
     }
 
-    public Player getCurrentPlayer()
+    public void setCurrentPlayerIndexFromNetwork(int index)
     {
-        if(players.isEmpty())
-        {
-            return null ;
+        if (index < 0) return;
+        currentPlayerIndex = index % Math.max(1, nbPlayer);
+        this.hasAnsweredCorrectly = false;
+        this.currentDifficulty = 0;
+        this.selectedAction = PendingAction.NONE;
+    }
+
+    public void setPlayerCount(int count)
+    {
+        if (count > 0) {
+            this.nbPlayer = count;
         }
-
-        return players.get(currentPlayerIndex);
     }
 
-
-    public void setPendingAction(PendingAction action)
-    {
-        this.selectedAction = action ;
+    public void setPendingAction(PendingAction pendingAction) {
+        selectedAction = pendingAction;
     }
 
-
-    public PendingAction getSelectedAction()
+    public Zone findZoneByName(String zoneName)
     {
-        return selectedAction;
+        if (zoneName == null) return null;
+        return zonesByName.get(zoneName);
     }
 
     public static GameController getInstance() {
@@ -348,6 +414,22 @@ public class GameController implements GameAnimationPort {
 
     public boolean isHasAnsweredCorrectly() {
         return hasAnsweredCorrectly;
+    }
+
+    public Player getCurrentPlayer() {
+        if (players == null || players.isEmpty()) {
+            return null;
+        }
+
+        if (currentPlayerIndex < 0 || currentPlayerIndex >= players.size()) {
+            return players.getFirst();
+        }
+
+        return players.get(currentPlayerIndex);
+    }
+
+    public PendingAction getSelectedAction() {
+        return selectedAction;
     }
 }
 

@@ -135,7 +135,34 @@ public enum RoomInfo {
     GAME_STARTED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {
-            notifyIfPresent(listener, l -> l.onGameStarted(readStringMap(node.get("selectedZones"))));
+            notifyIfPresent(listener, l -> l.onGameStarted(
+                readStringMap(node.get("selectedZones")),
+                readStringList(node.get("turnOrder")),
+                getText(node, "currentPlayerId")
+            ));
+        }
+    },
+
+    GAME_ACTION {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onGameAction(
+                getText(node, "action"),
+                getText(node, "playerId"),
+                getText(node, "zone"),
+                getInteger(node, "difficulty"),
+                getBoolean(node, "correct")
+            ));
+        }
+    },
+
+    TURN_CHANGED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onTurnChanged(
+                getText(node, "currentPlayerId"),
+                getInteger(node, "currentPlayerIndex")
+            ));
         }
     },
 
@@ -191,6 +218,29 @@ public enum RoomInfo {
         } catch (Exception e) {
             return Map.of();
         }
+    }
+
+    private static java.util.List<String> readStringList(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return java.util.List.of();
+        }
+
+        try {
+            return MAPPER.convertValue(node, new TypeReference<>() { });
+
+        } catch (Exception e) {
+            return java.util.List.of();
+        }
+    }
+
+    private static Integer getInteger(JsonNode node, String field) {
+        JsonNode value = node.get(field);
+        return value == null || value.isNull() ? null : value.asInt();
+    }
+
+    private static Boolean getBoolean(JsonNode node, String field) {
+        JsonNode value = node.get(field);
+        return value == null || value.isNull() ? null : value.asBoolean();
     }
 
     private static void notifyIfPresent(RoomEventListener listener, java.util.function.Consumer<RoomEventListener> callback) {

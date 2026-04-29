@@ -91,6 +91,10 @@ public final class GameBootstrapper {
             List<Zone> preferredStartZones = buildPreferredStartZones(playersSnapshot, roomPlayers, selectedZonesByPlayerId, worldMap.getAllZones());
             gameController.initializeGameState(playersSnapshot, worldMap, mapView, mapInterface, preferredStartZones);
 
+            if (roomPlayers != null) {
+                GameNetworkService.attach(gameController, roomPlayers);
+            }
+
             Game gameEngine = new Game(playersSnapshot, worldMap, gameController, zoneInfoPanel);
             worldMap.getAllZones().forEach(zone -> {
                 ZoneView zoneView = mapView.getViewFor(zone);
@@ -144,5 +148,3 @@ public final class GameBootstrapper {
         return preferredStartZones;
     }
 }
-
-

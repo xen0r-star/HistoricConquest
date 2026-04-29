@@ -402,6 +402,31 @@ public class RoomService {
         return getInstance().color;
     }
 
+    public static void sendGameAction(String action, Map<String, Object> data) {
+        if (action == null || action.isBlank()) {
+            return;
+        }
+
+        try {
+            Map<String, Object> payload = new java.util.HashMap<>();
+            payload.put("action", action);
+            if (data != null && !data.isEmpty()) {
+                payload.putAll(data);
+            }
+
+            getInstance().socketClient.sendJson(
+                "/app/game/action",
+                payload
+            );
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to send game action",
+                "Impossible to send game action, Please try again."
+            );
+        }
+    }
+
     private static String normalizeStatus(String status) {
         if (status == null || status.isBlank()) {
             return null;

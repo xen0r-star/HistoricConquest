@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest.controller.page.multiplayer;
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.game.GameBootstrapper;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
@@ -594,7 +595,7 @@ public class MultiplayerController {
             }
 
             @Override
-            public void onGameStarted(Map<String, String> selectedZones) {
+            public void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId) {
                 Platform.runLater(() -> {
                     gameStarted = true;
                     joinStatusLocked = true;
@@ -602,14 +603,27 @@ public class MultiplayerController {
                     hostCanCancelStart = false;
                     updateHostStartButton(false, false, false);
                     hideCountdownOverlay();
+                    GameNetworkService.setStartInfo(turnOrder, currentPlayerId);
+                    reorderRoomPlayers(turnOrder);
                     if (zoneSelectionController != null) {
+                        zoneSelectionController.applyTurnOrder(turnOrder);
                         zoneSelectionController.handleGameStarted(selectedZones);
                         zoneSelectionController = null;
 
                     } else {
-                        GameBootstrapper.launchGame(root, toGamePlayers());
+                        GameBootstrapper.launchGame(root, new ArrayList<>(roomPlayers), selectedZones);
                     }
                 });
+            }
+
+            @Override
+            public void onGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct) {
+                Platform.runLater(() -> GameNetworkService.handleGameAction(action, zoneName, difficulty, correct));
+            }
+
+            @Override
+            public void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex) {
+                Platform.runLater(() -> GameNetworkService.handleTurnChanged(currentPlayerId, currentPlayerIndex));
             }
 
             @Override
@@ -619,6 +633,7 @@ public class MultiplayerController {
                         return;
                     }
 
+                    GameNetworkService.detach();
                     joinStatusLocked = false;
                     updateJoinStatusButton();
                     hostCanCancelStart = false;
@@ -1010,6 +1025,31 @@ public class MultiplayerController {
 
     private void updateNumberPlayer(Label label) {
         label.setText(roomPlayers.size() + " / " + MAX_PLAYERS);
+    }
+
+    private void reorderRoomPlayers(List<String> turnOrder) {
+        if (turnOrder == null || turnOrder.isEmpty()) {
+            return;
+        }
+
+        List<RoomPlayer> ordered = new ArrayList<>();
+        for (String playerId : turnOrder) {
+            for (RoomPlayer player : roomPlayers) {
+                if (playerId.equals(player.getId())) {
+                    ordered.add(player);
+                    break;
+                }
+            }
+        }
+
+        for (RoomPlayer player : roomPlayers) {
+            if (!ordered.contains(player)) {
+                ordered.add(player);
+            }
+        }
+
+        roomPlayers.clear();
+        roomPlayers.addAll(ordered);
     }
 
     private void setPanel(PanelState panel) {

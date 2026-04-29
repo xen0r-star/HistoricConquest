@@ -196,6 +196,30 @@ public class ZoneSelectionController {
         GameBootstrapper.launchGame(hostRoot, new ArrayList<>(roomPlayers), selectedZonesByPlayerId);
     }
 
+    public void applyTurnOrder(List<String> turnOrder) {
+        if (turnOrder == null || turnOrder.isEmpty()) return;
+
+        List<RoomPlayer> ordered = new ArrayList<>();
+        for (String playerId : turnOrder) {
+            for (RoomPlayer player : roomPlayers) {
+                if (playerId.equals(player.getId())) {
+                    ordered.add(player);
+                    break;
+                }
+            }
+        }
+
+        for (RoomPlayer player : roomPlayers) {
+            if (!ordered.contains(player)) {
+                ordered.add(player);
+            }
+        }
+
+        roomPlayers.clear();
+        roomPlayers.addAll(ordered);
+        refreshPlayersPanel();
+    }
+
     public void selectZone(Zone zone) {
         if (!selectionActive || gameLaunched || zone == null) {
             return;
@@ -365,6 +389,3 @@ public class ZoneSelectionController {
         return null;
     }
 }
-
-
-

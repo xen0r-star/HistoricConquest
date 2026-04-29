@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.model.network.event;
 
 import com.historicconquest.historicconquest.model.network.model.NetworkPlayer;
 
+import java.util.List;
 import java.util.Map;
 
 public interface RoomEventListener {
@@ -16,7 +17,10 @@ public interface RoomEventListener {
     void onZoneSelectionStarted(int seconds, long startAt, Map<String, String> selectedZones);
     void onZoneSelectionUpdated(Map<String, String> selectedZones);
     void onGameStartCancelled(String reason);
-    void onGameStarted(Map<String, String> selectedZones);
+    void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId);
+
+    void onGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct);
+    void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex);
 
     void onRoomDeleted();
 }
