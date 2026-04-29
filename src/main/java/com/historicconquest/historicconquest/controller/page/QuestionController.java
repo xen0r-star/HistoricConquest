@@ -43,9 +43,17 @@ public class QuestionController {
     public static void showChoiceDifficultPage(StackPane parent){
         List<Theme> themeList = Question.getThemesFromJsonFile("/datas/Questions.json");
 
-        // CHOISIR LE VRAI THEME 
-        int random = (int) (Math.random() * 4);
-        theme = themeList.get(random);
+       Player player = GameController.getInstance().getCurrentPlayer();
+       String targetLabel = player.getCurrentZone().getThemes().getLabel();
+
+       theme = themeList.stream()
+               .filter(t -> t.name.getLabel().equalsIgnoreCase(targetLabel))
+               .findFirst()
+               .orElse(themeList.getFirst());
+
+
+
+
         FXMLLoader questionLoader = new FXMLLoader(
                 Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/ChoiceDifficultPage.fxml")));
 

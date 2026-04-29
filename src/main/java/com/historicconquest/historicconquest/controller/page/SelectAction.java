@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest.controller.page;
 import com.historicconquest.historicconquest.controller.game.GameController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 public class SelectAction {
@@ -15,6 +16,8 @@ public class SelectAction {
 
     @FXML
     public Button buttonPower ;
+
+    public AnchorPane root2 ;
 
     public StackPane root ;
 
@@ -56,5 +59,11 @@ public class SelectAction {
     public void setParentRoot(StackPane root) {
 
         this.root = root ;
+    }
+
+
+    public void closeAlliance()
+    {
+    root2.setVisible(false);
     }
 }

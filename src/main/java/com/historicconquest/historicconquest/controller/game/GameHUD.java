@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.controller.game;
 
 import com.historicconquest.historicconquest.controller.page.QuestionController;
 import com.historicconquest.historicconquest.controller.page.SelectAction;
+import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.util.Texture;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,8 +22,9 @@ public class GameHUD {
     @FXML private Pane mapViewport;
 
 
-
-    private Button playTurnBtn ;
+    private DisplayInfoPlayer cachedInfoPlayer ;
+    private CoallitionController cachedCoalition;
+    private Parent coalitionNode;
 
     @FXML
     public void initialize() {
@@ -34,7 +36,6 @@ public class GameHUD {
         root.getChildren().add(noiseLayer);
         noiseLayer.setViewOrder(-1.0);
         setupPlayturnButton();
-        //showPlayerInfo(); test
     }
 
     public void initializeMap(Group mapInterface) {
@@ -50,30 +51,28 @@ public class GameHUD {
     }
 
 
-    private void setupPlayturnButton()
-    {
-        playTurnBtn = new Button("Lancer la question");
+    private void setupPlayturnButton() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/PrincipalButton.fxml"));
+            Parent buttonPanel = loader.load();
 
-        // Style (tu peux adapter avec ton CSS)
-        playTurnBtn.setStyle("-fx-background-color: #EEDCBE;; -fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 10 20;");
+            PrincipalButton controller = loader.getController();
+            controller.setGameHUD(this);
 
-        // Positionnement en bas à droite
-        StackPane.setAlignment(playTurnBtn, Pos.BOTTOM_CENTER);
-        StackPane.setMargin(playTurnBtn, new javafx.geometry.Insets(0, 40, 40, 0));
+            StackPane.setAlignment(buttonPanel, Pos.BOTTOM_CENTER);
+            StackPane.setMargin(buttonPanel, new javafx.geometry.Insets(0, 0, 40, 0));
 
-        root.getChildren().add(playTurnBtn);
+            root.getChildren().add(buttonPanel);
 
-        playTurnBtn.setOnAction(e -> {
-            System.out.println("Bouton cliqué !");
-            showSelectAction();
-            //QuestionController.showChoiceDifficultPage(root);
-            // GameController.getInstance().startTurnSequence();
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Erreur lors du chargement du FXML des boutons.");
+        }
     }
 
 
 
-    private void showSelectAction()
+    public void showSelectAction()
     {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/SelectAction.fxml"));
@@ -91,24 +90,61 @@ public class GameHUD {
 
     }
 
+    public void togglePlayerInfo() {
+        if (cachedInfoPlayer == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoPlayer.fxml"));
+                Parent playerInfoNode = loader.load();
+                cachedInfoPlayer = loader.getController();
 
-    private void showPlayerInfo() {
-        try {
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoPlayer.fxml"));
-            Parent playerInfoNode = loader.load();
-
-            DisplayInfoPlayer controller = loader.getController();
-
-
-            root.getChildren().add(playerInfoNode);
-
-            StackPane.setAlignment(playerInfoNode, Pos.TOP_RIGHT);
-            StackPane.setMargin(playerInfoNode, new javafx.geometry.Insets(20, 0, 0, 20));
-
-        } catch (IOException e) {
-            e.printStackTrace();
+                root.getChildren().add(playerInfoNode);
+                StackPane.setAlignment(playerInfoNode, Pos.TOP_LEFT);
+                StackPane.setMargin(playerInfoNode, new javafx.geometry.Insets(30, 0, 0, 30));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
         }
+
+
+        Player current = GameController.getInstance().getCurrentPlayer();
+
+
+        cachedInfoPlayer.show(current);
     }
+
+    public void showCoalitionMenu() {
+
+        Player current = GameController.getInstance().getCurrentPlayer();
+
+        if (current != null && current.hasAlly()) {
+            com.historicconquest.historicconquest.controller.overlay.NotificationController.show(
+                    "Alliance",
+                    "You are already in an alliance!",
+                    com.historicconquest.historicconquest.controller.overlay.Notification.Type.INFORMATION,
+                    3000
+            );
+            return;
+        }
+
+        if (cachedCoalition == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/coalitionnew.fxml"));
+                coalitionNode = loader.load();
+                cachedCoalition = loader.getController();
+
+                root.getChildren().add(coalitionNode);
+                StackPane.setAlignment(coalitionNode, Pos.CENTER);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        coalitionNode.setVisible(true);
+        coalitionNode.toFront();
+        cachedCoalition.refreshPlayerList();
+    }
+
 }
 

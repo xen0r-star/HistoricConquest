@@ -268,6 +268,7 @@ public class NewGameController {
 
                 root.getChildren().add(infoVisual);
                 StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
+                StackPane.setMargin(infoVisual, new javafx.geometry.Insets(30, 30, 0,0 ));
                 zoneInfoPanel.hide();
 
                 GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
