@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<Pane id="class" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="92.0" prefWidth="602.0" style="-fx-background-color: transparent;"  stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.game.PrincipalButton">
+   <children>
+      <Button fx:id="buttonAttack" layoutX="43.0" layoutY="19.0" onAction="#startShowInfo" prefHeight="54.0" prefWidth="170.0" text="Show Player">
+         <styleClass>
+            <String fx:value="button-red" />
+            <String fx:value="button-small" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+      </Button>
+
+      <Button fx:id="buttonStart" onAction="#startStart" layoutX="218.0" layoutY="19.0" text="Start" prefHeight="54.0" prefWidth="170.0">
+         <styleClass>
+            <String fx:value="button-beige" />
+            <String fx:value="button-small" />
+         </styleClass>
+      </Button>
+
+      <Button fx:id="buttonAlliance" onAction="#startCoalition" layoutX="395.0" layoutY="19.0" text="coalition" prefHeight="54.0" prefWidth="170.0">
+         <styleClass>
+            <String fx:value="button-green" />
+            <String fx:value="button-small" />
+         </styleClass>
+      </Button>
+   </children>
+</Pane>

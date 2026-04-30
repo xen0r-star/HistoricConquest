@@ -1,6 +1,8 @@
 package com.historicconquest.historicconquest.model.map;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.overlay.Notification;
+import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 
 import java.util.*;
 
@@ -36,7 +38,12 @@ public class ZonePathfinder {
                     System.out.println("Resultat : DIRECT (Distance: " + (path.size() - 1) + ")");
                     return new PathResult(path, PathType.DIRECT);
                 } else {
-                    System.out.println("Resultat : IMPOSSIBLE (Trop loin : " + (path.size() - 1) + " zones)");
+                    NotificationController.show(
+                            "Movement Impossible",
+                            "Target is too far (" + (path.size() - 1) + " zones away). Check your movement range!",
+                            Notification.Type.ERROR,
+                            5000
+                    );
                     return new PathResult(path, PathType.IMPOSSIBLE);
                 }
             }

@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.model.player;
 
 import com.historicconquest.historicconquest.model.map.Zone;
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public class Player {
     private List<Pawn> pawns;
     private Zone currentZone;
     private Node pawnNode;
+    private Player ally ;
+    private Player pendingAllianceRequest ;
+    private Color currentAllianceColor ;
 
     public Player(int id, String pseudo, PlayerColor color) {
         this.id = id;
@@ -28,6 +32,58 @@ public class Player {
         zones = new ArrayList<>() ;
     }
 
+    public Player getPendingAllianceRequest() {
+        return pendingAllianceRequest;
+    }
+
+    public void setPendingAllianceRequest(Player pendingAllianceRequest) {
+        this.pendingAllianceRequest = pendingAllianceRequest;
+    }
+
+    public Color getCurrentAllianceColor() {
+        return currentAllianceColor;
+    }
+
+    public void setCurrentAllianceColor(Color currentAllianceColor) {
+        this.currentAllianceColor = currentAllianceColor;
+    }
+
+    public boolean hasPendingRequest() {
+        return pendingAllianceRequest != null;
+    }
+
+    public void clearPendingRequest() {
+        this.pendingAllianceRequest = null;
+    }
+    public boolean hasAlly()
+    {
+        return ally != null ;
+    }
+
+    public Player getAlly()
+    {
+        return ally ;
+    }
+
+    public void setAlly(Player ally) {
+        this.ally = ally;
+    }
+
+    public int getConsecutiveSuccesses() {
+        return consecutiveSuccesses;
+    }
+
+    public void setConsecutiveSuccesses(int consecutiveSuccesses) {
+        this.consecutiveSuccesses = consecutiveSuccesses;
+    }
+
+    public int getConsecutiveFailures() {
+        return consecutiveFailures;
+    }
+
+    public void setConsecutiveFailures(int consecutiveFailures) {
+        this.consecutiveFailures = consecutiveFailures;
+    }
 
     public int getConsecutiveSuccesses() {
         return consecutiveSuccesses;
