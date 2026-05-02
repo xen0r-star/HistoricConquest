@@ -1,5 +1,7 @@
 package com.historicconquest.historicconquest.controller.game;
 
+import com.historicconquest.historicconquest.controller.page.game.GameHUD;
+import com.historicconquest.historicconquest.controller.page.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
@@ -11,9 +13,11 @@ import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.MapViewFactory;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
@@ -62,19 +66,20 @@ public final class GameBootstrapper {
             MapView mapView = MapViewFactory.build(worldMap, true);
             Group mapInterface = mapView.getRoot();
 
-            FXMLLoader hudLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/GameHUD.fxml"));
+            FXMLLoader hudLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/GameHUD.fxml"));
             Parent hudVisual = hudLoader.load();
             GameHUD gameHUD = hudLoader.getController();
             hudVisual.setPickOnBounds(false);
             root.getChildren().add(hudVisual);
 
-            FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/zoneInfoPanel.fxml"));
+            FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/ZoneInfoPanel.fxml"));
             Parent infoVisual = infoLoader.load();
             ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
             ZoneInfoPanel.setInstance(zoneInfoPanel);
             infoVisual.setPickOnBounds(false);
             root.getChildren().add(infoVisual);
-            StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
+            StackPane.setAlignment(infoVisual, Pos.TOP_CENTER);
+            StackPane.setMargin(infoVisual, new Insets(45, 45, 45, 45));
             zoneInfoPanel.hide();
 
             GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
@@ -91,12 +96,16 @@ public final class GameBootstrapper {
                 GameNetworkService.attach(gameController, roomPlayers);
             }
 
-            Game gameEngine = new Game(playersSnapshot, worldMap, gameController, zoneInfoPanel);
+            Game gameEngine = new Game();
             worldMap.getAllZones().forEach(zone -> {
                 ZoneView zoneView = mapView.getViewFor(zone);
                 if (zoneView == null) return;
 
                 zoneView.setPickOnBounds(false);
+                zoneView.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> gameController.showZoneInfo(zone));
+                zoneView.addEventHandler(MouseEvent.MOUSE_MOVED, event -> gameController.showZoneInfo(zone));
+                zoneView.addEventHandler(MouseEvent.MOUSE_EXITED, event -> zoneInfoPanel.hide());
+
                 zoneView.setOnMouseClicked(event -> {
                     gameEngine.handleZoneSelection(zone);
                     event.consume();

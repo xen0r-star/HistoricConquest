@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="619.0" prefWidth="440.0" style="-fx-background-color: #635a2d;" styleClass="HUD-border" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
+   <Label fx:id="questionId" prefHeight="135.0" prefWidth="362.0" style="-fx-text-fill: #f7e7ce; -fx-border-width: 2px;" wrapText="true" StackPane.alignment="TOP_LEFT">
+      <StackPane.margin>
+         <Insets left="30.0" top="90.0" />
+      </StackPane.margin>
+      <font>
+         <Font name="Georgia Bold Italic" size="20.0" />
+      </font>
+   </Label>
+   <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="385.0">
+      <StackPane.margin>
+         <Insets top="75.0" />
+      </StackPane.margin>
+      <Button fx:id="answer1" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5px;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </VBox.margin>
+         <font>
+            <Font name="Georgia Regular" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="answer2" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5px;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" />
+         </VBox.margin>
+         <font>
+            <Font name="Georgia Regular" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="answer3" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5px;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" />
+         </VBox.margin>
+         <font>
+            <Font name="Georgia Regular" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="answer4" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5px;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" />
+         </VBox.margin>
+         <font>
+            <Font name="Georgia Regular" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+   </VBox>
+   <Button mnemonicParsing="false" onAction="#checkWin" prefHeight="42.0" prefWidth="114.0" styleClass="root" stylesheets="@../../styles/style.css" text="To reply" textAlignment="CENTER" StackPane.alignment="BOTTOM_CENTER">
+      <StackPane.margin>
+         <Insets bottom="50.0" />
+      </StackPane.margin>
+      <font>
+         <Font name="Georgia Bold" size="16.0" />
+      </font>
+   </Button>
+   <Label text="🗲 CHALLENGE" StackPane.alignment="TOP_CENTER">
+      <StackPane.margin>
+         <Insets top="25.0" />
+      </StackPane.margin>
+      <font>
+         <Font name="Georgia" size="40.0" />
+      </font>
+   </Label>
+</StackPane>

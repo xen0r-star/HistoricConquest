@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.controller.game;
+package com.historicconquest.historicconquest.controller.page.game;
 
 import com.historicconquest.historicconquest.model.player.Player;
 import javafx.fxml.FXML;

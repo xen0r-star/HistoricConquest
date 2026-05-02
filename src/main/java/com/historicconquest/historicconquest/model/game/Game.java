@@ -1,60 +1,43 @@
 package com.historicconquest.historicconquest.model.game;
 
-import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.controller.game.GameController;
-import com.historicconquest.historicconquest.model.map.WorldMap;
-import com.historicconquest.historicconquest.model.map.Zone;
-import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
-
-import java.util.List;
+import com.historicconquest.historicconquest.model.map.Zone;
 
 public class Game {
-    private List<Player> players ;
-    private GameAnimationPort gameAnimationPort;
-    private int currentPlayerIndex = 0 ;
-    private WorldMap worldMap ;
-    private GameController gameController ;
-    private ZoneInfoPanel zoneInfoPanel ;
+    private final GameController gameController;
 
 
-    public Game(List<Player> players , WorldMap worldMap , GameAnimationPort gameAnimationPort, ZoneInfoPanel zoneInfoPanel) {
-        this.players = players ;
-        this.worldMap = worldMap;
-        this.gameAnimationPort = gameAnimationPort;
+    public Game() {
         this.gameController = GameController.getInstance();
-        this.zoneInfoPanel = zoneInfoPanel ;
     }
-
 
     public void handleZoneSelection(Zone targetZone) {
-        if (!gameController.isHasAnsweredCorrectly()) {
-           gameController.showZoneInfo(targetZone);
-            return;
+        gameController.setTargetZone(targetZone);
+        if (gameController.getSelectedAction() == GameController.PendingAction.TRAVEL) {
+            gameController.previewTravelTarget();
         }
 
-        switch(gameController.getSelectedAction()) {
-            case TRAVEL:
-                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.TRAVEL, targetZone);
-                break;
-
-            case ATTACK:
-                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.ATTACK, targetZone);
-                break;
-
-            case POWER_UP:
-                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.POWER_UP, targetZone);
-                break;
-
-            case NONE:
-            default:
-                gameController.showZoneInfo(targetZone);
-                break;
-        }
-    }
+        if (!gameController.canSelectZone(targetZone)) return;
+        if (!gameController.isHasAnsweredCorrectly()) return;
 
 
-    public Player getCurrentPlayer() {
-        return gameController.getCurrentPlayer();
+//        switch(gameController.getSelectedAction()) {
+//            case TRAVEL:
+//                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.TRAVEL, targetZone);
+//                break;
+//
+//            case ATTACK:
+//                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.ATTACK, targetZone);
+//                break;
+//
+//            case POWER_UP:
+//                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.POWER_UP, targetZone);
+//                break;
+//
+//            case NONE:
+//            default:
+//                break;
+//        }
     }
 }

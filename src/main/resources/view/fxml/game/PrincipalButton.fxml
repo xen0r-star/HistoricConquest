@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="class" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="117.0" prefWidth="585.0" style="-fx-border-radius: 10 10 0 0; -fx-background-radius: 10 10 0 0; -fx-border-width: 0;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.PrincipalButton">
+   <HBox layoutX="22.0" layoutY="32.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
+      <Button fx:id="attackButton" onAction="#attack" prefHeight="46.0" prefWidth="122.0" style="-fx-background-color: #732626;" text="Attack">
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="button-small" />
+            <String fx:value="action-button" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="28.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../../icons/flash.png" />
+            </ImageView>
+         </graphic>
+      </Button>
+
+      <Button fx:id="travelButton" onAction="#travel" prefHeight="46.0" style="-fx-background-color: #264173;" text="Travel">
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="button-small" />
+            <String fx:value="action-button" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="28.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../../icons/compass.png" />
+            </ImageView>
+         </graphic>
+      </Button>
+
+      <Button fx:id="powerUpButton" onAction="#powerUp" prefHeight="46.0" style="-fx-background-color: #734726;" text="Power up">
+         <styleClass>
+            <String fx:value="button-blue" />
+            <String fx:value="button-small" />
+            <String fx:value="action-button" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="28.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../../icons/hammer.png" />
+            </ImageView>
+         </graphic>
+      </Button>
+   </HBox>
+   <HBox layoutX="343.0" layoutY="-12.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0">
+      <Button maxHeight="46.0" maxWidth="46.0" minHeight="46.0" minWidth="46.0" onAction="#coalition" prefHeight="46.0" prefWidth="46.0" style="-fx-border-insets: 0, 0;">
+         <styleClass>
+            <String fx:value="button-green" />
+            <String fx:value="button-icon" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../../icons/shield.png" />
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button maxHeight="46.0" maxWidth="46.0" minHeight="46.0" minWidth="46.0" onAction="#skipTurn" prefHeight="46.0" prefWidth="46.0" style="-fx-border-insets: 0, 0;">
+         <styleClass>
+            <String fx:value="button-red" />
+            <String fx:value="button-icon" />
+         </styleClass>
+         <font>
+            <Font name="Georgia" size="10.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../../icons/skip.png" />
+            </ImageView>
+         </graphic>
+      </Button>
+   </HBox>
+   <AnchorPane fx:id="actionContainer" layoutX="14.0" layoutY="20.0" prefHeight="32.0" prefWidth="556.0" style="-fx-background-color: #00000080; -fx-background-radius: 5;" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+      <Button layoutX="503.0" layoutY="2.0" mnemonicParsing="false" onAction="#acceptAction" prefHeight="32.0" prefWidth="68.0" style="-fx-border-width: 0; -fx-background-color: #809E5A; -fx-text-fill: #EEDCBE;" text="Accept" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Label fx:id="actionLabel" layoutX="13.0" layoutY="10.0" prefHeight="20.0" prefWidth="475.0" text="Would you like to travel to .........? (Level ...)" textFill="#eedcbe" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="6.0" AnchorPane.topAnchor="6.0">
+         <font>
+            <Font name="Georgia" size="14.0" />
+         </font>
+      </Label>
+   </AnchorPane>
+</AnchorPane>

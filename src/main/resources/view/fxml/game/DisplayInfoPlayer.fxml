@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="root" maxHeight="150.0" maxWidth="180.0" minHeight="150.0" minWidth="180.0" prefHeight="150.0" prefWidth="180.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.game.DisplayInfoPlayer">
+<AnchorPane fx:id="root" maxHeight="150.0" maxWidth="180.0" minHeight="150.0" minWidth="180.0" prefHeight="150.0" prefWidth="180.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.DisplayInfoPlayer">
    <styleClass>
       <String fx:value="button-beige" />
       <String fx:value="button-small" />

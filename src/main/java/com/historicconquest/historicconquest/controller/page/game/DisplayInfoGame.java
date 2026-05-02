@@ -1,4 +1,4 @@
-package com.historicconquest.historicconquest.controller.game;
+package com.historicconquest.historicconquest.controller.page.game;
 
 import com.historicconquest.historicconquest.model.player.Player;
 import javafx.fxml.FXML;
@@ -14,6 +14,10 @@ public class DisplayInfoGame {
     @FXML public HBox row2;
     @FXML public HBox row3;
     @FXML public HBox row4;
+    @FXML public Label playerTop1;
+    @FXML public Label playerTop2;
+    @FXML public Label playerTop3;
+    @FXML public Label playerTop4;
     @FXML public Label playerName1;
     @FXML public Label playerName2;
     @FXML public Label playerName3;
@@ -26,10 +30,10 @@ public class DisplayInfoGame {
     private static final String ROW_HIGHLIGHT_STYLE = "-fx-background-color: #C5A68266;";
 
     public void updateGameInfo(List<Player> players, int currentPlayerIndex) {
-        updateRow(0, players, currentPlayerIndex, row1, playerName1, playerPower1);
-        updateRow(1, players, currentPlayerIndex, row2, playerName2, playerPower2);
-        updateRow(2, players, currentPlayerIndex, row3, playerName3, playerPower3);
-        updateRow(3, players, currentPlayerIndex, row4, playerName4, playerPower4);
+        updateRow(0, players, currentPlayerIndex, row1, playerTop1, playerName1, playerPower1);
+        updateRow(1, players, currentPlayerIndex, row2, playerTop2, playerName2, playerPower2);
+        updateRow(2, players, currentPlayerIndex, row3, playerTop3, playerName3, playerPower3);
+        updateRow(3, players, currentPlayerIndex, row4, playerTop4, playerName4, playerPower4);
     }
 
     public void show(List<Player> players, int currentPlayerIndex) {
@@ -40,7 +44,7 @@ public class DisplayInfoGame {
     private void updateRow(
             int index, List<Player> players,
             int currentPlayerIndex, HBox row,
-            Label nameLabel, Label powerLabel
+            Label topLabel, Label nameLabel, Label powerLabel
     ) {
         if (row == null || nameLabel == null || powerLabel == null) return;
 
@@ -52,10 +56,20 @@ public class DisplayInfoGame {
 
         Player player = players.get(index);
         if (player != null) {
-            String name = player.getPseudo() != null ? player.getPseudo() : "-";
             int zones = player.getZones() != null ? player.getZones().size() : 0;
 
-            nameLabel.setText(name);
+            long rank = 1;
+            for (int i = 0; i < players.size(); i++) {
+                Player other = players.get(i);
+                int otherZones = other.getZones().size();
+
+                if (otherZones > zones || (otherZones == zones && i < index)) {
+                    rank++;
+                }
+            }
+
+            topLabel.setText(String.valueOf(rank));
+            nameLabel.setText(player.getPseudo());
             powerLabel.setText(String.valueOf(zones));
             nameLabel.setTextFill(player.getColor().getJavafxColor());
         }

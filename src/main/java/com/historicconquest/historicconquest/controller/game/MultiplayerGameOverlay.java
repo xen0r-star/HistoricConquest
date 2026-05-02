@@ -50,7 +50,7 @@ public final class MultiplayerGameOverlay {
         }
 
         if (controller != null) {
-            controller.handleQuestionResult(difficulty, correct);
+            controller.applyQuestionResult(difficulty, correct);
         }
     }
 
@@ -68,8 +68,7 @@ public final class MultiplayerGameOverlay {
                 case TRAVEL -> GameNetworkService.sendTravelAction(targetZone.getName());
                 case ATTACK -> GameNetworkService.sendAttackAction(targetZone.getName());
                 case POWER_UP -> GameNetworkService.sendPowerUpAction(targetZone.getName());
-                default -> {
-                }
+                default -> { }
             }
             return;
         }
@@ -78,10 +77,12 @@ public final class MultiplayerGameOverlay {
             return;
         }
 
+        controller.setTargetZone(targetZone);
+
         switch (action) {
-            case TRAVEL -> controller.travel(targetZone);
-            case ATTACK -> controller.attackZone(targetZone);
-            case POWER_UP -> controller.powerUp(targetZone);
+            case TRAVEL -> controller.applyTravel(targetZone);
+            case ATTACK -> controller.applyAttackZone(targetZone);
+            case POWER_UP -> controller.applyPowerUp(targetZone);
             default -> {
             }
         }
@@ -95,11 +96,11 @@ public final class MultiplayerGameOverlay {
         switch (action) {
             case "ANSWER_RESULT" -> {
                 if (difficulty == null || correct == null) return;
-                controller.applyQuestionResult(difficulty, correct, false);
+                controller.applyQuestionResult(difficulty, correct);
             }
-            case "TRAVEL" -> applyZoneAction(zoneName, controller::applyTravel);
-            case "ATTACK" -> applyZoneAction(zoneName, controller::applyAttackZone);
-            case "POWER_UP" -> applyZoneAction(zoneName, controller::applyPowerUp);
+            case "TRAVEL" -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyTravel(targetZone));
+            case "ATTACK" -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyAttackZone(targetZone));
+            case "POWER_UP" -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyPowerUp(targetZone));
             default -> {
             }
         }

@@ -22,6 +22,8 @@ public class ZoneView extends Group {
     private boolean hovered;
     private boolean focused;
     private boolean blockHover;
+    private boolean dimmed;
+
 
     public ZoneView(Zone zone) {
         this.zone = zone;
@@ -60,6 +62,7 @@ public class ZoneView extends Group {
         setOnMouseExited(event -> setHovered(false));
     }
 
+
     public Zone getZone() {
         return zone;
     }
@@ -79,6 +82,13 @@ public class ZoneView extends Group {
         applyCurrentDisplayColor();
     }
 
+    public void setDimmed(boolean dimmed) {
+        this.dimmed = dimmed;
+        setBlockHover(dimmed);
+
+        applyCurrentDisplayColor();
+    }
+
     public void setColor(Color color) {
         zone.setColor(color);
     }
@@ -87,6 +97,8 @@ public class ZoneView extends Group {
         return zone.getColor();
     }
 
+
+
     private void setHovered(boolean hovered) {
         this.hovered = hovered;
         applyCurrentDisplayColor();
@@ -94,15 +106,24 @@ public class ZoneView extends Group {
 
     private void applyCurrentDisplayColor() {
         Color baseColor = zone.getColor();
-        if (baseColor == null) {
-            return;
+        Color borderColor = zone.getBorderColor();
+
+        Color displayColor = baseColor;
+        if (hovered && !blockHover && !focused) {
+            displayColor = baseColor.deriveColor(0, 1.0, 0.85, 1.0);
         }
 
-        if (hovered && !blockHover && !focused) {
-            updateColor(baseColor.deriveColor(0, 1.0, 0.85, 1.0));
+        if (dimmed) {
+            displayColor = displayColor.interpolate(Color.BLACK, 0.35);
+            borderColor = Color.web("#8E8473");
+            this.setOpacity(0.3);
+
         } else {
-            updateColor(baseColor);
+            this.setOpacity(1.0);
         }
+
+        updateColor(displayColor);
+        updateBorderColor(borderColor);
     }
 
     private void updateColor(Color newColor) {
@@ -113,6 +134,17 @@ public class ZoneView extends Group {
             }
         });
     }
+
+    private void updateBorderColor(Color borderColor) {
+        if (zoneSVGGroup == null || borderColor == null) return;
+        zoneSVGGroup.getChildren().forEach(node -> {
+            if (node instanceof SVGPath svgPath) {
+                svgPath.setStroke(borderColor);
+            }
+        });
+    }
+
+
 
     private Group loadSVG(String resourcePath, double x, double y, double width, double height, Color fillColor, Color borderColor) {
         try (InputStream svgStream = ZoneView.class.getResourceAsStream(resourcePath)) {
@@ -144,6 +176,7 @@ public class ZoneView extends Group {
             }
 
             return svgGroup;
+
         } catch (Exception e) {
             System.err.println("Error loading SVG: " + resourcePath);
             return null;

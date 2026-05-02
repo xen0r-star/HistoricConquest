@@ -4,13 +4,13 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<StackPane fx:id="root" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.game.GameHUD">
+<StackPane fx:id="root" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.GameHUD">
    <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #907f66; -fx-border-width: 2;">
       <StackPane.margin>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
       </StackPane.margin>
    </Pane>
-   <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" styleClass="map-grid" stylesheets="@../styles/style.css">
+   <Region mouseTransparent="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0" styleClass="map-grid" stylesheets="@../../styles/style.css">
       <StackPane.margin>
          <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
       </StackPane.margin>

@@ -124,11 +124,11 @@ public final class GameNetworkService {
         switch (action) {
             case ACTION_ANSWER_RESULT -> {
                 if (difficulty == null || correct == null) return;
-                controller.applyQuestionResult(difficulty, correct, false);
+                controller.applyQuestionResult(difficulty, correct);
             }
-            case ACTION_TRAVEL -> applyZoneAction(zoneName, controller::applyTravel);
-            case ACTION_ATTACK -> applyZoneAction(zoneName, controller::applyAttackZone);
-            case ACTION_POWER_UP -> applyZoneAction(zoneName, controller::applyPowerUp);
+            case ACTION_TRAVEL -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyTravel(targetZone));
+            case ACTION_ATTACK -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyAttackZone(targetZone));
+            case ACTION_POWER_UP -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyPowerUp(targetZone));
             default -> {
             }
         }

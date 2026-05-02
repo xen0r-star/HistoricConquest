@@ -1,5 +1,6 @@
-package com.historicconquest.historicconquest.controller.game;
+package com.historicconquest.historicconquest.controller.page.game;
 
+import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.player.Player;
@@ -22,10 +23,11 @@ public class GameHUD {
     @FXML private StackPane root;
     @FXML private Pane mapViewport;
 
-    private CoallitionController cachedCoalition;
+    private CoalitionController cachedCoalition;
     private Parent coalitionNode;
     private DisplayInfoPlayer cachedPlayerInfo;
     private DisplayInfoGame cachedGameInfo;
+    private PrincipalButton principalButtonController;
 
     private List<Player> pendingPlayers;
     private Integer pendingCurrentIndex;
@@ -62,10 +64,11 @@ public class GameHUD {
 
     private void setupPrincipalButton() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/PrincipalButton.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/PrincipalButton.fxml"));
             Parent buttonPanel = loader.load();
 
             PrincipalButton controller = loader.getController();
+            principalButtonController = controller;
             controller.setGameHUD(this);
             controller.setParentRoot(root);
 
@@ -81,7 +84,7 @@ public class GameHUD {
 
     private void setupDisplayInfoPlayer() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoPlayer.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/DisplayInfoPlayer.fxml"));
             Parent playerInfoNode = loader.load();
 
             cachedPlayerInfo = loader.getController();
@@ -97,7 +100,7 @@ public class GameHUD {
 
     private void setupDisplayInfoGame() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoGame.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/DisplayInfoGame.fxml"));
             Parent gameInfoNode = loader.load();
 
             cachedGameInfo = loader.getController();
@@ -119,7 +122,7 @@ public class GameHUD {
 
     private void showLegend() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/MapLegend.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/MapLegend.fxml"));
             Parent mapLegendNode = loader.load();
 
             root.getChildren().add(mapLegendNode);
@@ -147,7 +150,7 @@ public class GameHUD {
 
         if (cachedCoalition == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/coalitionnew.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/coalitionnew.fxml"));
                 coalitionNode = loader.load();
                 cachedCoalition = loader.getController();
 
@@ -177,6 +180,16 @@ public class GameHUD {
     public void refreshPlayerInfo(Player player) {
         if (cachedPlayerInfo != null) {
             cachedPlayerInfo.updatePlayerData(player);
+        }
+        if (principalButtonController != null) {
+            principalButtonController.updateAttackAvailability(player);
+            principalButtonController.resetActionSelection();
+        }
+    }
+
+    public void updateTravelTargetPrompt(String zoneName, int distance) {
+        if (principalButtonController != null) {
+            principalButtonController.updateTravelTarget(zoneName, distance);
         }
     }
 }

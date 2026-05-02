@@ -184,6 +184,14 @@
     -fx-background-color: #632D2E;
 }
 
+.action-button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 2);
+}
+
+.action-button-selected {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0.0, 0, 3);
+    -fx-translate-y: -2;
+}
 
 .code-field {
     -fx-padding: 10;
@@ -286,4 +294,8 @@
     -fx-background-color: #6B1515;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
+}
+
+.button-selected {
+    -fx-background-color: #c9c9c9;
 }

@@ -8,7 +8,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="root" maxHeight="205.0" maxWidth="300.0" minHeight="205.0" minWidth="300.0" prefHeight="205.0" prefWidth="300.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.game.DisplayInfoGame">
+<AnchorPane fx:id="root" maxHeight="205.0" maxWidth="300.0" minHeight="205.0" minWidth="300.0" prefHeight="205.0" prefWidth="300.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.DisplayInfoGame">
    <styleClass>
       <String fx:value="button-beige" />
       <String fx:value="button-small" />
@@ -35,7 +35,7 @@
          <VBox.margin>
             <Insets />
          </VBox.margin>
-         <Label alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="1">
+         <Label fx:id="playerTop1" alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="1">
             <font>
                <Font name="Georgia Bold" size="17.0" />
             </font>
@@ -62,7 +62,7 @@
          <VBox.margin>
             <Insets />
          </VBox.margin>
-         <Label alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="2">
+         <Label fx:id="playerTop2" alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="2">
             <font>
                <Font name="Georgia Bold" size="17.0" />
             </font>
@@ -86,7 +86,7 @@
          <VBox.margin>
             <Insets />
          </VBox.margin>
-         <Label alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="3">
+         <Label fx:id="playerTop3" alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="3">
             <font>
                <Font name="Georgia Bold" size="17.0" />
             </font>
@@ -110,7 +110,7 @@
          <VBox.margin>
             <Insets />
          </VBox.margin>
-         <Label alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="4">
+         <Label fx:id="playerTop4" alignment="TOP_LEFT" prefHeight="20.0" prefWidth="24.0" text="4">
             <font>
                <Font name="Georgia Bold" size="17.0" />
             </font>

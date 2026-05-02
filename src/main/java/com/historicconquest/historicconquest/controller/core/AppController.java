@@ -26,7 +26,7 @@ public class AppController {
 		instance = this;
 		pageFxml.put(AppPage.HOME, "/view/fxml/HomePage.fxml");
 		pageFxml.put(AppPage.NEW_GAME, "/view/fxml/NewGame.fxml");
-		pageFxml.put(AppPage.MULTIPLAYER, "/view/fxml/MultiplayerPage.fxml");
+		pageFxml.put(AppPage.MULTIPLAYER, "/view/fxml/multiplayer/MultiplayerPage.fxml");
 	}
 
 	public static AppController getInstance() {

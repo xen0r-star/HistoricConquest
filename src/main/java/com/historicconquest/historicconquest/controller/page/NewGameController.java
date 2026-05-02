@@ -2,14 +2,11 @@ package com.historicconquest.historicconquest.controller.page;
 
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
-import com.historicconquest.historicconquest.controller.game.GameController;
-import com.historicconquest.historicconquest.controller.game.GameHUD;
-import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
-import com.historicconquest.historicconquest.controller.game.PawnController;
-import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
+import com.historicconquest.historicconquest.controller.game.*;
+import com.historicconquest.historicconquest.controller.page.game.GameHUD;
+import com.historicconquest.historicconquest.controller.page.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.map.WorldMap;
-import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
 import com.historicconquest.historicconquest.service.map.MapNavigationService;
@@ -21,18 +18,22 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class NewGameController {
+    private static final Logger logger = LoggerFactory.getLogger(NewGameController.class);
     private static final int NB_PLAYERS = 4;
 
     @FXML private StackPane root;
@@ -254,21 +256,20 @@ public class NewGameController {
                 MapView mapView = MapViewFactory.build(worldMap, true);
                 Group mapInterface = mapView.getRoot();
 
-                FXMLLoader hudLoader = new FXMLLoader(getClass().getResource("/view/fxml/GameHUD.fxml"));
+                FXMLLoader hudLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/GameHUD.fxml"));
                 Parent hudVisual = hudLoader.load();
                 GameHUD gameHUD = hudLoader.getController();
                 hudVisual.setPickOnBounds(false);
                 root.getChildren().add(hudVisual);
 
-                FXMLLoader infoLoader = new FXMLLoader(getClass().getResource("/view/fxml/zoneInfoPanel.fxml"));
+                FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/ZoneInfoPanel.fxml"));
                 Parent infoVisual = infoLoader.load();
                 ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
                 ZoneInfoPanel.setInstance(zoneInfoPanel);
                 infoVisual.setPickOnBounds(false);
-
                 root.getChildren().add(infoVisual);
-                StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
-                StackPane.setMargin(infoVisual, new javafx.geometry.Insets(30, 30, 0,0));
+                StackPane.setAlignment(infoVisual, Pos.TOP_CENTER);
+                StackPane.setMargin(infoVisual, new Insets(45, 45, 45, 45));
                 zoneInfoPanel.hide();
 
                 GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
@@ -278,12 +279,16 @@ public class NewGameController {
 
                 gameController.initializeGameState(listPlayer, worldMap, mapView, mapInterface);
 
-                Game gameEngine = new Game(listPlayer, worldMap, gameController , zoneInfoPanel);
+                Game gameEngine = new Game();
                 worldMap.getAllZones().forEach(zone -> {
                     ZoneView zoneView = mapView.getViewFor(zone);
                     if (zoneView == null) return;
 
                     zoneView.setPickOnBounds(false);
+                    zoneView.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> gameController.showZoneInfo(zone));
+                    zoneView.addEventHandler(MouseEvent.MOUSE_MOVED, event -> gameController.showZoneInfo(zone));
+                    zoneView.addEventHandler(MouseEvent.MOUSE_EXITED, event -> zoneInfoPanel.hide());
+
                     zoneView.setOnMouseClicked(event -> {
                         gameEngine.handleZoneSelection(zone);
                         event.consume();
@@ -291,7 +296,7 @@ public class NewGameController {
                 });
 
             } catch (Exception exception) {
-                System.err.println("Error New Game: " + exception);
+                logger.error("Error launching game", exception);
             }
         });
     }

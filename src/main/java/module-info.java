@@ -41,4 +41,6 @@ module com.historicconquest.historicconquest {
     opens com.historicconquest.historicconquest.model.network.event to com.fasterxml.jackson.databind;
     opens com.historicconquest.historicconquest.service.network to com.fasterxml.jackson.databind;
     opens com.historicconquest.historicconquest.controller.core to javafx.fxml;
+    exports com.historicconquest.historicconquest.controller.page.game;
+    opens com.historicconquest.historicconquest.controller.page.game to javafx.fxml;
 }

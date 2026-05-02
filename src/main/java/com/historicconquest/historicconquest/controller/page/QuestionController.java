@@ -1,14 +1,10 @@
 package com.historicconquest.historicconquest.controller.page;
 
-import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
+import com.historicconquest.historicconquest.controller.page.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
-import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import com.historicconquest.historicconquest.controller.game.GameController;
-import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
-import com.historicconquest.historicconquest.controller.overlay.Notification;
-import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,62 +20,41 @@ import java.util.List;
 import java.util.Objects;
 
 public class QuestionController {
-    private int myAnswer = 0; // A METTRE DANS LA LOGIC GAME PLUS TARD
-
+    private int myAnswer = 0;
 
     private static QuestionController instance;
     private Question question;
-    private GameController gameController ;
 
     @FXML public Slider slider;
     @FXML public Button yesButton, noButton, answer1, answer2, answer3, answer4;
-    @FXML public Label describeDifficult, theme_label, boutonSelected, questionId;
+    @FXML public Label describeDifficult, theme_label, questionId;
 
     private static int difficultyQuestion;
     private static StackPane mainStackPane;
     private static Theme theme;
 
-    public QuestionController() { instance = this; }
 
-    public static QuestionController getInstance() { return instance; }
+    public QuestionController() {
+        instance = this;
+        loadTheme();
+    }
 
-    public static void showChoiceDifficultPage(StackPane parent){
-        List<Theme> themeList = Question.getThemesFromJsonFile("/datas/Questions.json");
+    public static QuestionController getInstance() {
+        return instance;
+    }
 
-       Player player = GameController.getInstance().getCurrentPlayer();
-       String targetLabel = player.getCurrentZone().getThemes().getLabel();
-
-       theme = themeList.stream()
-               .filter(t -> t.name.getLabel().equalsIgnoreCase(targetLabel))
-               .findFirst()
-               .orElse(themeList.getFirst());
-
-
-
-
+    public static void showChoiceDifficultPage() {
         FXMLLoader questionLoader = new FXMLLoader(
-                Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/ChoiceDifficultPage.fxml")));
-
-
+            Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/question/ChoiceDifficultPage.fxml")));
 
         try {
             ZoneInfoPanel.getInstance().hide();
             StackPane difficultStackPane = questionLoader.load();
 
-
             QuestionController difficultController = questionLoader.getController();
-
-
-            difficultController.setMainStackPane(parent);
             difficultController.setLabelsTheme();
 
-
-
-            parent.getChildren().add(difficultStackPane);
-
-
-
-
+            mainStackPane.getChildren().add(difficultStackPane);
 
         } catch (IOException e) {
             System.err.println("Erreur de chargement des fichiers FXML");
@@ -87,13 +62,25 @@ public class QuestionController {
     }
 
     @FXML
-    public void confirmDifficult(){
-        int sliderValue = (int) Math.round(slider.getValue());
-        difficultyQuestion = sliderValue;
+    public void confirmDifficult() {
+        difficultyQuestion = (int) Math.round(slider.getValue());
 
         mainStackPane.getChildren().getLast().setVisible(true);
+        destroyStackPane();
         showQuestionPage();
+    }
 
+    public static void loadTheme() {
+        if (theme == null) {
+            List<Theme> themeList = Question.getThemesFromJsonFile("/datas/Questions.json");
+            Player player = GameController.getInstance().getCurrentPlayer();
+            String targetLabel = player.getCurrentZone().getThemes().getLabel();
+
+            theme = themeList.stream()
+                    .filter(t -> t.name.getLabel().equalsIgnoreCase(targetLabel))
+                    .findFirst()
+                    .orElse(themeList.getFirst());
+        }
     }
 
     public void setLabelsTheme(){
@@ -106,86 +93,68 @@ public class QuestionController {
         theme_label.setText(LabelTheme);
 
         switch(LabelTheme) {
-            case "History" :
+            case "History" -> {
                 theme_label.setPrefWidth(180);
                 theme_label.setAlignment(Pos.CENTER);
-                break;
-            case "Informatic":
+            }
+            case "Informatic" -> {
                 theme_label.setPrefWidth(200);
                 theme_label.setAlignment(Pos.CENTER);
-                break;
-            case "Divertissment":
+            }
+            case "Divertissment" -> {
                 theme_label.setPrefWidth(260);
                 theme_label.setAlignment(Pos.CENTER);
-                break;
-            case "Tourism":
+            }
+            case "Tourism" -> {
                 theme_label.setPrefWidth(160);
                 theme_label.setAlignment(Pos.CENTER);
-                break;
+            }
         }
 
         difficultyQuestion = (int) Math.round(slider.getValue());
-
     }
 
     @FXML
-    public void destroyStackPane(){
-        mainStackPane.getChildren().removeLast();
+    public static void destroyStackPane() {
+        if (mainStackPane != null && mainStackPane.getChildren().size() > 1) {
+            mainStackPane.getChildren().removeLast();
+        }
     }
 
-
-
+    @FXML
+    public void hideConfirm() { mainStackPane.getChildren().getLast().setVisible(false);}
 
     @FXML
-    public void hideConfirm(){ mainStackPane.getChildren().getLast().setVisible(false);}
-
-    @FXML
-    public void showQuestionPage(){
-        destroyStackPane();
+    public static void showQuestionPage() {
         FXMLLoader questionLoader = new FXMLLoader(
-                Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/QuestionPage.fxml")));
+            Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/question/QuestionPage.fxml")));
 
         try {
-
             StackPane questionStackPane = questionLoader.load();
-
             QuestionController questionController = questionLoader.getController();
+
             questionController.startQuestion();
-
-            StackPane stackPane = questionController.getMainStackPane();
-            stackPane.getChildren().add(questionStackPane);
-
-
+            mainStackPane.getChildren().add(questionStackPane);
 
         } catch (IOException e) {
             System.err.println("Error loading QuestionPage");
         }
-
     }
 
     @FXML
-    public void tellWhatAnswerChoiced(ActionEvent e){
-        if (e.getSource() == answer1){
-            boutonSelected.setText("Answer 1 selected !");
-            myAnswer = 1;
+    public void tellWhatAnswerChoice(ActionEvent e) {
+        List.of(answer1, answer2, answer3, answer4).forEach(b -> b.getStyleClass().remove("button-selected"));
 
-        } else if(e.getSource() == answer2){
-            boutonSelected.setText("Answer 2 selected !");
-            myAnswer = 2;
+        Button selectedButton = (Button) e.getSource();
+        selectedButton.getStyleClass().add("button-selected");
 
-        } else if(e.getSource() == answer3){
-            boutonSelected.setText("Answer 3 selected !");
-            myAnswer = 3;
-
-        } else {
-            boutonSelected.setText("Answer 4 selected !");
-            myAnswer = 4;
-        }
-
-        checkWin();
+        if (e.getSource() == answer1) myAnswer = 1;
+        else if(e.getSource() == answer2) myAnswer = 2;
+        else if(e.getSource() == answer3) myAnswer = 3;
+        else myAnswer = 4;
     }
 
-    public void startQuestion(){
+    public void startQuestion() {
         List<Question> listQuestion = new ArrayList<>();
         for(Question question : theme.questions){
             if(question.difficulty() == difficultyQuestion){
@@ -205,21 +174,22 @@ public class QuestionController {
     }
 
     @FXML
-    public void checkWin(){
-
+    public void checkWin() {
         boolean correct = question.isCorrectAnswer(myAnswer);
 
-        MultiplayerGameOverlay.requestQuestionResult(difficultyQuestion, correct);
-
+//        MultiplayerGameOverlay.requestQuestionResult(difficultyQuestion, correct);
+        GameController.getInstance().applyQuestionResult(difficultyQuestion, correct);
         mainStackPane.getChildren().removeLast();
-
     }
 
-    public void setMainStackPane(StackPane stackPane) { mainStackPane = stackPane; }
+    public static void setDifficultyQuestion(int difficultyQuestion) {
+        QuestionController.difficultyQuestion = difficultyQuestion;
+        showQuestionPage();
+    }
+
+    public static void setMainStackPane(StackPane stackPane) { mainStackPane = stackPane; }
     public StackPane getMainStackPane() { return mainStackPane; }
     public Theme getTheme() { return theme; }
     public void setTest(Question test) { question = test; }
     public Question getQuestion() { return this.question; }
-
-
 }

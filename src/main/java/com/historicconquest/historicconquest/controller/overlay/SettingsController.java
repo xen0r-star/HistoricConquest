@@ -43,11 +43,11 @@ public class SettingsController implements javafx.fxml.Initializable {
 
         // Sync labels sliders
         musicSlider.valueProperty().addListener((obs, old, val) ->
-                musicValueLabel.setText((int) val.doubleValue() + "%")
+            musicValueLabel.setText((int) val.doubleValue() + "%")
         );
 
         sfxSlider.valueProperty().addListener((obs, old, val) ->
-                sfxValueLabel.setText((int) val.doubleValue() + "%")
+            sfxValueLabel.setText((int) val.doubleValue() + "%")
         );
 
         // Muet désactive les sliders

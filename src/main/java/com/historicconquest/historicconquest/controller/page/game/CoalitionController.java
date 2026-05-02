@@ -1,5 +1,6 @@
-package com.historicconquest.historicconquest.controller.game;
+package com.historicconquest.historicconquest.controller.page.game;
 
+import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.map.Zone;
@@ -15,32 +16,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class CoallitionController {
-
-    @FXML
-    public ListView<Player> listPlayers ;
-
-    @FXML
-    public Button btnClose ;
-
-    @FXML
-    public Button btnProposal ;
-
-    @FXML
-    public StackPane root ;
-
-    @FXML
-    public VBox panePendingRequest ;
-
-    @FXML
-    public Label lblRequesterName ;
-
+public class CoalitionController {
+    @FXML public ListView<Player> listPlayers ;
+    @FXML public Button btnClose ;
+    @FXML public Button btnProposal ;
+    @FXML public StackPane root ;
+    @FXML public VBox panePendingRequest ;
+    @FXML public Label lblRequesterName ;
 
 
 
     @FXML
-    public  void closeAlliance()
-    {
+    public  void closeAlliance() {
         root.setVisible(false);
     }
 
@@ -62,6 +49,7 @@ public class CoallitionController {
                 super.updateItem(player, empty);
                 if (empty || player == null) {
                     setText(null);
+
                 } else {
                     setText(player.getPseudo());
                 }
@@ -78,8 +66,12 @@ public class CoallitionController {
         if (target != null && !target.hasAlly()) {
             target.setPendingAllianceRequest(sender);
 
-            NotificationController.show("Proposal Sent",
-                    "Request sent to " + target.getPseudo(), Notification.Type.SUCCESS, 5000);
+            NotificationController.show(
+                "Proposal Sent",
+                "Request sent to " + target.getPseudo(),
+                Notification.Type.SUCCESS,
+                5000
+            );
             closeAlliance();
         }
     }
@@ -88,13 +80,12 @@ public class CoallitionController {
     public void refreshPlayerList() {
         Player current = GameController.getInstance().getCurrentPlayer();
 
-        if(current.hasPendingRequest())
-        {
+        if(current.hasPendingRequest()) {
             panePendingRequest.setVisible(true);
             panePendingRequest.setManaged(true);
             lblRequesterName.setText(current.getPendingAllianceRequest().getPseudo());
-        }
-        else {
+
+        } else {
             panePendingRequest.setVisible(false);
             panePendingRequest.setManaged(false);
         }
@@ -103,8 +94,8 @@ public class CoallitionController {
         if (game != null) {
             ObservableList<Player> players = FXCollections.observableArrayList(game.getPlayers());
             players.removeIf(p ->
-                    p.equals(current) ||
-                            p.hasAlly());
+                p.equals(current) || p.hasAlly()
+            );
             listPlayers.setItems(players);
         }
     }
@@ -112,8 +103,7 @@ public class CoallitionController {
 
 
     @FXML
-    public void acceptAlliance()
-    {
+    public void acceptAlliance() {
         Player current = GameController.getInstance().getCurrentPlayer();
         Player requester = current.getPendingAllianceRequest();
 
@@ -130,18 +120,19 @@ public class CoallitionController {
 
         current.clearPendingRequest();
         closeAlliance();
-        NotificationController.show("Alliance", "You are now allied with " + requester.getPseudo(), Notification.Type.SUCCESS, 5000);
+        NotificationController.show(
+            "Alliance",
+            "You are now allied with " + requester.getPseudo(),
+            Notification.Type.SUCCESS,
+            5000
+        );
     }
 
 
     @FXML
-    public void declineAlliance()
-    {
+    public void declineAlliance() {
         Player current = GameController.getInstance().getCurrentPlayer();
         current.clearPendingRequest();
         refreshPlayerList();
     }
-
-
-
 }
