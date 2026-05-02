@@ -99,8 +99,27 @@ public final class GameNetworkService {
         );
     }
 
+    public static void sendTravelAction(String zoneName) {
+        sendZoneAction(ACTION_TRAVEL, zoneName);
+    }
+
+    public static void sendAttackAction(String zoneName) {
+        sendZoneAction(ACTION_ATTACK, zoneName);
+    }
+
+    public static void sendPowerUpAction(String zoneName) {
+        sendZoneAction(ACTION_POWER_UP, zoneName);
+    }
+
     public static void handleGameAction(String action, String zoneName, Integer difficulty, Boolean correct) {
-        if (!enabled || controller == null || action == null) return;
+        if (!enabled || action == null) return;
+
+        if (MultiplayerGameOverlay.isActive()) {
+            MultiplayerGameOverlay.applyNetworkAction(action, zoneName, difficulty, correct);
+            return;
+        }
+
+        if (controller == null) return;
 
         switch (action) {
             case ACTION_ANSWER_RESULT -> {

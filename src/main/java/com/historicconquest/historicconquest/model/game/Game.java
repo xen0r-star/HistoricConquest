@@ -2,13 +2,10 @@ package com.historicconquest.historicconquest.model.game;
 
 import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.controller.game.GameController;
-import com.historicconquest.historicconquest.controller.game.ZoneInfoPanel;
-import com.historicconquest.historicconquest.controller.overlay.Notification;
-import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
-import com.historicconquest.historicconquest.model.map.ZonePathfinder;
 import com.historicconquest.historicconquest.model.player.Player;
+import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
 
 import java.util.List;
 
@@ -36,21 +33,23 @@ public class Game {
             return;
         }
 
-        switch(gameController.getSelectedAction())
-        {
-            case TRAVEL :
-                gameController.travel(targetZone);
-                break ;
+        switch(gameController.getSelectedAction()) {
+            case TRAVEL:
+                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.TRAVEL, targetZone);
+                break;
+
             case ATTACK:
-                gameController.attackZone(targetZone);
-                break ;
+                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.ATTACK, targetZone);
+                break;
+
             case POWER_UP:
-                gameController.powerUp(targetZone);
-                break ;
+                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.POWER_UP, targetZone);
+                break;
+
             case NONE:
             default:
                 gameController.showZoneInfo(targetZone);
-                break ;
+                break;
         }
     }
 

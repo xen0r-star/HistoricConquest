@@ -11,7 +11,7 @@ public class Player {
     private final int id;
     private final String pseudo;
     private final PlayerColor color;
-    private List<Zone> zones;
+    private final List<Zone> zones;
     private int consecutiveSuccesses;
     private int consecutiveFailures;
     private Alliance alliance;
@@ -67,22 +67,6 @@ public class Player {
 
     public void setAlly(Player ally) {
         this.ally = ally;
-    }
-
-    public int getConsecutiveSuccesses() {
-        return consecutiveSuccesses;
-    }
-
-    public void setConsecutiveSuccesses(int consecutiveSuccesses) {
-        this.consecutiveSuccesses = consecutiveSuccesses;
-    }
-
-    public int getConsecutiveFailures() {
-        return consecutiveFailures;
-    }
-
-    public void setConsecutiveFailures(int consecutiveFailures) {
-        this.consecutiveFailures = consecutiveFailures;
     }
 
     public int getConsecutiveSuccesses() {

@@ -20,6 +20,10 @@ import java.util.Map;
 @Controller
 public class RoomSocketController {
     private static final int GAME_COUNTDOWN_SECONDS = 5;
+    private static final String ACTION_TRAVEL = "TRAVEL";
+    private static final String ACTION_ATTACK = "ATTACK";
+    private static final String ACTION_POWER_UP = "POWER_UP";
+    private static final String ACTION_ANSWER_RESULT = "ANSWER_RESULT";
 
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -610,6 +614,11 @@ public class RoomSocketController {
             return;
         }
 
+        if (!ACTION_TRAVEL.equals(action) && !ACTION_ATTACK.equals(action) && !ACTION_POWER_UP.equals(action) && !ACTION_ANSWER_RESULT.equals(action)) {
+            sendActionUnavailable(playerId, "GAME_ACTION", "Unknown action");
+            return;
+        }
+
         Map<String, Object> message = new java.util.HashMap<>();
         message.put("type", "GAME_ACTION");
         message.put("action", action);
@@ -628,6 +637,19 @@ public class RoomSocketController {
         Object correct = payload.get("correct");
         if (correct instanceof Boolean bool) {
             message.put("correct", bool);
+        }
+
+        if (ACTION_ANSWER_RESULT.equals(action)) {
+            if (!(difficulty instanceof Number) || !(correct instanceof Boolean)) {
+                sendActionUnavailable(playerId, "GAME_ACTION", "Missing answer data");
+                return;
+            }
+
+        } else {
+            if (zone == null || zone.toString().isBlank()) {
+                sendActionUnavailable(playerId, "GAME_ACTION", "Missing target zone");
+                return;
+            }
         }
 
         broadcastGameAction(roomCode, message);

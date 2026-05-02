@@ -268,7 +268,7 @@ public class NewGameController {
 
                 root.getChildren().add(infoVisual);
                 StackPane.setAlignment(infoVisual, Pos.TOP_RIGHT);
-                StackPane.setMargin(infoVisual, new javafx.geometry.Insets(30, 30, 0,0 ));
+                StackPane.setMargin(infoVisual, new javafx.geometry.Insets(30, 30, 0,0));
                 zoneInfoPanel.hide();
 
                 GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
@@ -276,7 +276,7 @@ public class NewGameController {
                 MapNavigationService mapNavigationService = new MapNavigationService();
                 mapNavigationService.attachNavigation(root, mapInterface);
 
-                gameController.initializeGameState(listPlayer, worldMap , mapView , mapInterface);
+                gameController.initializeGameState(listPlayer, worldMap, mapView, mapInterface);
 
                 Game gameEngine = new Game(listPlayer, worldMap, gameController , zoneInfoPanel);
                 worldMap.getAllZones().forEach(zone -> {
@@ -291,7 +291,7 @@ public class NewGameController {
                 });
 
             } catch (Exception exception) {
-                System.err.println("Error New Game");
+                System.err.println("Error New Game: " + exception);
             }
         });
     }

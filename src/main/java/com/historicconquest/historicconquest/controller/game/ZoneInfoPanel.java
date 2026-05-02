@@ -1,26 +1,18 @@
 package com.historicconquest.historicconquest.controller.game;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 
 public class ZoneInfoPanel {
-    @FXML
-    private AnchorPane root;
-    @FXML
-    public Button CloseBtn;
-    @FXML
-    public Label ThemeLabel;
-    @FXML
-    public Label BlockLabel;
-    @FXML
-    public Label OwnerLabel;
-    @FXML
-    public Label PowerLabel ;
-    @FXML
-    public Label ZoneNameLabel;
+    @FXML public AnchorPane root;
+    @FXML public Button CloseBtn;
+    @FXML public Label ThemeLabel;
+    @FXML public Label BlockLabel;
+    @FXML public Label OwnerLabel;
+    @FXML public Label PowerLabel ;
+    @FXML public Label ZoneNameLabel;
 
 
     private static ZoneInfoPanel instance;
@@ -49,9 +41,7 @@ public class ZoneInfoPanel {
 
 
     public void setBlockLabel(String block) {
-
         this.BlockLabel.setText(block);
-
     }
 
     public void setOwnerLabel(String owner)
@@ -73,8 +63,7 @@ public class ZoneInfoPanel {
         root.setManaged(false);
     }
 
-    public void CloseZoneInfoPanel(ActionEvent actionEvent) {
-
+    public void CloseZoneInfoPanel() {
         root.setVisible(false);
     }
 }

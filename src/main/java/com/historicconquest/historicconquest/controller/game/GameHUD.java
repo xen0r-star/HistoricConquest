@@ -1,31 +1,35 @@
 package com.historicconquest.historicconquest.controller.game;
 
-import com.historicconquest.historicconquest.controller.page.QuestionController;
-import com.historicconquest.historicconquest.controller.page.SelectAction;
+import com.historicconquest.historicconquest.controller.overlay.Notification;
+import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.util.Texture;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
+import java.util.List;
 
 public class GameHUD {
     @FXML private StackPane root;
     @FXML private Pane mapViewport;
 
-
-    private DisplayInfoPlayer cachedInfoPlayer ;
     private CoallitionController cachedCoalition;
     private Parent coalitionNode;
-    private Button playTurnBtn ;
+    private DisplayInfoPlayer cachedPlayerInfo;
+    private DisplayInfoGame cachedGameInfo;
+
+    private List<Player> pendingPlayers;
+    private Integer pendingCurrentIndex;
+
 
     @FXML
     public void initialize() {
@@ -36,7 +40,11 @@ public class GameHUD {
 
         root.getChildren().add(noiseLayer);
         noiseLayer.setViewOrder(-1.0);
-        setupPlayturnButton();
+        setupPrincipalButton();
+        setupDisplayInfoPlayer();
+        setupDisplayInfoGame();
+
+        showLegend();
     }
 
     public void initializeMap(Group mapInterface) {
@@ -52,78 +60,87 @@ public class GameHUD {
     }
 
 
-    private void setupPlayturnButton() {
+    private void setupPrincipalButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/PrincipalButton.fxml"));
             Parent buttonPanel = loader.load();
 
             PrincipalButton controller = loader.getController();
             controller.setGameHUD(this);
+            controller.setParentRoot(root);
 
             StackPane.setAlignment(buttonPanel, Pos.BOTTOM_CENTER);
-            StackPane.setMargin(buttonPanel, new javafx.geometry.Insets(0, 0, 40, 0));
+            StackPane.setMargin(buttonPanel, new Insets(0, 0, 30, 0));
 
             root.getChildren().add(buttonPanel);
 
         } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Erreur lors du chargement du FXML des boutons.");
+            System.err.println("Error loading PrincipalButton.fxml");
         }
     }
 
-
-
-    public void showSelectAction()
-    {
+    private void setupDisplayInfoPlayer() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/SelectAction.fxml"));
-            Parent selectActionNode = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoPlayer.fxml"));
+            Parent playerInfoNode = loader.load();
 
-            SelectAction controller = loader.getController();
-            controller.setParentRoot(root);
-            root.getChildren().add(selectActionNode);
+            cachedPlayerInfo = loader.getController();
 
-            StackPane.setAlignment(selectActionNode, Pos.CENTER);
+            root.getChildren().add(playerInfoNode);
+            StackPane.setAlignment(playerInfoNode, Pos.TOP_LEFT);
+            StackPane.setMargin(playerInfoNode, new Insets(45, 45, 45, 45));
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Error loading DisplayInfoPlayer.fxml");
         }
-
     }
 
-    public void togglePlayerInfo() {
-        if (cachedInfoPlayer == null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoPlayer.fxml"));
-                Parent playerInfoNode = loader.load();
-                cachedInfoPlayer = loader.getController();
+    private void setupDisplayInfoGame() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/DisplayInfoGame.fxml"));
+            Parent gameInfoNode = loader.load();
 
-                root.getChildren().add(playerInfoNode);
-                StackPane.setAlignment(playerInfoNode, Pos.TOP_LEFT);
-                StackPane.setMargin(playerInfoNode, new javafx.geometry.Insets(30, 0, 0, 30));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
+            cachedGameInfo = loader.getController();
+            if (pendingPlayers != null) {
+                int index = pendingCurrentIndex != null ? pendingCurrentIndex : 0;
+                cachedGameInfo.show(pendingPlayers, index);
+                pendingPlayers = null;
+                pendingCurrentIndex = null;
             }
+
+            root.getChildren().add(gameInfoNode);
+            StackPane.setAlignment(gameInfoNode, Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(gameInfoNode, new Insets(45, 45, 45, 45));
+
+        } catch (IOException e) {
+            System.err.println("Error loading DisplayInfoGame.fxml");
         }
-
-
-        Player current = GameController.getInstance().getCurrentPlayer();
-
-
-        cachedInfoPlayer.show(current);
     }
+
+    private void showLegend() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/MapLegend.fxml"));
+            Parent mapLegendNode = loader.load();
+
+            root.getChildren().add(mapLegendNode);
+            StackPane.setAlignment(mapLegendNode, Pos.BOTTOM_LEFT);
+            StackPane.setMargin(mapLegendNode, new Insets(45, 45, 45, 45));
+
+        } catch (IOException e) {
+            System.err.println("Error loading MapLegend.fxml");
+        }
+    }
+
 
     public void showCoalitionMenu() {
-
         Player current = GameController.getInstance().getCurrentPlayer();
 
         if (current != null && current.hasAlly()) {
-            com.historicconquest.historicconquest.controller.overlay.NotificationController.show(
-                    "Alliance",
-                    "You are already in an alliance!",
-                    com.historicconquest.historicconquest.controller.overlay.Notification.Type.INFORMATION,
-                    3000
+            NotificationController.show(
+                "Alliance",
+                "You are already in an alliance!",
+                Notification.Type.INFORMATION,
+                3000
             );
             return;
         }
@@ -136,8 +153,9 @@ public class GameHUD {
 
                 root.getChildren().add(coalitionNode);
                 StackPane.setAlignment(coalitionNode, Pos.CENTER);
+
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error loading coalitionnew.fxml");
                 return;
             }
         }
@@ -147,5 +165,18 @@ public class GameHUD {
         cachedCoalition.refreshPlayerList();
     }
 
-}
+    public void refreshGameInfo(List<Player> players, int currentPlayerIndex) {
+        if (cachedGameInfo != null) {
+            cachedGameInfo.show(players, currentPlayerIndex);
+        } else {
+            pendingPlayers = players;
+            pendingCurrentIndex = currentPlayerIndex;
+        }
+    }
 
+    public void refreshPlayerInfo(Player player) {
+        if (cachedPlayerInfo != null) {
+            cachedPlayerInfo.updatePlayerData(player);
+        }
+    }
+}

@@ -3,95 +3,33 @@
 <?import java.lang.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="root" maxHeight="497.0" maxWidth="365.0" minHeight="497.0" minWidth="365.0" prefHeight="497.0" prefWidth="365.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.game.DisplayInfoPlayer">
+<AnchorPane fx:id="root" maxHeight="150.0" maxWidth="180.0" minHeight="150.0" minWidth="180.0" prefHeight="150.0" prefWidth="180.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.game.DisplayInfoPlayer">
    <styleClass>
-      <String fx:value="button-blue" />
-      <String fx:value="button-main" />
+      <String fx:value="button-beige" />
+      <String fx:value="button-small" />
       <String fx:value="not-hover" />
    </styleClass>
-   <children>
-      <Label fx:id="labelNamePlayer" layoutX="40.0" layoutY="27.0" prefHeight="52.0" prefWidth="187.0" text="Hero Name">
+   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="2.0" layoutY="2.0" maxHeight="34.0" maxWidth="180.0" minHeight="34.0" minWidth="180.0" prefHeight="34.0" prefWidth="180.0" style="-fx-background-color: #00000033; -fx-background-radius: 10 10 0 0; -fx-border-width: 0 0 2 0; -fx-border-color: #675932;" text="PLAYER PROFILE" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <font>
+         <Font name="Georgia Bold" size="16.0" />
+      </font>
+   </Label>
+   <VBox layoutX="14.0" layoutY="54.0" prefHeight="81.0" prefWidth="220.0" spacing="1.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
+      <Label fx:id="LabelSuccessCount" text="Successes: 0">
          <font>
-            <Font name="Georgia" size="24.0" />
+            <Font name="Georgia" size="16.0" />
          </font>
       </Label>
-      <Separator layoutX="40.0" layoutY="81.0" prefHeight="3.0" prefWidth="253.0" />
-      <Label layoutX="40.0" layoutY="96.0" text="Successes : ">
+      <Label fx:id="LabelFailureCount" text="Failures: 0">
          <font>
-            <Font name="Georgia" size="18.0" />
+            <Font name="Georgia" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="40.0" layoutY="135.0" text="Failures :">
-         <font>
-            <Font name="Georgia" size="18.0" />
-         </font>
-      </Label>
-      <Label fx:id="LabelSuccessCount" layoutX="142.0" layoutY="93.0" text="0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label fx:id="LabelFailureCount" layoutX="142.0" layoutY="132.0" text="0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Separator layoutX="40.0" layoutY="247.0" prefHeight="3.0" prefWidth="254.0" />
-      <Label layoutX="40.0" layoutY="265.0" text="My Territories">
-         <font>
-            <Font name="Georgia" size="18.0" />
-         </font>
-      </Label>
-      <TableView fx:id="labelItems" layoutX="40.0" layoutY="302.0" prefHeight="162.0" prefWidth="284.0">
-        <columns>
-          <TableColumn fx:id="colName" editable="false" prefWidth="141.20001220703125" sortable="false" text="Name" />
-          <TableColumn fx:id="colPower" editable="false" prefWidth="141.5999755859375" sortType="DESCENDING" text="power" />
-        </columns>
-      </TableView>
-      <Label layoutX="41.0" layoutY="212.0" text="Current Location :">
-         <font>
-            <Font name="Georgia" size="18.0" />
-         </font>
-      </Label>
-      <Label fx:id="labelCurrentLoc" layoutX="195.0" layoutY="212.0" text="Name">
-         <font>
-            <Font name="Georgia" size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="40.0" layoutY="175.0" text="World Progress :">
-         <font>
-            <Font name="Georgia" size="18.0" />
-         </font>
-      </Label>
-      <Label fx:id="LabelWorldProgress" layoutX="190.0" layoutY="172.0" prefHeight="27.0" prefWidth="0.0" text="0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-
-      <Button fx:id="CloseBtn"
-              layoutX="317.0" layoutY="13.0"
-              prefHeight="28.0" prefWidth="28.0"
-              onAction="#Close"
-              style="-fx-background-color: transparent;"
-              AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="13.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-
-      <ImageView fitHeight="28.0" fitWidth="28.0"
-                 layoutX="317.0" layoutY="13.0"
-                 mouseTransparent="true"
-                 pickOnBounds="true" preserveRatio="true"
-                 AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="13.0">
-         <image>
-            <Image url="@../icons/close.png" />
-         </image>
-      </ImageView>
-   </children>
+   </VBox>
+   <cursor>
+      <Cursor fx:constant="DEFAULT" />
+   </cursor>
 </AnchorPane>

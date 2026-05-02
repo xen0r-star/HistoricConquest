@@ -22,31 +22,30 @@ import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public class GameController implements GameAnimationPort {
     private final ZoneInfoPanel zoneInfoPanel;
     private final MapView mapView;
-    private int currentPlayerIndex = 0 ;
-    private int currentDifficulty = 0 ;
-    private boolean hasAnsweredCorrectly ;
-    private static GameController instance ;
-    private int nbPlayer = 4 ;
-    private List<Player> players ;
+    private final GameHUD gameHUD;
+    private int currentPlayerIndex = 0;
+    private int currentDifficulty = 0;
+    private boolean hasAnsweredCorrectly;
+    private static GameController instance;
+    private int nbPlayer = 4;
+    private final List<Player> players;
+    private WorldMap worldMap;
     public static final Color ALLIANCE_1_COLOR = Color.web("#F2F2F2");
     public static final Color ALLIANCE_2_COLOR = Color.web("#A9A9A9");
 
     private int allianceCount = 0;
 
-    private PendingAction selectedAction = PendingAction.NONE ;
+    private PendingAction selectedAction = PendingAction.NONE;
 
-    public enum PendingAction{
-        NONE , TRAVEL ,ATTACK ,POWER_UP
+    public enum PendingAction {
+        NONE, TRAVEL, ATTACK, POWER_UP
     }
 
 
@@ -54,18 +53,27 @@ public class GameController implements GameAnimationPort {
         return players;
     }
 
-    public void initializeGameState(List<Player> playersData , WorldMap worldmap , MapView mapView , Group mapInterface)
-    {
+    public void initializeGameState(List<Player> playersData , WorldMap worldmap , MapView mapView , Group mapInterface) {
+        initializeGameState(playersData, worldmap, mapView, mapInterface, null);
+    }
+
+    public void initializeGameState(List<Player> playersData, WorldMap worldmap, MapView mapView, Group mapInterface, List<Zone> preferredStartZones) {
+        this.worldMap = worldmap;
         List<Zone> allZones = worldmap.getAllZones();
 
         for (int i = 0; i < playersData.size(); i++) {
             Player player = playersData.get(i);
 
-            boolean added = this.addPlayer(player);
+            this.addPlayer(player);
 
-            Zone startZone = allZones.get(i * 10);
-
-            //startZone.setPlayer(player);
+            Zone startZone = null;
+            if (preferredStartZones != null && i < preferredStartZones.size()) {
+                startZone = preferredStartZones.get(i);
+            }
+            if (startZone == null) {
+                int fallbackIndex = Math.min(i * 10, allZones.size() - 1);
+                startZone = allZones.get(fallbackIndex);
+            }
 
             startZone.setColor(player.getColor().getJavafxColor());
             startZone.setPower(4);
@@ -77,7 +85,7 @@ public class GameController implements GameAnimationPort {
             ZoneView startZoneView = mapView.getViewFor(startZone);
             if (startZoneView == null) continue;
 
-            Group pawnGroup = com.historicconquest.historicconquest.controller.game.PawnController.createPawn(player.getColor(), 40.0);
+            Group pawnGroup = PawnController.createPawn(player.getColor(), 40.0);
             pawnGroup.setMouseTransparent(true);
 
             Bounds zoneBounds = startZoneView.getZoneSVGGroup().getBoundsInParent();
@@ -95,30 +103,29 @@ public class GameController implements GameAnimationPort {
             player.setPawnNode(pawnGroup);
         }
 
+        gameHUD.refreshGameInfo(players, currentPlayerIndex);
+        gameHUD.refreshPlayerInfo(getCurrentPlayer());
     }
 
 
     public GameController(ZoneInfoPanel zoneInfoPanel, GameHUD gameHUD, MapView mapView) {
         this.zoneInfoPanel = zoneInfoPanel;
         this.mapView = mapView;
+        this.gameHUD = gameHUD;
+
+        players = new ArrayList<>();
 
         gameHUD.initializeMap(mapView.getRoot());
         this.zoneInfoPanel.hide();
 
-        instance = this ;
-
-        players = new ArrayList<>();
-
+        instance = this;
     }
 
 
-    public boolean addPlayer(Player player)
-    {
-        if(players.contains(player))
-        {
-            return false ;
+    public void addPlayer(Player player) {
+        if (!players.contains(player)) {
+            players.add(player);
         }
-        return players.add(player);
     }
 
     public void animatePawnMove(Node pawn, List<Zone> pathListe, Runnable onFinished) {
@@ -173,59 +180,70 @@ public class GameController implements GameAnimationPort {
     }
 
 
-    public void handleQuestionResult(int level , boolean correct)
-    {
-        this.currentDifficulty = level ;
-        this.hasAnsweredCorrectly= correct ;
+    public void handleQuestionResult(int level, boolean correct) {
+        applyQuestionResult(level, correct, true);
+    }
+
+    public void travel(Zone targetZone) {
+        applyTravel(targetZone, true);
+    }
+
+    public void attackZone(Zone targetZone) {
+        applyAttackZone(targetZone, true);
+    }
+
+    public void powerUp(Zone targetZone) {
+        applyPowerUp(targetZone, true);
+    }
+
+    public void applyQuestionResult(int level, boolean correct, boolean advanceTurn) {
+        this.currentDifficulty = level;
+        this.hasAnsweredCorrectly = correct;
         Player current = players.get(currentPlayerIndex);
 
-        if(!correct)
-        {
+        if (!correct) {
             NotificationController.show(
-                    "Wrong Answer",
-                    "Incorrect! Your turn is over.",
-                    Notification.Type.ERROR,
-                    5000
+                "Wrong Answer",
+                "Incorrect! Your turn is over.",
+                Notification.Type.ERROR,
+                5000
             );
 
-            current.setConsecutiveFailures(current.getConsecutiveFailures()+1);
+            current.setConsecutiveFailures(current.getConsecutiveFailures() + 1);
             current.setConsecutiveSuccesses(0);
-            ZonePathfinder.findPath(current.getCurrentZone() , current.getCurrentZone());
+            ZonePathfinder.findPath(current.getCurrentZone(), current.getCurrentZone());
 
-            if(current.getConsecutiveFailures()>=3)
-            {
+            if (current.getConsecutiveFailures() >= 3) {
                 NotificationController.show(
-                        "Critical Failure",
-                        "3 consecutive incorrect answers! You have received a penalty.",
-                        Notification.Type.ERROR,
-                        6000
+                    "Critical Failure",
+                    "3 consecutive incorrect answers! You have received a penalty.",
+                    Notification.Type.ERROR,
+                    6000
                 );
                 current.setConsecutiveFailures(3);
             }
-            nextPlayer();
-        }
-        else
-        {
-            current.setConsecutiveSuccesses(current.getConsecutiveSuccesses()+1);
-            current.setConsecutiveFailures(0);
-            ZonePathfinder.setMaxPathLength(level+1);
-            if(current.getConsecutiveSuccesses()>=3)
-            {
-                NotificationController.show(
-                        "Win Streak!",
-                        "3 correct answers in a row! You've earned a special bonus.",
-                        Notification.Type.SUCCESS,
-                        6000
-                );
-                current.setConsecutiveSuccesses(0);
+
+            if (advanceTurn) {
+                nextPlayer();
             }
-
+            return;
         }
 
+        current.setConsecutiveSuccesses(current.getConsecutiveSuccesses() + 1);
+        current.setConsecutiveFailures(0);
+        ZonePathfinder.setMaxPathLength(level + 1);
+        if (current.getConsecutiveSuccesses() >= 3) {
+            NotificationController.show(
+                "Win Streak!",
+                "3 correct answers in a row! You've earned a special bonus.",
+                Notification.Type.SUCCESS,
+                6000
+            );
+            current.setConsecutiveSuccesses(0);
+        }
     }
 
-
-    public void travel(Zone targetZone) {
+    public void applyTravel(Zone targetZone, boolean advanceTurn) {
         Player current = getCurrentPlayer();
 
         ZonePathfinder.PathResult result = ZonePathfinder.findPath(current.getCurrentZone(), targetZone);
@@ -235,62 +253,62 @@ public class GameController implements GameAnimationPort {
 
             if (distance <= currentDifficulty) {
                 NotificationController.show(
-                        "Traveling",
-                        "Moving to " + targetZone.getName() + " (" + distance + " zones).",
-                        Notification.Type.INFORMATION,
-                        3000
+                    "Traveling",
+                    "Moving to " + targetZone.getName() + " (" + distance + " zones).",
+                    Notification.Type.INFORMATION,
+                    3000
                 );
 
                 this.selectedAction = PendingAction.NONE;
 
+                Runnable onFinished = advanceTurn ? this::nextPlayer : null;
                 animatePawnMove(
-                        current.getPawnNode(),
-                        result.zones(),
-                        this::nextPlayer
+                    current.getPawnNode(),
+                    result.zones(),
+                    onFinished
                 );
 
                 current.setCurrentZone(targetZone);
-            }
-            else {
+                gameHUD.refreshGameInfo(players, currentPlayerIndex);
+                gameHUD.refreshPlayerInfo(getCurrentPlayer());
+
+            } else {
                 NotificationController.show(
-                        "Too Far",
-                        "Target is " + distance + " zones away, but your answer only allows " + currentDifficulty + " steps!",
-                        Notification.Type.ERROR,
-                        6000
+                    "Too Far",
+                    "Target is " + distance + " zones away, but your answer only allows " + currentDifficulty + " steps!",
+                    Notification.Type.ERROR,
+                    6000
                 );
             }
         }
     }
 
-
-    public int getCurrentDifficulty() {
-        return currentDifficulty;
-    }
-
-    public void attackZone(Zone targetZone) {
+    public void applyAttackZone(Zone targetZone, boolean advanceTurn) {
         Player current = getCurrentPlayer();
         Zone currentZone = current.getCurrentZone();
-        String oldOwnername = targetZone.getNameOwner();
+        String oldOwnerName = targetZone.getNameOwner();
 
         if (currentZone != targetZone) {
             NotificationController.show(
-                    "Movement Required",
-                    "You must be in the zone to attack. Distance to target: " + currentDifficulty + " steps.",
-                    Notification.Type.ERROR, // Changé de SUCCESS à WARNING
-                    5000
+                "Movement Required",
+                "You must be in the zone to attack. Distance to target: " + currentDifficulty + " steps.",
+                Notification.Type.ERROR,
+                5000
             );
-            this.selectedAction = PendingAction.TRAVEL ;
+
+            this.selectedAction = PendingAction.TRAVEL;
             return;
         }
 
         if (current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
             NotificationController.show(
-                    "Invalid Target",
-                    "You cannot attack your own territory. Please select a different action (Power Up or Travel).",
-                    Notification.Type.SUCCESS,
-                    8000
+                "Invalid Target",
+                "You cannot attack your own territory. Please select a different action (Power Up or Travel).",
+                Notification.Type.SUCCESS,
+                8000
             );
-            this.selectedAction = PendingAction.NONE ;
+
+            this.selectedAction = PendingAction.NONE;
             return;
         }
 
@@ -299,45 +317,37 @@ public class GameController implements GameAnimationPort {
         if (result > 0) {
             targetZone.setPower(result);
             NotificationController.show(
-                    "Attack Progress",
-                    "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
-                    Notification.Type.INFORMATION,
-                    5000
+                "Attack Progress",
+                "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
+                Notification.Type.INFORMATION,
+                5000
             );
-        }
-        else if(result == 0)
-        {
 
-
-            for(Player p : players )
-            {
-                if(p.getPseudo().equalsIgnoreCase(oldOwnername))
-                {
+        } else if(result == 0) {
+            for(Player p : players ) {
+                if(p.getPseudo().equalsIgnoreCase(oldOwnerName)) {
                     p.getZones().remove(targetZone);
-                    break ;
+                    break;
                 }
             }
 
             NotificationController.show(
-                    "Zone Neutralized",
-                    "The defenses have fallen! The zone is now neutral.",
-                    Notification.Type.SUCCESS,
-                    5000
+                "Zone Neutralized",
+                "The defenses have fallen! The zone is now neutral.",
+                Notification.Type.SUCCESS,
+                5000
             );
             targetZone.setPower(0);
             targetZone.setNameOwner("Nobody");
             targetZone.setColor(targetZone.getBaseColor());
-        }
-        else {
+
+        } else {
             int finalPower = Math.abs(result);
 
-
-            for(Player p : players )
-            {
-                if(p.getPseudo().equalsIgnoreCase(oldOwnername))
-                {
+            for(Player p : players ) {
+                if(p.getPseudo().equalsIgnoreCase(oldOwnerName)) {
                     p.getZones().remove(targetZone);
-                    break ;
+                    break;
                 }
             }
 
@@ -345,48 +355,137 @@ public class GameController implements GameAnimationPort {
             targetZone.setPower(finalPower);
             targetZone.setNameOwner(current.getPseudo());
 
-            if(current.hasAlly())
-            {
+            if(current.hasAlly()) {
                 targetZone.setColor(current.getCurrentAllianceColor());
-            }
-            else
-            {
+
+            } else {
                 targetZone.setColor(current.getColor().getJavafxColor());
             }
+
             current.addZone(targetZone);
             NotificationController.show(
-                    "Victory!",
-                    "You have captured " + targetZone.getName() + " with " + finalPower + " power!",
-                    Notification.Type.SUCCESS,
-                    6000
+                "Victory!",
+                "You have captured " + targetZone.getName() + " with " + finalPower + " power!",
+                Notification.Type.SUCCESS,
+                6000
             );
 
             checkWinCondition();
         }
 
-        // 4. Fin du tour
         this.selectedAction = PendingAction.NONE;
-        nextPlayer();
+        gameHUD.refreshGameInfo(players, currentPlayerIndex);
+        gameHUD.refreshPlayerInfo(getCurrentPlayer());
+
+        if (advanceTurn) nextPlayer();
+    }
+
+    public void applyPowerUp(Zone targetZone, boolean advanceTurn) {
+        Player current = getCurrentPlayer();
+
+        if (!current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
+            NotificationController.show(
+                "Action Denied",
+                "You can only power up your own zones!",
+                Notification.Type.ERROR,
+                3000
+            );
+            return;
+        }
+
+
+        int currentPower = targetZone.getPower();
+        int maxPower = targetZone.getMAX_POWER_ZONE();
+
+        if (currentPower < maxPower) {
+            int newPower = Math.min(currentPower + currentDifficulty, maxPower);
+            targetZone.setPower(newPower);
+            NotificationController.show(
+                "Zone Upgraded",
+                targetZone.getName() + " power increased to " + newPower + "!",
+                Notification.Type.SUCCESS,
+                3000
+            );
+            this.selectedAction = PendingAction.NONE;
+            gameHUD.refreshGameInfo(players, currentPlayerIndex);
+            gameHUD.refreshPlayerInfo(getCurrentPlayer());
+
+            if (advanceTurn) nextPlayer();
+
+        } else {
+            NotificationController.show(
+                "Maximum Power",
+                "This zone is already at maximum capacity.",
+                Notification.Type.ERROR,
+                3000
+            );
+        }
+    }
+
+    public void setCurrentPlayerIndexFromNetwork(int index) {
+        if (index < 0 || index >= players.size()) {
+            return;
+        }
+
+        currentPlayerIndex = index;
+        hasAnsweredCorrectly = false;
+        currentDifficulty = 0;
+        selectedAction = PendingAction.NONE;
+
+        Player nextP = getCurrentPlayer();
+        NotificationController.show(
+            "Next Turn",
+            "It's now " + nextP.getPseudo() + "'s turn!",
+            Notification.Type.INFORMATION,
+            3000
+        );
+
+        if (nextP.getPendingAllianceRequest() != null) {
+            showAllianceDecisionMenu(nextP);
+        }
+
+        gameHUD.refreshGameInfo(players, currentPlayerIndex);
+        gameHUD.refreshPlayerInfo(getCurrentPlayer());
+    }
+
+    public void setPlayerCount(int count) {
+        if (count > 0) {
+            nbPlayer = count;
+        }
+    }
+
+    public Zone findZoneByName(String zoneName) {
+        if (zoneName == null || zoneName.isBlank() || worldMap == null) {
+            return null;
+        }
+
+        for (Zone zone : worldMap.getAllZones()) {
+            if (zoneName.equalsIgnoreCase(zone.getName())) {
+                return zone;
+            }
+        }
+
+        return null;
     }
 
     private void checkWinCondition() {
         Player current = getCurrentPlayer();
-        int totalZones = 0;
-        String winnerName = "";
+        int totalZones;
+        String winnerName;
 
         if (current.hasAlly()) {
             Player ally = current.getAlly();
             totalZones = current.getZones().size() + ally.getZones().size();
             System.out.println("total zone alliance :"+totalZones);
             winnerName = "The Alliance (" + current.getPseudo() + " & " + ally.getPseudo() + ")";
+
         } else {
             totalZones = current.getZones().size();
             winnerName = current.getPseudo();
             System.out.println("total zone solo :"+totalZones);
         }
 
-        if (totalZones >= 21)
-        {
+        if (totalZones >= 21) {
             triggerEndGame(winnerName);
         }
     }
@@ -418,47 +517,7 @@ public class GameController implements GameAnimationPort {
     }
 
 
-    public void powerUp(Zone targetZone) {
-        Player current = getCurrentPlayer();
-
-        if (!current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
-            NotificationController.show(
-                    "Action Denied",
-                    "You can only power up your own zones!",
-                    Notification.Type.ERROR,
-                    3000
-            );
-            return;
-        }
-
-
-        int currentPower = targetZone.getPower();
-        int maxPower = targetZone.getMAX_POWER_ZONE();
-
-        if (currentPower < maxPower) {
-            int newPower = Math.min(currentPower + currentDifficulty, maxPower);
-            targetZone.setPower(newPower);
-            NotificationController.show(
-                    "Zone Upgraded",
-                    targetZone.getName() + " power increased to " + newPower + "!",
-                    Notification.Type.SUCCESS,
-                    3000
-            );
-            this.selectedAction = PendingAction.NONE;
-            nextPlayer();
-        } else {
-            NotificationController.show(
-                    "Maximum Power",
-                    "This zone is already at maximum capacity.",
-                    Notification.Type.ERROR,
-                    3000
-            );
-        }
-    }
-
-
-    public void nextPlayer()
-    {
+    public void nextPlayer() {
         currentPlayerIndex =(currentPlayerIndex +1) % nbPlayer ;
 
         this.hasAnsweredCorrectly = false ;
@@ -467,31 +526,32 @@ public class GameController implements GameAnimationPort {
         Player nextP = getCurrentPlayer();
 
         NotificationController.show(
-                "Next Turn",
-                "It's now " + nextP.getPseudo() + "'s turn!",
-                Notification.Type.INFORMATION,
-                3000
+            "Next Turn",
+            "It's now " + nextP.getPseudo() + "'s turn!",
+            Notification.Type.INFORMATION,
+            3000
         );
 
         if (nextP.getPendingAllianceRequest() != null) {
             showAllianceDecisionMenu(nextP);
         }
+
+        gameHUD.refreshGameInfo(players, currentPlayerIndex);
+        gameHUD.refreshPlayerInfo(getCurrentPlayer());
     }
 
     private void showAllianceDecisionMenu(Player receiver) {
         Player requester = receiver.getPendingAllianceRequest();
         NotificationController.show(
-                "Alliance Request",
-                requester.getPseudo() + " wants to form an alliance with you!",
-                Notification.Type.INFORMATION,
-                7000
+            "Alliance Request",
+            requester.getPseudo() + " wants to form an alliance with you!",
+            Notification.Type.INFORMATION,
+            7000
         );
     }
 
-    public Player getCurrentPlayer()
-    {
-        if(players.isEmpty())
-        {
+    public Player getCurrentPlayer() {
+        if(players.isEmpty()) {
             return null ;
         }
 
@@ -499,14 +559,12 @@ public class GameController implements GameAnimationPort {
     }
 
 
-    public void setPendingAction(PendingAction action)
-    {
+    public void setPendingAction(PendingAction action) {
         this.selectedAction = action ;
     }
 
 
-    public PendingAction getSelectedAction()
-    {
+    public PendingAction getSelectedAction() {
         return selectedAction;
     }
 
@@ -518,12 +576,9 @@ public class GameController implements GameAnimationPort {
         return hasAnsweredCorrectly;
     }
 
-
     public Color getNextAllianceColor() {
         allianceCount++;
         if (allianceCount == 1) return ALLIANCE_1_COLOR;
         return ALLIANCE_2_COLOR;
     }
-
 }
-

@@ -6,6 +6,9 @@ import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
+import com.historicconquest.historicconquest.controller.overlay.Notification;
+import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -206,7 +209,7 @@ public class QuestionController {
 
         boolean correct = question.isCorrectAnswer(myAnswer);
 
-        GameController.getInstance().handleQuestionResult(difficultyQuestion , correct);
+        MultiplayerGameOverlay.requestQuestionResult(difficultyQuestion, correct);
 
         mainStackPane.getChildren().removeLast();
 
@@ -220,4 +223,3 @@ public class QuestionController {
 
 
 }
-

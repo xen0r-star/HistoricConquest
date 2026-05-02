@@ -11,7 +11,6 @@ import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.MapViewFactory;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -21,19 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public final class GameBootstrapper {
     private static final Logger logger = LoggerFactory.getLogger(GameBootstrapper.class);
 
     private GameBootstrapper() {
-    }
-
-    public static void launchGame(StackPane root, List<Player> players) {
-        launchGame(root, players, null, null);
     }
 
     public static void launchGame(StackPane root, List<RoomPlayer> roomPlayers, Map<String, String> selectedZonesByPlayerId) {
@@ -83,6 +78,7 @@ public final class GameBootstrapper {
             zoneInfoPanel.hide();
 
             GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
+            MultiplayerGameOverlay.attach(gameController, worldMap);
 
             MapNavigationService mapNavigationService = new MapNavigationService();
             mapNavigationService.attachNavigation(root, mapInterface);
