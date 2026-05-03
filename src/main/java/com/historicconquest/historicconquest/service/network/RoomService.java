@@ -1,5 +1,8 @@
 package com.historicconquest.historicconquest.service.network;
 
+import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.page.QuestionController;
+import javafx.application.Platform;
 import tools.jackson.databind.JsonNode;
 import com.historicconquest.historicconquest.model.network.event.RoomEventListener;
 import com.historicconquest.historicconquest.model.network.event.RoomInfo;
@@ -8,8 +11,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
 
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,7 +36,7 @@ public class RoomService {
     private String color;
 
     private final SocketClient socketClient;
-    private final StompListener pingListener, roomListener, errorListener;
+    private final StompListener pingListener, replyListener, roomListener, errorListener;
     private final ErrorNotifier errorNotifier;
 
     private ScheduledExecutorService pingScheduler;
@@ -53,6 +60,7 @@ public class RoomService {
         this.errorNotifier = errorNotifier;
         this.socketClient = new SocketClient(token);
         this.pingListener = buildPingListener();
+        this.replyListener = buildReplyListener();
         this.roomListener = buildRoomListener();
         this.errorListener = buildErrorListener();
 
@@ -154,11 +162,38 @@ public class RoomService {
             @Override
             public void onMessage(String destination, String rawMessage) {
                 JsonNode payload = socketClient.getJson(rawMessage);
-//                String type = payload.get("type").asText();
                 String title = payload.get("title").asString();
                 String message = payload.get("message").asString();
 
                 notifyError(title, message);
+            }
+        };
+    }
+
+    private StompListener buildReplyListener() {
+        return new StompListener() {
+            @Override
+            public void onMessage(String destination, String rawMessage) {
+                try {
+                    JsonNode payload = socketClient.getJson(rawMessage);
+                    String type = payload.has("type") ? payload.get("type").asString() : "";
+
+                    if ("QUESTION_CHALLENGE".equals(type)) {
+                        String questionId = payload.get("questionId").asString();
+                        String questionText = payload.get("question").asString();
+
+                        List<String> choices = new ArrayList<>();
+                        payload.get("choices").forEach(choice -> choices.add(choice.asString()));
+
+                        System.out.println(questionText);
+                        Platform.runLater(() ->
+                            QuestionController.showQuestionPage(questionId, questionText, choices)
+                        );
+                    }
+
+                } catch (Exception e) {
+                    System.err.println("Error reading private message (Reply) " + e);
+                }
             }
         };
     }
@@ -169,6 +204,11 @@ public class RoomService {
         socketClient.subscribe(
             "sub-ping", "/user/queue/ping",
             pingListener
+        );
+
+        socketClient.subscribe(
+            "sub-reply", "/user/queue/reply",
+            replyListener
         );
 
         socketClient.subscribe(
@@ -408,7 +448,7 @@ public class RoomService {
         }
 
         try {
-            Map<String, Object> payload = new java.util.HashMap<>();
+            Map<String, Object> payload = new HashMap<>();
             payload.put("action", action);
             if (data != null && !data.isEmpty()) {
                 payload.putAll(data);

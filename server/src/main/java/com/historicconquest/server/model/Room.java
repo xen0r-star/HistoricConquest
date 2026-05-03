@@ -1,10 +1,15 @@
 package com.historicconquest.server.model;
 
+import com.historicconquest.server.model.map.WorldMap;
+import com.historicconquest.server.model.map.Zone;
+import com.historicconquest.server.model.player.Player;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Room {
     private final static int MAX_PLAYER = 4;
@@ -17,9 +22,14 @@ public class Room {
     private long gameStartAt;
 
     private final Map<String, Player> players = new ConcurrentHashMap<>();
+    private WorldMap worldMap;
+
     private final Map<String, String> selectedZones = new ConcurrentHashMap<>();
-    private final java.util.List<String> playerOrder = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private final List<String> playerOrder = new CopyOnWriteArrayList<>();
+
     private int currentPlayerIndex;
+    private String pendingZoneName;
+    private String pendingAction;
 
     public Room(String code) {
         this.code = code;
@@ -155,9 +165,25 @@ public class Room {
         this.hostId = hostId;
     }
 
+    public void generateWorldMap() {
+        worldMap = new WorldMap();
+    }
+
 
     public String getCode() {
         return code;
+    }
+
+    public Map<String, String> getAllThemeZone() {
+        Map<String, String> themeZones = new HashMap<>();
+
+        worldMap.getBlocs()
+            .forEach(bloc -> bloc.getZones()
+            .forEach(zone -> themeZones.put(
+                zone.getName(), zone.getThemes().getLabel()
+            )));
+
+        return themeZones;
     }
 
     public Collection<Player> getPlayers() {
@@ -206,5 +232,28 @@ public class Room {
             return;
         }
         currentPlayerIndex = (currentPlayerIndex + 1) % playerOrder.size();
+    }
+
+    public Zone getZone(String name) {
+        return worldMap.getAllZones().stream()
+            .filter(zone -> zone.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public void setPendingZone(String zoneName) {
+        pendingZoneName = zoneName;
+    }
+
+    public void setPendingAction(String action) {
+        pendingAction = action;
+    }
+
+    public String getPendingZone() {
+        return pendingZoneName;
+    }
+
+    public String getPendingAction() {
+        return pendingAction;
     }
 }

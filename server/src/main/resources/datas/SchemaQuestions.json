@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Questions",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "theme": {
+        "type": "string",
+        "enum": [
+          "Tourism",
+          "Mystery",
+          "Informatics",
+          "Entertainment"
+        ]
+      },
+      "subject": {
+        "type": "string"
+      },
+      "difficulty": {
+        "type": "integer",
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "question": {
+        "type": "string"
+      },
+      "answer": {
+        "type": "string"
+      },
+      "choices": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "theme",
+      "subject",
+      "difficulty",
+      "question",
+      "answer",
+      "choices"
+    ]
+  }
+}

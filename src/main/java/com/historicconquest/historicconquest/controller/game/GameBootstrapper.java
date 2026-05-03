@@ -10,6 +10,7 @@ import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
 import com.historicconquest.historicconquest.model.questions.Theme;
+import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import com.historicconquest.historicconquest.service.map.MapNavigationService;
 import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.MapViewFactory;
@@ -68,7 +69,7 @@ public final class GameBootstrapper {
             MultiplayerGameOverlay.attach(ctx.gameController, ctx.worldMap);
             GameNetworkService.attach(ctx.gameController, roomPlayers);
             QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
-            Game gameEngine = new Game(true);
+            Game gameEngine = Game.init(true);
 
             setupZoneEvent(ctx, gameEngine);
 
@@ -84,8 +85,11 @@ public final class GameBootstrapper {
             GameUIContext ctx = setupGameUI(root);
             ctx.gameController.initializeGameState(players, ctx.worldMap, ctx.mapView, ctx.mapInterface);
             QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
-            Game gameEngine = new Game(false);
+            Game gameEngine = Game.init(false);
 
+            ctx.worldMap.getAllZones().forEach(zone ->
+                zone.setThemes(TypeThemes.getRandom())
+            );
             setupZoneEvent(ctx, gameEngine);
 
         } catch (Exception exception) {

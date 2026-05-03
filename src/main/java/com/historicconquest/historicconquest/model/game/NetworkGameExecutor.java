@@ -20,20 +20,13 @@ public class NetworkGameExecutor implements GameActionExecutor {
         if (!gameController.canSelectZone(targetZone)) return;
         if (!gameController.isHasAnsweredCorrectly()) return;
 
-        switch(gameController.getSelectedAction()) {
-            case TRAVEL:
-                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.TRAVEL, targetZone);
-                break;
-            case ATTACK:
-                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.ATTACK, targetZone);
-                break;
-            case POWER_UP:
-                MultiplayerGameOverlay.requestZoneAction(GameController.PendingAction.POWER_UP, targetZone);
-                break;
-            case NONE:
-            default:
-                break;
-        }
+        if (
+            gameController.getSelectedAction() != GameController.PendingAction.TRAVEL ||
+            gameController.getSelectedAction() != GameController.PendingAction.ATTACK ||
+            gameController.getSelectedAction() != GameController.PendingAction.POWER_UP
+        ) return;
+
+        MultiplayerGameOverlay.requestZoneAction(gameController.getSelectedAction(), targetZone);
     }
 }
 

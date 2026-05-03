@@ -1,16 +1,16 @@
 package com.historicconquest.historicconquest.controller.page;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
 
+import com.historicconquest.historicconquest.service.network.RoomService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +25,7 @@ public class QuestionController {
     private static StackPane mainStackPane;
     private static List<Theme> themes;
     private static int difficultyQuestion;
+    private String currentNetworkQuestionId;
 
     private Question question;
     private Theme theme;
@@ -151,6 +152,26 @@ public class QuestionController {
         else if(e.getSource() == answer4) myAnswer = answer4.getText();
     }
 
+    public static void showQuestionPage(String questionId, String question, List<String> choices) {
+        FXMLLoader questionLoader = new FXMLLoader(
+                Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/question/QuestionPage.fxml")));
+
+        try {
+            StackPane questionStackPane = questionLoader.load();
+            QuestionController controller = questionLoader.getController();
+
+            controller.theme = findCurrentTheme();
+            controller.currentNetworkQuestionId = questionId;
+            controller.setTextQuestionPage(question, choices);
+
+            mainStackPane.getChildren().add(questionStackPane);
+
+        } catch (IOException e) {
+            System.err.println("Error loading QuestionPage" + e);
+        }
+    }
+
+
     public void startQuestion() {
         List<Question> listQuestion = new ArrayList<>();
         for(Question themeQuestion : theme.getQuestions()){
@@ -165,21 +186,32 @@ public class QuestionController {
 
         int random = (int) (Math.random() * listQuestion.size());
         Question selectedQuestion = listQuestion.get(random);
-        questionId.setText(selectedQuestion.question());
-
         this.setQuestion(selectedQuestion);
-        answer1.setText(selectedQuestion.choices().get(0));
-        answer2.setText(selectedQuestion.choices().get(1));
-        answer3.setText(selectedQuestion.choices().get(2));
-        answer4.setText(selectedQuestion.choices().get(3));
+
+        setTextQuestionPage(selectedQuestion.question(), selectedQuestion.choices());
+    }
+
+    public void setTextQuestionPage(String question, List<String> choices) {
+        questionId.setText(question);
+        answer1.setText(choices.get(0));
+        answer2.setText(choices.get(1));
+        answer3.setText(choices.get(2));
+        answer4.setText(choices.get(3));
     }
 
     @FXML
     public void checkWin() {
-        boolean correct = question.isCorrectAnswer(myAnswer);
+        if (GameNetworkService.isEnabled() && currentNetworkQuestionId != null) {
+            RoomService.sendGameAction(
+                "SUBMIT_ANSWER",
+                Map.of("questionId", currentNetworkQuestionId,  "answer", myAnswer)
+            );
 
-//        MultiplayerGameOverlay.requestQuestionResult(difficultyQuestion, correct);
-        GameController.getInstance().applyQuestionResult(difficultyQuestion, correct);
+        } else if (question != null) {
+            boolean correct = question.isCorrectAnswer(myAnswer);
+            GameController.getInstance().applyQuestionResult(difficultyQuestion, correct);
+        }
+
         mainStackPane.getChildren().removeLast();
     }
 

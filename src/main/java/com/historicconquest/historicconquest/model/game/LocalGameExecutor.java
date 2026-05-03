@@ -18,4 +18,3 @@ public class LocalGameExecutor implements GameActionExecutor {
         }
     }
 }
-

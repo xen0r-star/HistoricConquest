@@ -22,8 +22,7 @@ public final class GameNetworkService {
     private static String startCurrentPlayerId;
     private static final Map<String, Integer> playerIndexById = new HashMap<>();
 
-    private GameNetworkService() {
-    }
+    private GameNetworkService() { }
 
     public static void setStartInfo(List<String> turnOrder, String currentPlayerId) {
         startTurnOrder = turnOrder;
@@ -78,37 +77,32 @@ public final class GameNetworkService {
         return enabled && localPlayerId != null && localPlayerId.equals(currentPlayerId);
     }
 
-    public static void sendAnswerResult(int difficulty, boolean correct) {
-        if (!enabled) return;
-
-        RoomService.sendGameAction(
-            ACTION_ANSWER_RESULT,
-            Map.of(
-                "difficulty", difficulty,
-                "correct", correct
-            )
-        );
-    }
-
-    public static void sendZoneAction(String action, String zoneName) {
+    public static void sendZoneAction(String action, String zoneName, int difficulty) {
         if (!enabled) return;
 
         RoomService.sendGameAction(
             action,
-            Map.of("zone", zoneName)
+            Map.of("zone", zoneName,  "difficulty", difficulty)
         );
     }
 
-    public static void sendTravelAction(String zoneName) {
-        sendZoneAction(ACTION_TRAVEL, zoneName);
+    public static void sendTravelAction(String zoneName, int difficulty) {
+        sendZoneAction(ACTION_TRAVEL, zoneName, difficulty);
     }
 
-    public static void sendAttackAction(String zoneName) {
-        sendZoneAction(ACTION_ATTACK, zoneName);
+    public static void sendAttackAction(String zoneName, int difficulty) {
+        sendZoneAction(ACTION_ATTACK, zoneName, difficulty);
     }
 
-    public static void sendPowerUpAction(String zoneName) {
-        sendZoneAction(ACTION_POWER_UP, zoneName);
+    public static void sendPowerUpAction(String zoneName, int difficulty) {
+        sendZoneAction(ACTION_POWER_UP, zoneName, difficulty);
+    }
+
+    public static void sendSkipAction() {
+        RoomService.sendGameAction(
+            "SKIP",
+            Map.of()
+        );
     }
 
     public static void handleGameAction(String action, String zoneName, Integer difficulty, Boolean correct) {
@@ -129,8 +123,7 @@ public final class GameNetworkService {
             case ACTION_TRAVEL -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyTravel(targetZone));
             case ACTION_ATTACK -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyAttackZone(targetZone));
             case ACTION_POWER_UP -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyPowerUp(targetZone));
-            default -> {
-            }
+            default -> { }
         }
     }
 

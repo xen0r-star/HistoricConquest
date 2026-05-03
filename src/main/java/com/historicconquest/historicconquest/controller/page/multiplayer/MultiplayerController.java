@@ -2,10 +2,15 @@ package com.historicconquest.historicconquest.controller.page.multiplayer;
 
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
+import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
+import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
+import com.historicconquest.historicconquest.model.map.WorldMap;
+import com.historicconquest.historicconquest.model.map.Zone;
+import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import com.historicconquest.historicconquest.service.network.ApiService;
 import com.historicconquest.historicconquest.model.network.model.NetworkPlayer;
 import com.historicconquest.historicconquest.model.network.event.RoomEventListener;
@@ -594,7 +599,7 @@ public class MultiplayerController {
             }
 
             @Override
-            public void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId) {
+            public void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId, Map<String, String> listThemeZone) {
                 Platform.runLater(() -> {
                     gameStarted = true;
                     joinStatusLocked = true;
@@ -608,6 +613,24 @@ public class MultiplayerController {
                     zoneSelectionController.applyTurnOrder(turnOrder);
                     zoneSelectionController.handleGameStarted(selectedZones);
                     zoneSelectionController = null;
+
+
+                    WorldMap worldMap = MultiplayerGameOverlay.getWorldMap();
+                    if (worldMap != null && listThemeZone != null) {
+                        listThemeZone.forEach((zoneName, themeLabel) -> {
+                            for (Zone zone : worldMap.getAllZones()) {
+                                if (zone.getName().equals(zoneName)) {
+                                    try {
+                                        zone.setThemes(TypeThemes.fromString(themeLabel));
+
+                                    } catch (IllegalArgumentException e) {
+                                        zone.setThemes(TypeThemes.NONE);
+                                    }
+                                    break;
+                                }
+                            }
+                        });
+                    }
                 });
             }
 
@@ -619,6 +642,30 @@ public class MultiplayerController {
             @Override
             public void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex) {
                 Platform.runLater(() -> GameNetworkService.handleTurnChanged(currentPlayerId, currentPlayerIndex));
+            }
+
+            @Override
+            public void onAnswerResult(String playerId, Boolean correct, Integer difficulty) {
+                Platform.runLater(() -> {
+                    GameController.getInstance().applyQuestionResult(difficulty, correct);
+
+                    RoomPlayer roomPlayer = roomPlayers.stream()
+                            .filter(obj -> Objects.equals(obj.getId(), playerId))
+                            .findFirst()
+                            .orElse(null);
+
+                    String pseudo = roomPlayer != null ? roomPlayer.getName() : "Player";
+
+
+                    String message = correct ? " answered the question correctly" : " failed to answer the question";
+
+                    NotificationController.show(
+                        "Quiz results",
+                        pseudo + message,
+                        correct ? Notification.Type.SUCCESS : Notification.Type.ERROR,
+                        3000
+                    );
+                });
             }
 
             @Override

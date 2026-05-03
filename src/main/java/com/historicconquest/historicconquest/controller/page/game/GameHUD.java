@@ -28,6 +28,7 @@ public class GameHUD {
     private DisplayInfoPlayer cachedPlayerInfo;
     private DisplayInfoGame cachedGameInfo;
     private PrincipalButton principalButtonController;
+    private Parent principalButtonPanel;
 
     private List<Player> pendingPlayers;
     private Integer pendingCurrentIndex;
@@ -53,7 +54,6 @@ public class GameHUD {
         if (mapViewport != null) {
             mapViewport.getChildren().add(mapInterface);
 
-            // Map cutting
             Rectangle clip = new Rectangle();
             clip.widthProperty().bind(mapViewport.widthProperty());
             clip.heightProperty().bind(mapViewport.heightProperty());
@@ -65,17 +65,19 @@ public class GameHUD {
     private void setupPrincipalButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/PrincipalButton.fxml"));
-            Parent buttonPanel = loader.load();
+            principalButtonPanel = loader.load();
 
             PrincipalButton controller = loader.getController();
             principalButtonController = controller;
             controller.setGameHUD(this);
             controller.setParentRoot(root);
 
-            StackPane.setAlignment(buttonPanel, Pos.BOTTOM_CENTER);
-            StackPane.setMargin(buttonPanel, new Insets(0, 0, 30, 0));
+            StackPane.setAlignment(principalButtonPanel, Pos.BOTTOM_CENTER);
+            StackPane.setMargin(principalButtonPanel, new Insets(0, 0, 30, 0));
 
-            root.getChildren().add(buttonPanel);
+            root.getChildren().add(principalButtonPanel);
+
+            updateActionButtonVisibility(true);
 
         } catch (IOException e) {
             System.err.println("Error loading PrincipalButton.fxml");
@@ -190,6 +192,13 @@ public class GameHUD {
     public void updateTravelTargetPrompt(String zoneName, int distance, boolean isBoat) {
         if (principalButtonController != null) {
             principalButtonController.updateTravelTarget(zoneName, distance, isBoat);
+        }
+    }
+
+    public void updateActionButtonVisibility(boolean isVisible) {
+        if (principalButtonPanel != null) {
+            principalButtonPanel.setVisible(isVisible);
+            principalButtonPanel.setManaged(isVisible);
         }
     }
 }

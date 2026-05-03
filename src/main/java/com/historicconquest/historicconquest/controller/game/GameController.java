@@ -11,6 +11,7 @@ import com.historicconquest.historicconquest.controller.overlay.NotificationCont
 import com.historicconquest.historicconquest.controller.page.game.EndGame;
 import com.historicconquest.historicconquest.controller.page.game.GameHUD;
 import com.historicconquest.historicconquest.controller.page.game.ZoneInfoPanel;
+import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.game.GameAnimationPort;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
@@ -62,9 +63,35 @@ public class GameController implements GameAnimationPort {
     }
 
 
+
+    public GameController(ZoneInfoPanel zoneInfoPanel, GameHUD gameHUD, MapView mapView) {
+        this.zoneInfoPanel = zoneInfoPanel;
+        this.mapView = mapView;
+        this.gameHUD = gameHUD;
+
+        players = new ArrayList<>();
+
+        gameHUD.initializeMap(mapView.getRoot());
+        this.zoneInfoPanel.hide();
+
+        instance = this;
+    }
+
+    public static void clearGame() {
+        instance = null;
+    }
+
+    public void addPlayer(Player player) {
+        if (!players.contains(player)) {
+            players.add(player);
+        }
+    }
+
     public List<Player> getPlayers() {
         return players;
     }
+
+
 
     public void initializeGameState(List<Player> playersData , WorldMap worldmap , MapView mapView , Group mapInterface) {
         initializeGameState(playersData, worldmap, mapView, mapInterface, null);
@@ -116,33 +143,9 @@ public class GameController implements GameAnimationPort {
             player.setPawnNode(pawnGroup);
         }
 
-        gameHUD.refreshGameInfo(players, currentPlayerIndex);
-        gameHUD.refreshPlayerInfo(getCurrentPlayer());
+        refreshTurnUI();
     }
 
-
-    public GameController(ZoneInfoPanel zoneInfoPanel, GameHUD gameHUD, MapView mapView) {
-        this.zoneInfoPanel = zoneInfoPanel;
-        this.mapView = mapView;
-        this.gameHUD = gameHUD;
-
-        players = new ArrayList<>();
-
-        gameHUD.initializeMap(mapView.getRoot());
-        this.zoneInfoPanel.hide();
-
-        instance = this;
-    }
-
-    public static void clearGame() {
-        instance = null;
-    }
-
-    public void addPlayer(Player player) {
-        if (!players.contains(player)) {
-            players.add(player);
-        }
-    }
 
     public void animatePawnMove(Node pawn, List<Zone> pathListe, Runnable onFinished) {
         if (pathListe == null || pathListe.isEmpty() || pawn == null) {
@@ -262,7 +265,6 @@ public class GameController implements GameAnimationPort {
             }
         }
 
-
         nextPlayer();
     }
 
@@ -298,8 +300,7 @@ public class GameController implements GameAnimationPort {
                 );
 
                 current.setCurrentZone(targetZone);
-                gameHUD.refreshGameInfo(players, currentPlayerIndex);
-                gameHUD.refreshPlayerInfo(getCurrentPlayer());
+                refreshTurnUI();
 
             } else {
                 NotificationController.show(
@@ -410,8 +411,7 @@ public class GameController implements GameAnimationPort {
         }
 
         setPendingAction(PendingAction.NONE);
-        gameHUD.refreshGameInfo(players, currentPlayerIndex);
-        gameHUD.refreshPlayerInfo(getCurrentPlayer());
+        refreshTurnUI();
     }
 
 
@@ -450,8 +450,7 @@ public class GameController implements GameAnimationPort {
                 3000
             );
             setPendingAction(PendingAction.NONE);
-            gameHUD.refreshGameInfo(players, currentPlayerIndex);
-            gameHUD.refreshPlayerInfo(getCurrentPlayer());
+            refreshTurnUI();
 
         } else {
             NotificationController.show(
@@ -486,8 +485,7 @@ public class GameController implements GameAnimationPort {
             showAllianceDecisionMenu(nextP);
         }
 
-        gameHUD.refreshGameInfo(players, currentPlayerIndex);
-        gameHUD.refreshPlayerInfo(getCurrentPlayer());
+        refreshTurnUI();
     }
 
     public void setPlayerCount(int count) {
@@ -561,7 +559,7 @@ public class GameController implements GameAnimationPort {
 
 
     public void nextPlayer() {
-        currentPlayerIndex =(currentPlayerIndex +1) % nbPlayer;
+        currentPlayerIndex = (currentPlayerIndex + 1) % nbPlayer;
 
         this.hasAnsweredCorrectly = false;
         this.currentDifficulty = 0;
@@ -580,8 +578,7 @@ public class GameController implements GameAnimationPort {
             showAllianceDecisionMenu(nextP);
         }
 
-        gameHUD.refreshGameInfo(players, currentPlayerIndex);
-        gameHUD.refreshPlayerInfo(getCurrentPlayer());
+        refreshTurnUI();
     }
 
     private void showAllianceDecisionMenu(Player receiver) {
@@ -670,6 +667,22 @@ public class GameController implements GameAnimationPort {
             zoneView.setDimmed(true);
             zoneView.setCursor(Cursor.DEFAULT);
             travelHintZones.add(zone);
+        }
+    }
+
+    private void refreshTurnUI() {
+        Player currentPlayer = getCurrentPlayer();
+
+        gameHUD.refreshGameInfo(players, currentPlayerIndex);
+        gameHUD.refreshPlayerInfo(currentPlayer);
+
+
+        if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+            boolean isMyTurn = GameNetworkService.isLocalTurn();
+            gameHUD.updateActionButtonVisibility(isMyTurn);
+
+        } else {
+            gameHUD.updateActionButtonVisibility(true);
         }
     }
 

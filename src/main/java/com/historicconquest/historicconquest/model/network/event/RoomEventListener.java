@@ -17,10 +17,11 @@ public interface RoomEventListener {
     void onZoneSelectionStarted(int seconds, long startAt, Map<String, String> selectedZones);
     void onZoneSelectionUpdated(Map<String, String> selectedZones);
     void onGameStartCancelled(String reason);
-    void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId);
+    void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId, Map<String, String> listThemeZone);
 
     void onGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct);
     void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex);
+    void onAnswerResult(String currentPlayerId, Boolean currentCorrect, Integer currentDifficulty);
 
     void onRoomDeleted();
 }

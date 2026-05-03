@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.controller.page.game;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
 import com.historicconquest.historicconquest.controller.page.QuestionController;
 import com.historicconquest.historicconquest.model.map.Zone;
@@ -53,7 +54,14 @@ public class PrincipalButton {
 
     public void skipTurn() {
         if (!MultiplayerGameOverlay.ensureLocalTurn("skip turn")) return;
-        GameController.getInstance().nextPlayer();
+
+        if (GameNetworkService.isEnabled()) {
+            GameNetworkService.sendSkipAction();
+
+        } else {
+            GameController.getInstance().nextPlayer();
+        }
+
         clearActionSelection();
         hideActionContainer();
     }
@@ -61,13 +69,28 @@ public class PrincipalButton {
     public void acceptAction() {
         hideActionContainer();
 
+        GameController gc = GameController.getInstance();
+        Zone target = gc.getTargetZone();
 
         QuestionController.setMainStackPane(root);
-        if (GameController.getInstance().getPendingAction() == GameController.PendingAction.TRAVEL) {
-            QuestionController.setDifficultyQuestion(GameController.getInstance().getCurrentDistance());
+
+        if (GameNetworkService.isEnabled()) {
+            if (gc.getPendingAction() == GameController.PendingAction.TRAVEL) {
+                MultiplayerGameOverlay.requestZoneAction(
+                    gc.getPendingAction(), target
+                );
+
+            } else {
+                QuestionController.showChoiceDifficultPage();
+            }
 
         } else {
-            QuestionController.showChoiceDifficultPage();
+            if (gc.getPendingAction() == GameController.PendingAction.TRAVEL) {
+                QuestionController.setDifficultyQuestion(gc.getCurrentDistance());
+
+            } else {
+                QuestionController.showChoiceDifficultPage();
+            }
         }
     }
 

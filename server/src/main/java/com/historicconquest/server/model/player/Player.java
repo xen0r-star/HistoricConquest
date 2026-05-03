@@ -1,4 +1,4 @@
-package com.historicconquest.server.model;
+package com.historicconquest.server.model.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

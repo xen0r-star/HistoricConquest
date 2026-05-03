@@ -1,12 +1,11 @@
 package com.historicconquest.server.service;
 
-import com.historicconquest.server.model.Player;
+import com.historicconquest.server.model.player.Player;
 import com.historicconquest.server.model.Room;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,7 +25,7 @@ public class RoomService {
         "East Asia", "Central Asia", "Eastern Middle East", "Arabian Peninsula", "Middle East",
         "Mercosur", "Great Chaco", "Southern Cone", "South Central", "South America North",
         "Central America and the Caribbean", "Mexico", "United States", "Canada", "Alaska",
-        "Southern Africa", "Indian Ocean", "Congo Basin", "East Africa", "Horn of Africa",
+        "Southern Africa", "South-Central Africa", "Congo Basin", "East Africa", "Horn of Africa",
         "Gulf of Guinea", "West Africa", "Sahel", "Nile Valley", "Maghreb",
         "Russia", "Eurasia & Caucasus", "Eastern Europe", "Balkans & Greece", "Central Europe - Alpine",
         "Iberian Peninsula", "Western Europe", "Scandinavia", "British Isles - Iceland", "Greenland"

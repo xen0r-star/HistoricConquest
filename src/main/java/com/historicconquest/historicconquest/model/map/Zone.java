@@ -12,11 +12,10 @@ import java.util.List;
 public class Zone {
     private final String name;
     private final String blocName;
-    private final TypeThemes themes;
     private int power;
     private static final int MAX_POWER_ZONE = 8;
 
-    private String nameOwner ="Nobody" ;
+    private String nameOwner = "Nobody";
 
     private final List<Pawn> pawns;
     private final List<Zone> adjacentZones;
@@ -28,18 +27,18 @@ public class Zone {
     private final double x;
     private final double y;
     private final Color baseColor;
+    private final ObjectProperty<TypeThemes> themes = new SimpleObjectProperty<>(TypeThemes.NONE);
     private final ObjectProperty<Color> colorProperty;
     private final Color borderColor;
 
 
     public Zone(String name, String blocName, int power, double x, double y, Color color, Color borderColor) {
-        this(name, blocName, TypeThemes.NONE, power, x, y, null, color, borderColor);
+        this(name, blocName, power, x, y, null, color, borderColor);
     }
 
-    public Zone(String name, String blocName, TypeThemes themes, int power, double x, double y, ZoneIcon icon, Color color, Color borderColor) {
+    public Zone(String name, String blocName, int power, double x, double y, ZoneIcon icon, Color color, Color borderColor) {
         this.name = name;
         this.blocName = blocName;
-        this.themes = themes;
         this.power = power;
         this.icon = icon;
         this.x = x;
@@ -111,10 +110,6 @@ public class Zone {
         return blocName;
     }
 
-    public TypeThemes getThemes() {
-        return themes;
-    }
-
     public String getPowerText() {
         return String.valueOf(power);
     }
@@ -149,6 +144,18 @@ public class Zone {
 
     public void setOceanName(String oceanName) {
         this.oceanName = oceanName;
+    }
+
+    public ObjectProperty<TypeThemes> themesProperty() {
+        return themes;
+    }
+
+    public TypeThemes getThemes() {
+        return themes.get();
+    }
+
+    public void setThemes(TypeThemes themes) {
+        this.themes.set(themes);
     }
 
 

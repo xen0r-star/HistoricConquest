@@ -138,7 +138,8 @@ public enum RoomInfo {
             notifyIfPresent(listener, l -> l.onGameStarted(
                 readStringMap(node.get("selectedZones")),
                 readStringList(node.get("turnOrder")),
-                getText(node, "currentPlayerId")
+                getText(node, "currentPlayerId"),
+                readStringMap(node.get("listThemeZone"))
             ));
         }
     },
@@ -162,6 +163,17 @@ public enum RoomInfo {
             notifyIfPresent(listener, l -> l.onTurnChanged(
                 getText(node, "currentPlayerId"),
                 getInteger(node, "currentPlayerIndex")
+            ));
+        }
+    },
+
+    ANSWER_RESULT {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onAnswerResult(
+                getText(node, "playerId"),
+                getBoolean(node, "correct"),
+                getInteger(node, "difficulty")
             ));
         }
     },

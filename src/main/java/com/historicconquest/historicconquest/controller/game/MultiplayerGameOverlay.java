@@ -32,26 +32,12 @@ public final class MultiplayerGameOverlay {
 
         String label = (actionLabel == null || actionLabel.isBlank()) ? "perform this action" : actionLabel;
         NotificationController.show(
-                "Not your turn",
-                "Wait for your turn before you " + label + ".",
-                Notification.Type.INFORMATION,
-                3000
+            "Not your turn",
+            "Wait for your turn before you " + label + ".",
+            Notification.Type.INFORMATION,
+            3000
         );
         return false;
-    }
-
-    public static void requestQuestionResult(int difficulty, boolean correct) {
-        if (GameNetworkService.isEnabled()) {
-            if (!ensureLocalTurn("answer")) {
-                return;
-            }
-            GameNetworkService.sendAnswerResult(difficulty, correct);
-            return;
-        }
-
-        if (controller != null) {
-            controller.applyQuestionResult(difficulty, correct);
-        }
     }
 
     public static void requestZoneAction(GameController.PendingAction action, Zone targetZone) {
@@ -64,27 +50,25 @@ public final class MultiplayerGameOverlay {
                 return;
             }
 
+            int difficulty = GameController.getInstance().getCurrentDistance();
+
             switch (action) {
-                case TRAVEL -> GameNetworkService.sendTravelAction(targetZone.getName());
-                case ATTACK -> GameNetworkService.sendAttackAction(targetZone.getName());
-                case POWER_UP -> GameNetworkService.sendPowerUpAction(targetZone.getName());
+                case TRAVEL -> GameNetworkService.sendTravelAction(targetZone.getName(), difficulty);
+                case ATTACK -> GameNetworkService.sendAttackAction(targetZone.getName(), difficulty);
+                case POWER_UP -> GameNetworkService.sendPowerUpAction(targetZone.getName(), difficulty);
                 default -> { }
             }
             return;
         }
 
-        if (controller == null) {
-            return;
-        }
-
+        if (controller == null) return;
         controller.setTargetZone(targetZone);
 
         switch (action) {
             case TRAVEL -> controller.applyTravel(targetZone);
             case ATTACK -> controller.applyAttackZone(targetZone);
             case POWER_UP -> controller.applyPowerUp(targetZone);
-            default -> {
-            }
+            default -> { }
         }
     }
 
@@ -101,8 +85,7 @@ public final class MultiplayerGameOverlay {
             case "TRAVEL" -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyTravel(targetZone));
             case "ATTACK" -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyAttackZone(targetZone));
             case "POWER_UP" -> applyZoneAction(zoneName, (targetZone, advanceTurn) -> controller.applyPowerUp(targetZone));
-            default -> {
-            }
+            default -> { }
         }
     }
 
@@ -136,6 +119,10 @@ public final class MultiplayerGameOverlay {
     @FunctionalInterface
     private interface ZoneAction {
         void apply(Zone zone, boolean advanceTurn);
+    }
+
+    public static WorldMap getWorldMap() {
+        return worldMap;
     }
 }
 

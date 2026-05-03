@@ -1,8 +1,11 @@
 package com.historicconquest.server.controller;
 
+import com.historicconquest.server.model.map.Zone;
+import com.historicconquest.server.model.questions.Question;
 import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.model.Room;
-import com.historicconquest.server.model.Player;
+import com.historicconquest.server.model.player.Player;
+import com.historicconquest.server.service.QuestionService;
 import com.historicconquest.server.service.RoomService;
 import com.historicconquest.server.util.NameGenerator;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -11,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,19 +27,22 @@ public class RoomSocketController {
     private static final String ACTION_TRAVEL = "TRAVEL";
     private static final String ACTION_ATTACK = "ATTACK";
     private static final String ACTION_POWER_UP = "POWER_UP";
-    private static final String ACTION_ANSWER_RESULT = "ANSWER_RESULT";
+    private static final String ACTION_SUBMIT_ANSWER = "SUBMIT_ANSWER";
+    private static final String ACTION_SKIP = "SKIP";
 
     private final RoomService roomService;
+    private final QuestionService questionService;
     private final SimpMessagingTemplate messagingTemplate;
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread thread = new Thread(r, "room-start-scheduler");
         thread.setDaemon(true);
         return thread;
     });
 
-    public RoomSocketController(RoomService roomService,
-                                SimpMessagingTemplate messagingTemplate) {
+    public RoomSocketController(RoomService roomService, QuestionService questionService, SimpMessagingTemplate messagingTemplate) {
         this.roomService = roomService;
+        this.questionService = questionService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -71,7 +78,7 @@ public class RoomSocketController {
     private void broadcastGameAction(String roomCode, Map<String, Object> payload) {
         messagingTemplate.convertAndSend(
             "/topic/room-" + roomCode,
-                (Object) payload
+            (Object) payload
         );
     }
 
@@ -199,13 +206,9 @@ public class RoomSocketController {
 
             scheduler.schedule(() -> {
                 Room currentRoom = roomService.getRoom(roomCode);
-                if (currentRoom == null) {
-                    return;
-                }
+                if (currentRoom == null) return;
+                if (!currentRoom.isGameStarting()) return;
 
-                if (!currentRoom.isGameStarting()) {
-                    return;
-                }
 
                 if (!roomService.stillCanStartGame(roomCode)) {
                     roomService.cancelGameStart(roomCode);
@@ -232,15 +235,12 @@ public class RoomSocketController {
                         )
                     );
 
+                    currentRoom.generateWorldMap();
+
                     scheduler.schedule(() -> {
                         Room latestRoom = roomService.getRoom(roomCode);
-                        if (latestRoom == null || latestRoom.isGameStarted()) {
-                            return;
-                        }
-
-                        if (!latestRoom.isZoneSelectionStarted()) {
-                            return;
-                        }
+                        if (latestRoom == null || latestRoom.isGameStarted()) return;
+                        if (!latestRoom.isZoneSelectionStarted()) return;
 
                         try {
                             RoomService.ZoneSelectionUpdate finalSelection = roomService.completeZoneSelection(roomCode);
@@ -250,13 +250,13 @@ public class RoomSocketController {
                                     "type", "GAME_STARTED",
                                     "selectedZones", finalSelection.selectedZones(),
                                     "turnOrder", latestRoom.getPlayerOrder(),
-                                    "currentPlayerId", latestRoom.getCurrentPlayerId()
+                                    "currentPlayerId", latestRoom.getCurrentPlayerId(),
+                                    "listThemeZone", latestRoom.getAllThemeZone()
                                 )
                             );
                             broadcastTurnChanged(roomCode, latestRoom);
 
-                        } catch (Exception ignored) {
-                        }
+                        } catch (Exception ignored) { }
                     }, 30, TimeUnit.SECONDS);
 
                 } catch (Exception e) {
@@ -614,55 +614,93 @@ public class RoomSocketController {
             return;
         }
 
-        if (!ACTION_TRAVEL.equals(action) && !ACTION_ATTACK.equals(action) && !ACTION_POWER_UP.equals(action) && !ACTION_ANSWER_RESULT.equals(action)) {
+        if (
+            !ACTION_TRAVEL.equals(action) && !ACTION_ATTACK.equals(action) &&
+            !ACTION_POWER_UP.equals(action) && !ACTION_SUBMIT_ANSWER.equals(action) &&
+            !ACTION_SKIP.equals(action)
+        ) {
             sendActionUnavailable(playerId, "GAME_ACTION", "Unknown action");
             return;
         }
 
-        Map<String, Object> message = new java.util.HashMap<>();
-        message.put("type", "GAME_ACTION");
-        message.put("action", action);
-        message.put("playerId", playerId);
 
-        Object zone = payload.get("zone");
-        if (zone != null) {
-            message.put("zone", zone.toString());
-        }
-
+        Object zoneName = payload.get("zone");
         Object difficulty = payload.get("difficulty");
-        if (difficulty instanceof Number number) {
-            message.put("difficulty", number.intValue());
-        }
+        Object questionId = payload.get("questionId");
+        Object answer = payload.get("answer");
 
-        Object correct = payload.get("correct");
-        if (correct instanceof Boolean bool) {
-            message.put("correct", bool);
-        }
-
-        if (ACTION_ANSWER_RESULT.equals(action)) {
-            if (!(difficulty instanceof Number) || !(correct instanceof Boolean)) {
+        if (ACTION_SUBMIT_ANSWER.equals(action)) {
+            if (questionId == null || answer == null) {
                 sendActionUnavailable(playerId, "GAME_ACTION", "Missing answer data");
                 return;
             }
 
-        } else {
-            if (zone == null || zone.toString().isBlank()) {
+        } else if (ACTION_ATTACK.equals(action) || ACTION_POWER_UP.equals(action) || ACTION_TRAVEL.equals(action)) {
+            if (zoneName == null || zoneName.toString().isBlank() || !(difficulty instanceof Number)) {
                 sendActionUnavailable(playerId, "GAME_ACTION", "Missing target zone");
                 return;
             }
+
+            room.setPendingAction(action);
+            room.setPendingZone((String) zoneName);
         }
 
-        broadcastGameAction(roomCode, message);
 
-        boolean advanceTurn = switch (action) {
-            case "TRAVEL", "ATTACK", "POWER_UP" -> true;
-            case "ANSWER_RESULT" -> Boolean.FALSE.equals(correct);
-            default -> false;
-        };
+        switch (action) {
+            case "TRAVEL", "ATTACK", "POWER_UP" -> {
+                Zone zone = roomService.getRoom(roomCode).getZone((String) zoneName);
 
-        if (advanceTurn) {
-            room.advanceTurn();
-            broadcastTurnChanged(roomCode, room);
+                Question question;
+                if (difficulty instanceof Integer number) {
+                    question = questionService.getRandomQuestion(zone.getThemes(), number);
+
+                } else {
+                    question = questionService.getRandomQuestion(zone.getThemes(), 4);
+                }
+
+
+                messagingTemplate.convertAndSendToUser(
+                    playerId,
+                    "/queue/reply",
+                    Map.of(
+                        "type", "QUESTION_CHALLENGE",
+                        "questionId", question.id(),
+                        "theme", question.theme(),
+                        "subject", question.subject(),
+                        "difficulty", question.difficulty(),
+                        "question", question.question(),
+                        "choices", question.choices()
+                    )
+                );
+            }
+            case "SUBMIT_ANSWER" -> {
+                Question question = questionService.getQuestion((String) questionId);
+                boolean isCorrect = question.answer().equalsIgnoreCase(String.valueOf(answer));
+
+                if (isCorrect) {
+                    Map<String, Object> moveMsg = new HashMap<>();
+                    moveMsg.put("type", "GAME_ACTION");
+                    moveMsg.put("action", room.getPendingAction());
+                    moveMsg.put("zone", room.getPendingZone());
+                    moveMsg.put("playerId", playerId);
+
+                    broadcastGameAction(roomCode, moveMsg);
+                }
+
+                broadcastGameAction(roomCode, Map.of(
+                    "type", "ANSWER_RESULT",
+                    "playerId", playerId,
+                    "correct", isCorrect,
+                    "difficulty", question.difficulty()
+                ));
+
+                room.advanceTurn();
+                broadcastTurnChanged(roomCode, room);
+            }
+            case "SKIP" -> {
+                room.advanceTurn();
+                broadcastTurnChanged(roomCode, room);
+            }
         }
     }
 }

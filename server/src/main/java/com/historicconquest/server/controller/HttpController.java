@@ -1,7 +1,7 @@
 package com.historicconquest.server.controller;
 
 import com.historicconquest.server.model.Room;
-import com.historicconquest.server.model.Player;
+import com.historicconquest.server.model.player.Player;
 import com.historicconquest.server.security.JwtHttpPrincipal;
 import com.historicconquest.server.service.RoomService;
 import com.historicconquest.server.util.NameGenerator;
