@@ -187,9 +187,9 @@ public class GameHUD {
         }
     }
 
-    public void updateTravelTargetPrompt(String zoneName, int distance) {
+    public void updateTravelTargetPrompt(String zoneName, int distance, boolean isBoat) {
         if (principalButtonController != null) {
-            principalButtonController.updateTravelTarget(zoneName, distance);
+            principalButtonController.updateTravelTarget(zoneName, distance, isBoat);
         }
     }
 }

@@ -128,9 +128,11 @@ public class PrincipalButton {
         }
     }
 
-    public void updateTravelTarget(String zoneName, int distance) {
+    public void updateTravelTarget(String zoneName, int distance, boolean isBoat) {
         if (zoneName == null || zoneName.isBlank() || distance <= 0) return;
-        showActionText("Travel to " + zoneName + " (Level " + distance + ")");
+
+        String transportType = isBoat ? "Boat" : "Horse-drawn";
+        showActionText("Travel to " + zoneName + " via " + transportType + " (Level " + distance + ")");
     }
 
     private void showActionText(String text) {

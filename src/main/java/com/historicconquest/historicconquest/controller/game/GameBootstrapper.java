@@ -34,98 +34,113 @@ import java.util.stream.Collectors;
 public final class GameBootstrapper {
     private static final Logger logger = LoggerFactory.getLogger(GameBootstrapper.class);
 
-    private GameBootstrapper() {
-    }
+    private GameBootstrapper() {  }
 
-    public static void launchGame(StackPane root, List<RoomPlayer> roomPlayers, Map<String, String> selectedZonesByPlayerId) {
-        if (roomPlayers == null || roomPlayers.isEmpty()) {
-            return;
-        }
+    private record GameUIContext(
+        WorldMap worldMap, MapView mapView,
+        Group mapInterface, GameController gameController,
+        ZoneInfoPanel zoneInfoPanel, GameHUD gameHUD
+    ) { }
+
+
+
+
+    public static void launchMultiGame(StackPane root, List<RoomPlayer> roomPlayers, Map<String, String> selectedZonesByPlayerId) {
+        if (roomPlayers == null || roomPlayers.isEmpty()) return;
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < roomPlayers.size(); i++) {
             RoomPlayer roomPlayer = roomPlayers.get(i);
             PlayerColor color = parsePlayerColor(roomPlayer.getColor());
-            if (color == null) {
-                color = PlayerColor.RED;
-            }
 
+            if (color == null) color = PlayerColor.RED;
             players.add(new Player(i, roomPlayer.getName(), color));
         }
 
-        launchGame(root, players, roomPlayers, selectedZonesByPlayerId);
-    }
-
-    private static void launchGame(StackPane root, List<Player> players, List<RoomPlayer> roomPlayers, Map<String, String> selectedZonesByPlayerId) {
-        if (root == null || players == null || players.isEmpty()) {
-            return;
-        }
+        if (root == null || players.isEmpty()) return;
 
         try {
-            root.getChildren().clear();
-
-            WorldMap worldMap = new WorldMap(true, true, true, Color.web("#f2e1bf"), Color.web("#C5A682"));
-            MapView mapView = MapViewFactory.build(worldMap, true);
-            Group mapInterface = mapView.getRoot();
-
-            FXMLLoader hudLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/GameHUD.fxml"));
-            Parent hudVisual = hudLoader.load();
-            GameHUD gameHUD = hudLoader.getController();
-            hudVisual.setPickOnBounds(false);
-            root.getChildren().add(hudVisual);
-
-            FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/ZoneInfoPanel.fxml"));
-            Parent infoVisual = infoLoader.load();
-            ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
-            ZoneInfoPanel.setInstance(zoneInfoPanel);
-            infoVisual.setPickOnBounds(false);
-            root.getChildren().add(infoVisual);
-            StackPane.setAlignment(infoVisual, Pos.TOP_CENTER);
-            StackPane.setMargin(infoVisual, new Insets(45, 45, 45, 45));
-            zoneInfoPanel.hide();
-
-            GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
-            MultiplayerGameOverlay.attach(gameController, worldMap);
-
-            MapNavigationService mapNavigationService = new MapNavigationService();
-            mapNavigationService.attachNavigation(root, mapInterface);
-
+            GameUIContext ctx = setupGameUI(root);
             List<Player> playersSnapshot = new ArrayList<>(players);
-            List<Zone> preferredStartZones = buildPreferredStartZones(playersSnapshot, roomPlayers, selectedZonesByPlayerId, worldMap.getAllZones());
-            gameController.initializeGameState(playersSnapshot, worldMap, mapView, mapInterface, preferredStartZones);
+            List<Zone> preferredStartZones = buildPreferredStartZones(playersSnapshot, roomPlayers, selectedZonesByPlayerId, ctx.worldMap.getAllZones());
+            ctx.gameController.initializeGameState(playersSnapshot, ctx.worldMap, ctx.mapView, ctx.mapInterface, preferredStartZones);
 
-            if (roomPlayers != null) {
-                GameNetworkService.attach(gameController, roomPlayers);
-            }
-
-
+            MultiplayerGameOverlay.attach(ctx.gameController, ctx.worldMap);
+            GameNetworkService.attach(ctx.gameController, roomPlayers);
             QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
+            Game gameEngine = new Game(true);
 
-            Game gameEngine = new Game();
-            worldMap.getAllZones().forEach(zone -> {
-                ZoneView zoneView = mapView.getViewFor(zone);
-                if (zoneView == null) return;
-
-                zoneView.setPickOnBounds(false);
-                zoneView.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> gameController.showZoneInfo(zone));
-                zoneView.addEventHandler(MouseEvent.MOUSE_MOVED, event -> gameController.showZoneInfo(zone));
-                zoneView.addEventHandler(MouseEvent.MOUSE_EXITED, event -> zoneInfoPanel.hide());
-
-                zoneView.setOnMouseClicked(event -> {
-                    gameEngine.handleZoneSelection(zone);
-                    event.consume();
-                });
-            });
+            setupZoneEvent(ctx, gameEngine);
 
         } catch (Exception exception) {
             logger.error("Error launching game", exception);
         }
     }
 
-    private static PlayerColor parsePlayerColor(String rawColor) {
-        if (rawColor == null || rawColor.isBlank()) {
-            return null;
+    public static void launchSoloGame(StackPane root, List<Player> players) {
+        if (root == null || players == null || players.isEmpty()) return;
+
+        try {
+            GameUIContext ctx = setupGameUI(root);
+            ctx.gameController.initializeGameState(players, ctx.worldMap, ctx.mapView, ctx.mapInterface);
+            QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
+            Game gameEngine = new Game(false);
+
+            setupZoneEvent(ctx, gameEngine);
+
+        } catch (Exception exception) {
+            logger.error("Error launching solo game", exception);
         }
+    }
+
+
+    private static GameUIContext setupGameUI(StackPane root) throws Exception {
+        root.getChildren().clear();
+        WorldMap worldMap = new WorldMap(true, true, true, Color.web("#f2e1bf"), Color.web("#C5A682"));
+        MapView mapView = MapViewFactory.build(worldMap, true);
+        Group mapInterface = mapView.getRoot();
+
+        FXMLLoader hudLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/GameHUD.fxml"));
+        Parent hudVisual = hudLoader.load();
+        GameHUD gameHUD = hudLoader.getController();
+        hudVisual.setPickOnBounds(false);
+        root.getChildren().add(hudVisual);
+
+        FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/ZoneInfoPanel.fxml"));
+        Parent infoVisual = infoLoader.load();
+        ZoneInfoPanel zoneInfoPanel = infoLoader.getController();
+        ZoneInfoPanel.setInstance(zoneInfoPanel);
+        infoVisual.setPickOnBounds(false);
+        root.getChildren().add(infoVisual);
+        StackPane.setAlignment(infoVisual, Pos.TOP_CENTER);
+        StackPane.setMargin(infoVisual, new Insets(45, 45, 45, 45));
+        zoneInfoPanel.hide();
+
+        GameController gameController = new GameController(zoneInfoPanel, gameHUD, mapView);
+        MapNavigationService mapNavigationService = new MapNavigationService();
+        mapNavigationService.attachNavigation(root, mapInterface);
+
+        return new GameUIContext(worldMap, mapView, mapInterface, gameController, zoneInfoPanel, gameHUD);
+    }
+
+    private static void setupZoneEvent(GameUIContext ctx, Game gameEngine) {
+        ctx.worldMap.getAllZones().forEach(zone -> {
+            ZoneView zoneView = ctx.mapView.getViewFor(zone);
+            if (zoneView == null) return;
+            zoneView.setPickOnBounds(false);
+            zoneView.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> ctx.gameController.showZoneInfo(zone));
+            zoneView.addEventHandler(MouseEvent.MOUSE_MOVED, event -> ctx.gameController.showZoneInfo(zone));
+            zoneView.addEventHandler(MouseEvent.MOUSE_EXITED, event -> ctx.zoneInfoPanel.hide());
+            zoneView.setOnMouseClicked(event -> {
+                gameEngine.handleZoneSelection(zone);
+                event.consume();
+            });
+        });
+    }
+
+
+    private static PlayerColor parsePlayerColor(String rawColor) {
+        if (rawColor == null || rawColor.isBlank()) return null;
 
         try {
             return PlayerColor.valueOf(rawColor.trim().toUpperCase());

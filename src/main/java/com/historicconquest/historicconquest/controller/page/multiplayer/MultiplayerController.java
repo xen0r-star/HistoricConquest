@@ -2,7 +2,6 @@ package com.historicconquest.historicconquest.controller.page.multiplayer;
 
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
-import com.historicconquest.historicconquest.controller.game.GameBootstrapper;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
@@ -605,14 +604,10 @@ public class MultiplayerController {
                     hideCountdownOverlay();
                     GameNetworkService.setStartInfo(turnOrder, currentPlayerId);
                     reorderRoomPlayers(turnOrder);
-                    if (zoneSelectionController != null) {
-                        zoneSelectionController.applyTurnOrder(turnOrder);
-                        zoneSelectionController.handleGameStarted(selectedZones);
-                        zoneSelectionController = null;
 
-                    } else {
-                        GameBootstrapper.launchGame(root, new ArrayList<>(roomPlayers), selectedZones);
-                    }
+                    zoneSelectionController.applyTurnOrder(turnOrder);
+                    zoneSelectionController.handleGameStarted(selectedZones);
+                    zoneSelectionController = null;
                 });
             }
 

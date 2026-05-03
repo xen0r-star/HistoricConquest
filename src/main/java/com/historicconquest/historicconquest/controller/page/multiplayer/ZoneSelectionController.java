@@ -193,7 +193,7 @@ public class ZoneSelectionController {
             selectedZonesByPlayerId.putAll(selectedZones);
         }
 
-        GameBootstrapper.launchGame(hostRoot, new ArrayList<>(roomPlayers), selectedZonesByPlayerId);
+        GameBootstrapper.launchMultiGame(hostRoot, new ArrayList<>(roomPlayers), selectedZonesByPlayerId);
     }
 
     public void applyTurnOrder(List<String> turnOrder) {

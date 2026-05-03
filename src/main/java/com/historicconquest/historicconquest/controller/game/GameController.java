@@ -206,9 +206,11 @@ public class GameController implements GameAnimationPort {
             return;
         }
 
-        currentDistance = ZonePathfinder.getShortestDistance(currentZone, targetZone, TRAVEL_HINT_MAX_DISTANCE);
+        ZonePathfinder.DistanceResult result = ZonePathfinder.getShortestDistance(currentZone, targetZone, TRAVEL_HINT_MAX_DISTANCE);
+        currentDistance = result.distance();
+
         if (currentDistance > 0 && currentDistance <= TRAVEL_HINT_MAX_DISTANCE && gameHUD != null) {
-            gameHUD.updateTravelTargetPrompt(targetZone.getName(), currentDistance);
+            gameHUD.updateTravelTargetPrompt(targetZone.getName(), currentDistance, result.isBoat());
         }
     }
 
@@ -276,7 +278,7 @@ public class GameController implements GameAnimationPort {
 
         ZonePathfinder.PathResult result = ZonePathfinder.findPath(current.getCurrentZone(), targetZone);
 
-        if (result.type() == ZonePathfinder.PathType.DIRECT) {
+        if (result.type() == ZonePathfinder.PathType.DIRECT || result.type() == ZonePathfinder.PathType.BOAT) {
             int distance = result.zones().size() - 1;
 
             if (distance > 0 && distance <= TRAVEL_HINT_MAX_DISTANCE) {
@@ -677,8 +679,8 @@ public class GameController implements GameAnimationPort {
             return false;
         }
 
-        int distance = ZonePathfinder.getShortestDistance(currentZone, targetZone, TRAVEL_HINT_MAX_DISTANCE);
-        return distance > 0 && distance <= TRAVEL_HINT_MAX_DISTANCE;
+        ZonePathfinder.DistanceResult result = ZonePathfinder.getShortestDistance(currentZone, targetZone, TRAVEL_HINT_MAX_DISTANCE);
+        return result.distance() > 0 && result.distance() <= TRAVEL_HINT_MAX_DISTANCE;
     }
 
     private boolean isAttackTargetValid(Player current, Zone currentZone, Zone targetZone) {
