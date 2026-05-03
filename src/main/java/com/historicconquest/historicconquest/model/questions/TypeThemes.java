@@ -1,12 +1,13 @@
 package com.historicconquest.historicconquest.model.questions;
 
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum TypeThemes {
-    DIVERTISSMENT("Divertissment"),
+    ENTERTAINMENT("Entertainment"),
     INFORMATIC("Informatic"),
     TOURISM("Tourism"),
-    HISTORY("History"),
+    MYSTERY("Mystery"),
     NONE("None");
 
 
@@ -16,11 +17,20 @@ public enum TypeThemes {
     }
 
     public static TypeThemes getRandom() {
-        TypeThemes[] valid = java.util.Arrays.stream(values())
+        TypeThemes[] valid = Arrays.stream(values())
                 .filter(t -> t != NONE)
                 .toArray(TypeThemes[]::new);
 
         return valid[ThreadLocalRandom.current().nextInt(valid.length)];
+    }
+
+    public static TypeThemes fromString(String text) {
+        for (TypeThemes b : TypeThemes.values()) {
+            if (b.label.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return NONE;
     }
 
     public String getLabel() {

@@ -42,13 +42,13 @@ public class ZoneView extends Group {
         zone.colorProperty().addListener((observable, oldColor, newColor) -> applyCurrentDisplayColor());
 
         if (zone.getIcon() != null) {
-            String iconSVG = "/map/icons/" + zone.getThemes() + ".svg";
+            String iconSVG = "/map/icons/" + zone.getThemes().getLabel() + ".svg";
             Group iconSVGGroup = loadSVG(
-                    iconSVG,
-                    zone.getIcon().x(), zone.getIcon().y(),
-                    zone.getIcon().width(), zone.getIcon().height(),
-                    Color.web("#635341"),
-                    Color.web("#635341")
+                iconSVG,
+                zone.getIcon().x(), zone.getIcon().y(),
+                zone.getIcon().width(), zone.getIcon().height(),
+                Color.web("#635341"),
+                Color.web("#635341")
             );
 
             if (iconSVGGroup != null) {

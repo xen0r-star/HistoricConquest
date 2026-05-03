@@ -185,7 +185,7 @@ public class GameController implements GameAnimationPort {
         zoneInfoPanel.setTitleLabel(zone.getName());
 //        zoneInfoPanel.setSubTitleLabel(zone.getThemes().getLabel());
         zoneInfoPanel.setSubTitleLabel("(" + zone.getBlocName() + ")");
-        zoneInfoPanel.setDescriptionLabel(zone.getNameOwner() + " (" + zone.getPowertext() + ")");
+        zoneInfoPanel.setDescriptionLabel(zone.getNameOwner() + " (" + zone.getPowerText() + ")");
         zoneInfoPanel.show();
         if (zoneInfoPanel.getRoot() != null) {
             zoneInfoPanel.getRoot().toFront();

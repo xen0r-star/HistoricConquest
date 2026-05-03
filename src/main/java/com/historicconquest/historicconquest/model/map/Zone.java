@@ -14,7 +14,7 @@ public class Zone {
     private final String blocName;
     private final TypeThemes themes;
     private int power;
-    private final int MAX_POWER_ZONE = 8 ;
+    private static final int MAX_POWER_ZONE = 8;
 
     private String nameOwner ="Nobody" ;
 
@@ -102,16 +102,12 @@ public class Zone {
         return themes;
     }
 
-    public String getPowertext() {
-        return ""+power+"";
+    public String getPowerText() {
+        return String.valueOf(power);
     }
 
     public void setPower(int power) {
         this.power = power;
-    }
-
-    public List<Pawn> getPawns() {
-        return pawns;
     }
 
     public ZoneIcon getIcon() {
