@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public enum TypeThemes {
     ENTERTAINMENT("Entertainment"),
-    INFORMATIC("Informatic"),
+    INFORMATICS("Informatics"),
     TOURISM("Tourism"),
     MYSTERY("Mystery"),
     NONE("None");

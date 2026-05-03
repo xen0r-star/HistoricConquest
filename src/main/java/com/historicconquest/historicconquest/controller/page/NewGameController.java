@@ -9,6 +9,7 @@ import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
+import com.historicconquest.historicconquest.model.questions.Theme;
 import com.historicconquest.historicconquest.service.map.MapNavigationService;
 import com.historicconquest.historicconquest.util.NameGenerator;
 import com.historicconquest.historicconquest.view.map.MapView;
@@ -278,6 +279,8 @@ public class NewGameController {
                 mapNavigationService.attachNavigation(root, mapInterface);
 
                 gameController.initializeGameState(listPlayer, worldMap, mapView, mapInterface);
+
+                QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
 
                 Game gameEngine = new Game();
                 worldMap.getAllZones().forEach(zone -> {

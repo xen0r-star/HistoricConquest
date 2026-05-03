@@ -25,6 +25,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
@@ -133,6 +134,9 @@ public class GameController implements GameAnimationPort {
         instance = this;
     }
 
+    public static void clearGame() {
+        instance = null;
+    }
 
     public void addPlayer(Player player) {
         if (!players.contains(player)) {
@@ -172,7 +176,6 @@ public class GameController implements GameAnimationPort {
         });
 
         pt.play();
-
     }
 
     private Bounds getZoneBounds(Zone zone) {
@@ -183,7 +186,7 @@ public class GameController implements GameAnimationPort {
 
     public void showZoneInfo(Zone zone) {
         zoneInfoPanel.setTitleLabel(zone.getName());
-//        zoneInfoPanel.setSubTitleLabel(zone.getThemes().getLabel());
+        zoneInfoPanel.setThemeImage(zone.getThemes());
         zoneInfoPanel.setSubTitleLabel("(" + zone.getBlocName() + ")");
         zoneInfoPanel.setDescriptionLabel(zone.getNameOwner() + " (" + zone.getPowerText() + ")");
         zoneInfoPanel.show();
@@ -529,6 +532,7 @@ public class GameController implements GameAnimationPort {
 
     private void triggerEndGame(String winnerName) {
         this.selectedAction = PendingAction.NONE;
+        clearGame();
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/Victory.fxml"));
@@ -541,7 +545,7 @@ public class GameController implements GameAnimationPort {
             }
 
 
-            javafx.scene.layout.Pane rootNode = (javafx.scene.layout.Pane) mapView.getRoot().getScene().getRoot();
+            Pane rootNode = (Pane) mapView.getRoot().getScene().getRoot();
 
 
             rootNode.getChildren().add(endPage);
@@ -701,6 +705,10 @@ public class GameController implements GameAnimationPort {
 
     public int getCurrentDistance() {
         return currentDistance;
+    }
+
+    public Zone getTargetZone() {
+        return targetZone;
     }
 
     public PendingAction getSelectedAction() {

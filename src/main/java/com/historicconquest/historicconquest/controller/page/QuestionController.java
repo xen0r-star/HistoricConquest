@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
-import com.historicconquest.historicconquest.controller.page.game.ZoneInfoPanel;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
@@ -22,18 +21,19 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.StackPane;
 
 public class QuestionController {
-    private String myAnswer;
-
     private static QuestionController instance;
+    private static StackPane mainStackPane;
+    private static List<Theme> themes;
+    private static int difficultyQuestion;
+
     private Question question;
+    private Theme theme;
+    private String myAnswer;
 
     @FXML public Slider slider;
     @FXML public Button answer1, answer2, answer3, answer4;
     @FXML public Label describeDifficult, theme_label, questionId;
 
-    private static int difficultyQuestion;
-    private static StackPane mainStackPane;
-    private Theme theme;
 
 
     public QuestionController() {
@@ -72,20 +72,18 @@ public class QuestionController {
     }
 
     public static Theme findCurrentTheme() {
-        List<Theme> themeList = Question.getThemesFromJsonFile("/datas/Questions.json");
-        if (themeList.isEmpty()) return new Theme(TypeThemes.NONE);
+        if (themes.isEmpty()) throw new IllegalStateException("No themes available");
 
-        Player player = GameController.getInstance().getCurrentPlayer();
-        String targetLabel = player.getCurrentZone().getThemes().getLabel();
+        String targetLabel = GameController.getInstance().getTargetZone().getThemes().getLabel();
 
-        return themeList.stream()
-                .filter(t -> t.name.getLabel().equalsIgnoreCase(targetLabel))
+        return themes.stream()
+                .filter(t -> t.getName().getLabel().equalsIgnoreCase(targetLabel))
                 .findFirst()
-                .orElse(themeList.getFirst());
+                .orElse(themes.isEmpty() ? null : themes.getFirst());
     }
 
     public void setLabelsTheme(){
-        theme_label.setText(String.valueOf(theme.name));
+        theme_label.setText(String.valueOf(theme.getName()));
 
         Player player = GameController.getInstance().getCurrentPlayer();
 
@@ -97,7 +95,7 @@ public class QuestionController {
                 theme_label.setPrefWidth(180);
                 theme_label.setAlignment(Pos.CENTER);
             }
-            case INFORMATIC -> {
+            case INFORMATICS -> {
                 theme_label.setPrefWidth(200);
                 theme_label.setAlignment(Pos.CENTER);
             }
@@ -136,7 +134,7 @@ public class QuestionController {
             mainStackPane.getChildren().add(questionStackPane);
 
         } catch (IOException e) {
-            System.err.println("Error loading QuestionPage"+e);
+            System.err.println("Error loading QuestionPage" + e);
         }
     }
 
@@ -155,14 +153,14 @@ public class QuestionController {
 
     public void startQuestion() {
         List<Question> listQuestion = new ArrayList<>();
-        for(Question themeQuestion : theme.questions){
+        for(Question themeQuestion : theme.getQuestions()){
             if(themeQuestion.difficulty() == difficultyQuestion){
                 listQuestion.add(themeQuestion);
             }
         }
 
         if (listQuestion.isEmpty()) {
-            throw new IllegalStateException("No question found for theme " + theme.name + " and difficulty " + difficultyQuestion);
+            throw new IllegalStateException("No question found for theme " + theme.getName() + " and difficulty " + difficultyQuestion);
         }
 
         int random = (int) (Math.random() * listQuestion.size());
@@ -193,4 +191,8 @@ public class QuestionController {
     public static void setMainStackPane(StackPane stackPane) { mainStackPane = stackPane; }
 
     public void setQuestion(Question question) { this.question = question; }
+
+    public static void setThemes(List<Theme> themes) {
+        QuestionController.themes = themes;
+    }
 }

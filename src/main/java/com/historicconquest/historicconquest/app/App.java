@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -21,6 +22,9 @@ public class App extends Application {
         stage.getIcons().add(new Image(Objects.requireNonNull(
             getClass().getResourceAsStream("/view/images/icon.png")
         )));
+        stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) AppController.getInstance().showPauseGame(true);
+        });
 
 
         StackPane root = new StackPane();
@@ -29,6 +33,10 @@ public class App extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(
             getClass().getResource("/view/styles/style.css")
         ).toExternalForm());
+
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) AppController.getInstance().showPauseGame(true);
+        });
 
         appController.initialize(stage, root);
         appController.showPage(AppPage.HOME);

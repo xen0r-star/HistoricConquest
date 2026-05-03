@@ -13,8 +13,8 @@
         <String fx:value="button-small" />
         <String fx:value="not-hover" />
     </styleClass>
-    <ImageView fitHeight="42.0" fitWidth="42.0" layoutX="8.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <Image url="@../../icons/informatique-icon.png" />
+    <ImageView fx:id="ThemeImage" fitHeight="42.0" fitWidth="42.0" layoutX="8.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Image url="@../../icons/informatics-icon.png" />
     </ImageView>
     <Label fx:id="DescriptionLabel" layoutX="61.0" layoutY="30.0" prefHeight="15.0" prefWidth="156.0" text="Unknown (0)" textFill="#232321e5" AnchorPane.bottomAnchor="4.0">
         <font>

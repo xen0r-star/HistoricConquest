@@ -37,7 +37,7 @@
          <children>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../icons/informatique-icon.png" />
+                  <Image url="@../../icons/informatics-icon.png" />
                </image>
             </ImageView>
             <Label text="Informatics">

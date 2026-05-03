@@ -1,13 +1,17 @@
 package com.historicconquest.historicconquest.controller.core;
 
+import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.overlay.HelpController;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
+import com.historicconquest.historicconquest.controller.overlay.PauseGameController;
 import com.historicconquest.historicconquest.controller.overlay.SettingsController;
+import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -44,10 +48,12 @@ public class AppController {
 		SettingsController.initialize();
 		NotificationController.initialize();
 		MapBackgroundController.initialize();
+		PauseGameController.initialize();
 
 		addOverlay(SettingsController.getSettings());
 		addOverlay(HelpController.getHelp());
 		addOverlay(NotificationController.getNotifications());
+		addOverlay(PauseGameController.getPauseGame());
 	}
 
 	public void showPage(AppPage page) {
@@ -85,6 +91,22 @@ public class AppController {
 		}
 
 		HelpController.close();
+	}
+
+	public void showPauseGame(boolean show) {
+		if (GameController.getInstance() != null) {
+			AnchorPane pauseGame = PauseGameController.getPauseGame();
+			if (pauseGame == null) return;
+
+			addOverlay(pauseGame);
+			if (show) {
+				PauseGameController.show();
+				pauseGame.toFront();
+				return;
+			}
+
+			PauseGameController.close();
+		}
 	}
 
 	public void exit() {
