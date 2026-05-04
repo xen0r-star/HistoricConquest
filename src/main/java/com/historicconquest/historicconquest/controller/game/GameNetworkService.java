@@ -289,6 +289,11 @@ public final class GameNetworkService {
         }
     }
 
+    public static void handleGameWon(String winnerName) {
+        if (!enabled || controller == null || winnerName == null || winnerName.isBlank()) return;
+        controller.showEndGame(winnerName);
+    }
+
     private static void applyZoneAction(String zoneName, ZoneAction actionHandler) {
         if (zoneName == null || zoneName.isBlank()) return;
 

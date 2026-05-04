@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest.controller.game;
 import java.io.IOException;
 import java.util.*;
 
+import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.controller.page.game.EndGame;
@@ -14,6 +15,7 @@ import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.map.ZonePathfinder;
 import com.historicconquest.historicconquest.model.player.Player;
+import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 
@@ -256,14 +258,17 @@ public class GameController implements GameAnimationPort {
         this.currentDifficulty = level;
         this.hasAnsweredCorrectly = correct;
         Player current = players.get(currentPlayerIndex);
+        boolean networkGame = Game.getInstance() != null && Game.getInstance().isNetworkGame();
 
         if (!correct) {
-            NotificationController.show(
-                "Wrong Answer",
-                "Incorrect! Your turn is over.",
-                Notification.Type.ERROR,
-                5000
-            );
+            if (!networkGame || current.getPseudo().equalsIgnoreCase(RoomService.getCurrentPseudo())) {
+                NotificationController.show(
+                    "Wrong Answer",
+                    "Incorrect! Your turn is over.",
+                    Notification.Type.ERROR,
+                    5000
+                );
+            }
 
             current.setConsecutiveFailures(current.getConsecutiveFailures() + 1);
             current.setConsecutiveSuccesses(0);
@@ -299,7 +304,9 @@ public class GameController implements GameAnimationPort {
             }
         }
 
-        nextPlayer();
+        if (!networkGame) {
+            nextPlayer();
+        }
     }
 
 
@@ -553,6 +560,10 @@ public class GameController implements GameAnimationPort {
     }
 
     private void checkWinCondition() {
+        if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+            return;
+        }
+
         Player current = getCurrentPlayer();
         int totalZones;
         String winnerName;
@@ -560,18 +571,21 @@ public class GameController implements GameAnimationPort {
         if (current.hasAlly()) {
             Player ally = current.getAlly();
             totalZones = current.getZones().size() + ally.getZones().size();
-            System.out.println("total zone alliance :"+totalZones);
             winnerName = "The Alliance (" + current.getPseudo() + " & " + ally.getPseudo() + ")";
 
         } else {
             totalZones = current.getZones().size();
             winnerName = current.getPseudo();
-            System.out.println("total zone solo :"+totalZones);
         }
 
         if (totalZones >= 21) {
             triggerEndGame(winnerName);
         }
+    }
+
+    public void showEndGame(String winnerName) {
+        if (winnerName == null || winnerName.isBlank()) return;
+        triggerEndGame(winnerName);
     }
 
     private void triggerEndGame(String winnerName) {
@@ -582,6 +596,7 @@ public class GameController implements GameAnimationPort {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/Victory.fxml"));
             StackPane endPage = loader.load();
 
+            AppController.getInstance().showPauseGame(true);
 
             EndGame controller = loader.getController();
             if (controller != null) {

@@ -362,4 +362,35 @@ public class Room {
         if (allianceCount == 1) return ALLIANCE_COLOR_PRIMARY;
         return ALLIANCE_COLOR_SECONDARY;
     }
+
+    public synchronized Player checkWinner() {
+        if (!gameStarted) return null;
+
+        for (Player player : players.values()) {
+            int totalZones = 0;
+            String playerId = player.getId();
+
+            totalZones += countZonesForPlayer(playerId);
+
+            String allyId = allianceByPlayer.get(playerId);
+            if (allyId != null && players.containsKey(allyId)) {
+                totalZones += countZonesForPlayer(allyId);
+            }
+
+            if (totalZones >= 2) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    private int countZonesForPlayer(String playerId) {
+        if (worldMap == null) return 0;
+
+        return (int) worldMap.getBlocs().stream()
+            .flatMap(bloc -> bloc.getZones().stream())
+            .filter(zone -> playerId.equals(zone.getNameOwner()))
+            .count();
+    }
 }

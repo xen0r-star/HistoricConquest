@@ -8,88 +8,90 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="532.0" prefWidth="440.0" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-insets: 0; -fx-border-width: 2;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
-   <Label fx:id="questionId" alignment="BOTTOM_CENTER" prefHeight="135.0" prefWidth="362.0" style="-fx-border-width: 2px;" text="select name from users where age &gt; 18 having city = 'Paris';" textAlignment="CENTER" wrapText="true" StackPane.alignment="TOP_LEFT">
-      <StackPane.margin>
-         <Insets left="30.0" top="90.0" />
-      </StackPane.margin>
-      <font>
-         <Font name="Georgia Bold Italic" size="20.0" />
-      </font>
-   </Label>
-   <Button mnemonicParsing="false" onAction="#checkWin" prefHeight="42.0" prefWidth="114.0" style="-fx-border-color: #343b22; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #6a7548; -fx-text-fill: #EEDCBE; -fx-background-radius: 5;" styleClass="root" stylesheets="@../../styles/style.css" text="To reply" textAlignment="CENTER" StackPane.alignment="BOTTOM_CENTER">
-      <StackPane.margin>
-         <Insets bottom="35.0" />
-      </StackPane.margin>
-      <font>
-         <Font name="Georgia Bold" size="16.0" />
-      </font>
-   </Button>
-   <HBox alignment="CENTER" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" spacing="10.0" StackPane.alignment="TOP_CENTER">
-      <StackPane.margin>
-         <Insets top="25.0" />
-      </StackPane.margin>
-      <ImageView fx:id="IconThemeLabelQuestion" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-         <Image url="@../../icons/informatics-icon.png" />
-      </ImageView>
-      <Label fx:id="theme_label_question" alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="51.0" text="Informatics" textAlignment="CENTER">
+<StackPane prefHeight="1080.0" prefWidth="1920.0" onScroll="#handleScroll" onMousePressed="#consumeEvent" onMouseDragged="#consumeEvent" style="-fx-background-color: rgba(0,0,0,0.875);" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
+   <StackPane maxHeight="532.0" maxWidth="440.0" minHeight="532.0" minWidth="440.0" prefHeight="532.0" prefWidth="440.0" style="-fx-background-radius: 10; -fx-border-radius: 8; -fx-border-insets: 0; -fx-border-width: 2;">
+      <Label fx:id="questionId" alignment="BOTTOM_CENTER" prefHeight="135.0" prefWidth="362.0" style="-fx-border-width: 2px;" text="select name from users where age &gt; 18 having city = 'Paris';" textAlignment="CENTER" wrapText="true" StackPane.alignment="TOP_LEFT">
+         <StackPane.margin>
+            <Insets left="30.0" top="90.0" />
+         </StackPane.margin>
          <font>
-            <Font name="Georgia Bold" size="40.0" />
+            <Font name="Georgia Bold Italic" size="20.0" />
          </font>
       </Label>
-   </HBox>
-   <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="385.0">
-      <StackPane.margin>
-         <Insets top="150.0" />
-      </StackPane.margin>
-      <Button fx:id="answer1" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
-         <VBox.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </VBox.margin>
+      <Button mnemonicParsing="false" onAction="#checkWin" prefHeight="42.0" prefWidth="114.0" style="-fx-border-color: #343b22; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #6a7548; -fx-text-fill: #EEDCBE; -fx-background-radius: 5;" styleClass="root" stylesheets="@../../styles/style.css" text="To reply" textAlignment="CENTER" StackPane.alignment="BOTTOM_CENTER">
+         <StackPane.margin>
+            <Insets bottom="35.0" />
+         </StackPane.margin>
          <font>
-            <Font name="Georgia Regular" size="14.0" />
+            <Font name="Georgia Bold" size="16.0" />
          </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
       </Button>
-      <Button fx:id="answer2" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
-         <VBox.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" />
-         </VBox.margin>
-         <font>
-            <Font name="Georgia Regular" size="14.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button fx:id="answer3" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
-         <VBox.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" />
-         </VBox.margin>
-         <font>
-            <Font name="Georgia Regular" size="14.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button fx:id="answer4" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
-         <VBox.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" />
-         </VBox.margin>
-         <font>
-            <Font name="Georgia Regular" size="14.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-   </VBox>
-   <styleClass>
-      <String fx:value="button-beige" />
-      <String fx:value="button-small" />
-      <String fx:value="not-hover" />
-   </styleClass>
+      <HBox alignment="CENTER" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" spacing="10.0" StackPane.alignment="TOP_CENTER">
+         <StackPane.margin>
+            <Insets top="25.0" />
+         </StackPane.margin>
+         <ImageView fx:id="IconThemeLabelQuestion" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../../icons/informatics-icon.png" />
+         </ImageView>
+         <Label fx:id="theme_label_question" alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="51.0" text="Informatics" textAlignment="CENTER">
+            <font>
+               <Font name="Georgia Bold" size="40.0" />
+            </font>
+         </Label>
+      </HBox>
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="385.0">
+         <StackPane.margin>
+            <Insets top="150.0" />
+         </StackPane.margin>
+         <Button fx:id="answer1" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Georgia Regular" size="14.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+         <Button fx:id="answer2" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Georgia Regular" size="14.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+         <Button fx:id="answer3" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Georgia Regular" size="14.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+         <Button fx:id="answer4" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#tellWhatAnswerChoice" prefHeight="35.0" prefWidth="365.0" style="-fx-border-radius: 5; -fx-border-width: 0; -fx-background-radius: 5; -fx-border-insets: 0;" styleClass="button-gray" stylesheets="@../../styles/style.css" wrapText="true">
+            <VBox.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+            <font>
+               <Font name="Georgia Regular" size="14.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+      </VBox>
+      <styleClass>
+         <String fx:value="button-beige" />
+         <String fx:value="button-small" />
+         <String fx:value="not-hover" />
+      </styleClass>
+   </StackPane>
 </StackPane>

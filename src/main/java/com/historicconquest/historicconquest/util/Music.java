@@ -12,6 +12,8 @@ public class Music {
     private int currentTrackIndex = 0;
     private static MediaPlayer mediaPlayer;
 
+    private static boolean isMuted = false;
+    private static double currentVolume = 0.5;
 
     private static Music instance;
 
@@ -28,13 +30,17 @@ public class Music {
 
         String path = tracks.get(currentTrackIndex);
         Media media = new Media(Objects.requireNonNull(getClass().getResource(path)).toExternalForm());
+
+        if (mediaPlayer != null) {
+            mediaPlayer.dispose();
+        }
+
         mediaPlayer = new MediaPlayer(media);
 
-        mediaPlayer.setVolume(0.5);
-        mediaPlayer.setMute(false);
+        mediaPlayer.setVolume(currentVolume);
+        mediaPlayer.setMute(isMuted);
 
         mediaPlayer.setOnEndOfMedia(() -> {
-            mediaPlayer.dispose();
             currentTrackIndex++;
             playPlaylist();
         });
@@ -43,11 +49,18 @@ public class Music {
     }
 
     public static void setVolume(double volume) {
+        currentVolume = volume;
         if (mediaPlayer != null) mediaPlayer.setVolume(volume);
     }
 
     public static void setMuted(boolean mute) {
-        if (mediaPlayer != null) mediaPlayer.setMute(mute);
+        isMuted = mute;
+        if (mediaPlayer != null) {
+            mediaPlayer.setMute(mute);
+
+            if (mute) mediaPlayer.pause();
+            else mediaPlayer.play();
+        }
     }
 
 

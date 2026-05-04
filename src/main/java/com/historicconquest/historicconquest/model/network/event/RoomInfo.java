@@ -190,6 +190,15 @@ public enum RoomInfo {
         }
     },
 
+    GAME_WON {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onGameWon(
+                getText(node, "winnerName")
+            ));
+        }
+    },
+
     COALITION_ACCEPTED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {

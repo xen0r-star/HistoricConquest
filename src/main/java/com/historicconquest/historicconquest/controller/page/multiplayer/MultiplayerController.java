@@ -675,6 +675,11 @@ public class MultiplayerController {
             }
 
             @Override
+            public void onGameWon(String winnerName) {
+                Platform.runLater(() -> GameNetworkService.handleGameWon(winnerName));
+            }
+
+            @Override
             public void onCoalitionRequested(String requesterId, String targetId) {
                 Platform.runLater(() -> GameNetworkService.handleCoalitionRequested(requesterId, targetId));
             }

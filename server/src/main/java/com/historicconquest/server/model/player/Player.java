@@ -18,9 +18,6 @@ public class Player {
 
     private int consecutiveSuccesses;
     private int consecutiveFailures;
-    private Player ally;
-    private Player pendingAllianceRequest;
-    private String currentAllianceColor;
 
 
     public Player(String pseudo, String roomCode) {

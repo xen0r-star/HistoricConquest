@@ -3,6 +3,7 @@ package com.historicconquest.historicconquest.model.map;
 import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
+import com.historicconquest.historicconquest.model.game.Game;
 
 import java.util.*;
 
@@ -38,7 +39,9 @@ public class ZonePathfinder {
             return new PathResult(landPath, PathType.IMPOSSIBLE);
         }
 
-        GameController.getInstance().nextPlayer();
+        if (Game.getInstance() == null || !Game.getInstance().isNetworkGame()) {
+            GameController.getInstance().nextPlayer();
+        }
         return new PathResult(null, PathType.IMPOSSIBLE);
     }
 

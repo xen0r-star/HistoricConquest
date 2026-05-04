@@ -1,6 +1,7 @@
 package com.historicconquest.server.controller;
 
 import com.historicconquest.server.model.map.Zone;
+import com.historicconquest.server.model.map.ZonePathfinder;
 import com.historicconquest.server.model.questions.Question;
 import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.model.Room;
@@ -70,6 +71,13 @@ public class RoomSocketController {
         );
     }
 
+    private void broadcastPayload(String roomCode, Map<String, Object> payload) {
+        messagingTemplate.convertAndSend(
+            "/topic/room-" + roomCode,
+            (Object) payload
+        );
+    }
+
     private void broadcastTurnChanged(String roomCode, Room room) {
         if (room == null) return;
 
@@ -83,12 +91,6 @@ public class RoomSocketController {
         );
     }
 
-    private void broadcastGameAction(String roomCode, Map<String, Object> payload) {
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) payload
-        );
-    }
 
     private void processBotTurns(String roomCode, Room room) {
         if (room == null || !room.isGameStarted()) return;
@@ -128,7 +130,7 @@ public class RoomSocketController {
         room.setPendingAction(choice.action());
         room.setPendingZone(choice.zoneName());
 
-        broadcastGameAction(roomCode, Map.of(
+        broadcastPayload(roomCode, Map.of(
             "type", "ACTION_SELECTED",
             "action", choice.action(),
             "playerId", currentId,
@@ -156,15 +158,25 @@ public class RoomSocketController {
             moveMsg.put("zone", choice.zoneName());
             moveMsg.put("playerId", playerId);
             moveMsg.put("difficulty", choice.difficulty());
-            broadcastGameAction(roomCode, moveMsg);
+            broadcastPayload(roomCode, moveMsg);
         }
 
-        broadcastGameAction(roomCode, Map.of(
+        broadcastPayload(roomCode, Map.of(
             "type", "ANSWER_RESULT",
             "playerId", playerId,
             "correct", correct,
             "difficulty", choice.difficulty()
         ));
+
+        Player winner = room.checkWinner();
+        if (winner != null) {
+            broadcastPayload(roomCode, Map.of(
+                "type", "GAME_WON",
+                "winnerName", winner.getPseudo()
+            ));
+            roomService.deleteRoom(roomCode);
+            return;
+        }
 
         room.advanceTurn();
         broadcastTurnChanged(roomCode, room);
@@ -188,15 +200,15 @@ public class RoomSocketController {
             return new BotAction(ACTION_POWER_UP, currentZone.getName(), difficulty);
         }
 
-        BotAction travel = selectTravelAction(room, currentZone, playerId);
+        BotAction travel = selectTravelAction(currentZone, playerId);
         if (travel != null) return travel;
 
         int difficulty = pickDifficulty(4);
         return new BotAction(ACTION_POWER_UP, currentZone.getName(), difficulty);
     }
 
-    private BotAction selectTravelAction(Room room, Zone currentZone, String playerId) {
-        List<Zone> inRange = List.copyOf(com.historicconquest.server.model.map.ZonePathfinder.getZonesWithinRange(currentZone, 4));
+    private BotAction selectTravelAction(Zone currentZone, String playerId) {
+        List<Zone> inRange = List.copyOf(ZonePathfinder.getZonesWithinRange(currentZone, 4));
         inRange = inRange.stream().filter(zone -> zone != currentZone).toList();
         if (inRange.isEmpty()) return null;
 
@@ -205,7 +217,7 @@ public class RoomSocketController {
             target = inRange.get(BOT_RANDOM.nextInt(inRange.size()));
         }
 
-        var distance = com.historicconquest.server.model.map.ZonePathfinder.getShortestDistance(currentZone, target, 4);
+        var distance = ZonePathfinder.getShortestDistance(currentZone, target, 4);
         int difficulty = Math.clamp(distance.distance(), 1, 4);
         return new BotAction(ACTION_TRAVEL, target.getName(), difficulty);
     }
@@ -329,13 +341,10 @@ public class RoomSocketController {
                 );
             }
 
-            messagingTemplate.convertAndSend(
-                "/topic/room-" + roomCode,
-                (Object) Map.of(
-                    "type", "PLAYER_JOIN",
-                    "player", newBot
-                )
-            );
+            broadcastPayload(roomCode, Map.of(
+                "type", "PLAYER_JOIN",
+                "player", newBot
+            ));
 
         } else {
             messagingTemplate.convertAndSendToUser(
@@ -396,14 +405,11 @@ public class RoomSocketController {
         try {
             long startAt = roomService.startGame(roomCode);
 
-            messagingTemplate.convertAndSend(
-                "/topic/room-" + roomCode,
-                (Object) Map.of(
-                    "type", "GAME_COUNTDOWN_STARTED",
-                    "seconds", GAME_COUNTDOWN_SECONDS,
-                    "startAt", startAt
-                )
-            );
+            broadcastPayload(roomCode, Map.of(
+                "type", "GAME_COUNTDOWN_STARTED",
+                "seconds", GAME_COUNTDOWN_SECONDS,
+                "startAt", startAt
+            ));
 
             scheduler.schedule(() -> {
                 Room currentRoom = roomService.getRoom(roomCode);
@@ -413,28 +419,22 @@ public class RoomSocketController {
 
                 if (!roomService.stillCanStartGame(roomCode)) {
                     roomService.cancelGameStart(roomCode);
-                    messagingTemplate.convertAndSend(
-                        "/topic/room-" + roomCode,
-                        (Object) Map.of(
-                            "type", "GAME_START_CANCELLED",
-                            "reason", "The room is no longer full and ready"
-                        )
-                    );
+                    broadcastPayload(roomCode, Map.of(
+                        "type", "GAME_START_CANCELLED",
+                        "reason", "The room is no longer full and ready"
+                    ));
                     return;
                 }
 
                 try {
                     RoomService.ZoneSelectionStart selectionStart = roomService.startZoneSelection(roomCode);
 
-                    messagingTemplate.convertAndSend(
-                        "/topic/room-" + roomCode,
-                        (Object) Map.of(
-                            "type", "ZONE_SELECTION_STARTED",
-                            "seconds", 30,
-                            "startAt", selectionStart.startAt(),
-                            "selectedZones", selectionStart.selectedZones()
-                        )
-                    );
+                    broadcastPayload(roomCode, Map.of(
+                        "type", "ZONE_SELECTION_STARTED",
+                        "seconds", 30,
+                        "startAt", selectionStart.startAt(),
+                        "selectedZones", selectionStart.selectedZones()
+                    ));
 
                     currentRoom.generateWorldMap();
 
@@ -445,16 +445,13 @@ public class RoomSocketController {
 
                         try {
                             RoomService.ZoneSelectionUpdate finalSelection = roomService.completeZoneSelection(roomCode);
-                            messagingTemplate.convertAndSend(
-                                "/topic/room-" + roomCode,
-                                (Object) Map.of(
-                                    "type", "GAME_STARTED",
-                                    "selectedZones", finalSelection.selectedZones(),
-                                    "turnOrder", latestRoom.getPlayerOrder(),
-                                    "currentPlayerId", latestRoom.getCurrentPlayerId(),
-                                    "listThemeZone", latestRoom.getAllThemeZone()
-                                )
-                            );
+                            broadcastPayload(roomCode, Map.of(
+                                "type", "GAME_STARTED",
+                                "selectedZones", finalSelection.selectedZones(),
+                                "turnOrder", latestRoom.getPlayerOrder(),
+                                "currentPlayerId", latestRoom.getCurrentPlayerId(),
+                                "listThemeZone", latestRoom.getAllThemeZone()
+                            ));
                             latestRoom.initializeGameState(finalSelection.selectedZones());
                             broadcastTurnChanged(roomCode, latestRoom);
                             processBotTurns(roomCode, latestRoom);
@@ -518,13 +515,10 @@ public class RoomSocketController {
 
         roomService.cancelGameStart(roomCode);
 
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) Map.of(
-                "type", "GAME_START_CANCELLED",
-                "reason", "The host cancelled the game launch"
-            )
-        );
+        broadcastPayload(roomCode, Map.of(
+            "type", "GAME_START_CANCELLED",
+            "reason", "The host cancelled the game launch"
+        ));
     }
 
 
@@ -548,13 +542,10 @@ public class RoomSocketController {
         try {
             RoomService.ZoneSelectionUpdate update = roomService.selectZone(roomCode, playerId, payload.get("zone"));
 
-            messagingTemplate.convertAndSend(
-                "/topic/room-" + roomCode,
-                (Object) Map.of(
-                    "type", "ZONE_SELECTION_UPDATED",
-                    "selectedZones", update.selectedZones()
-                )
-            );
+            broadcastPayload(roomCode, Map.of(
+                "type", "ZONE_SELECTION_UPDATED",
+                "selectedZones", update.selectedZones()
+            ));
 
         } catch (Exception e) {
             sendActionUnavailable(
@@ -645,14 +636,11 @@ public class RoomSocketController {
         }
 
 
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) Map.of(
-                "type", type,
-                "playerId", playerId,
-                "data", data
-            )
-        );
+        broadcastPayload(roomCode, Map.of(
+            "type", type,
+            "playerId", playerId,
+            "data", data
+        ));
     }
 
 
@@ -675,27 +663,21 @@ public class RoomSocketController {
         roomService.removePlayer(roomCode, playerId);
 
 
-        messagingTemplate.convertAndSend(
-            "/topic/room-" + roomCode,
-            (Object) Map.of(
-                "type", "PLAYER_QUIT",
-                "playerId", playerId
-            )
-        );
+        broadcastPayload(roomCode, Map.of(
+            "type", "PLAYER_QUIT",
+            "playerId", playerId
+        ));
 
         if (cancelFlow && roomService.getRoom(roomCode) != null) {
             roomService.cancelGameStart(roomCode);
-            messagingTemplate.convertAndSend(
-                "/topic/room-" + roomCode,
-                (Object) Map.of(
-                    "type", "GAME_START_CANCELLED",
-                    "reason", "A player left the room"
-                )
-            );
+            broadcastPayload(roomCode, Map.of(
+                "type", "GAME_START_CANCELLED",
+                "reason", "A player left the room"
+            ));
         }
 
         if (allyId != null && roomService.getRoom(roomCode) != null) {
-            broadcastGameAction(roomCode, Map.of(
+            broadcastPayload(roomCode, Map.of(
                 "type", "COALITION_BROKEN",
                 "playerAId", playerId,
                 "playerBId", allyId
@@ -737,16 +719,13 @@ public class RoomSocketController {
             room.clearPendingAllianceRequestsFrom(playerIdToKick);
             roomService.removePlayer(roomCode, playerIdToKick);
 
-            messagingTemplate.convertAndSend(
-                "/topic/room-" + roomCode,
-                (Object) Map.of(
-                    "type", "PLAYER_KICK",
-                    "playerId", playerIdToKick
-                )
-            );
+            broadcastPayload(roomCode, Map.of(
+                "type", "PLAYER_KICK",
+                "playerId", playerIdToKick
+            ));
 
             if (allyId != null && roomService.getRoom(roomCode) != null) {
-                broadcastGameAction(roomCode, Map.of(
+                broadcastPayload(roomCode, Map.of(
                     "type", "COALITION_BROKEN",
                     "playerAId", playerIdToKick,
                     "playerBId", allyId
@@ -795,12 +774,9 @@ public class RoomSocketController {
         if (room.isHost(player.getId())) {
             roomService.deleteRoom(roomCode);
 
-            messagingTemplate.convertAndSend(
-                "/topic/room-" + roomCode,
-                (Object) Map.of(
-                    "type", "ROOM_DELETED"
-                )
-            );
+            broadcastPayload(roomCode, Map.of(
+                "type", "ROOM_DELETED"
+            ));
 
         } else {
             messagingTemplate.convertAndSendToUser(
@@ -911,7 +887,7 @@ public class RoomSocketController {
 
         String allianceColor = room.createAlliance(requesterId, playerId);
 
-        broadcastGameAction(roomCode, Map.of(
+        broadcastPayload(roomCode, Map.of(
             "type", "COALITION_ACCEPTED",
             "playerAId", requesterId,
             "playerBId", playerId,
@@ -950,7 +926,7 @@ public class RoomSocketController {
         room.clearPendingAllianceRequest(playerId);
         room.clearPendingAllianceRequestsFrom(requesterId);
 
-        broadcastGameAction(roomCode, Map.of(
+        broadcastPayload(roomCode, Map.of(
             "type", "COALITION_DECLINED",
             "requesterId", requesterId,
             "targetId", playerId
@@ -1031,7 +1007,7 @@ public class RoomSocketController {
                 }
 
                 Number number = (Number) difficulty;
-                broadcastGameAction(roomCode, Map.of(
+                broadcastPayload(roomCode, Map.of(
                     "type", "ACTION_SELECTED",
                     "action", action,
                     "playerId", playerId,
@@ -1067,15 +1043,25 @@ public class RoomSocketController {
                     moveMsg.put("playerId", playerId);
                     moveMsg.put("difficulty", question.difficulty());
 
-                    broadcastGameAction(roomCode, moveMsg);
+                    broadcastPayload(roomCode, moveMsg);
                 }
 
-                broadcastGameAction(roomCode, Map.of(
+                broadcastPayload(roomCode, Map.of(
                     "type", "ANSWER_RESULT",
                     "playerId", playerId,
                     "correct", isCorrect,
                     "difficulty", question.difficulty()
                 ));
+
+                Player winner = room.checkWinner();
+                if (winner != null) {
+                    broadcastPayload(roomCode, Map.of(
+                        "type", "GAME_WON",
+                        "winnerName", winner.getPseudo()
+                    ));
+                    roomService.deleteRoom(roomCode);
+                    return;
+                }
 
                 room.advanceTurn();
                 broadcastTurnChanged(roomCode, room);

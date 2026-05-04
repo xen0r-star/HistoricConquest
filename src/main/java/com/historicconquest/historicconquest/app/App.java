@@ -2,6 +2,7 @@ package com.historicconquest.historicconquest.app;
 
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.core.AppPage;
+import com.historicconquest.historicconquest.util.Music;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -40,6 +41,8 @@ public class App extends Application {
 
         appController.initialize(stage, root);
         appController.showPage(AppPage.HOME);
+
+        Music.getInstance().playPlaylist();
 
         Platform.setImplicitExit(true);
         stage.setOnCloseRequest(event -> {

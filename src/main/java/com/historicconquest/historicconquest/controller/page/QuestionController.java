@@ -21,6 +21,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 
 public class QuestionController {
@@ -240,6 +242,16 @@ public class QuestionController {
     public static void setDifficultyQuestion(int difficultyQuestion) {
         QuestionController.difficultyQuestion = difficultyQuestion;
         showQuestionPage();
+    }
+
+    @FXML
+    private void consumeEvent(MouseEvent event) {
+        event.consume();
+    }
+
+    @FXML
+    private void handleScroll(ScrollEvent event) {
+        event.consume();
     }
 
     public static void setMainStackPane(StackPane stackPane) { mainStackPane = stackPane; }
