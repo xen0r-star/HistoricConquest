@@ -683,6 +683,7 @@ public class RoomSocketController {
                     moveMsg.put("action", room.getPendingAction());
                     moveMsg.put("zone", room.getPendingZone());
                     moveMsg.put("playerId", playerId);
+                    moveMsg.put("difficulty", question.difficulty());
 
                     broadcastGameAction(roomCode, moveMsg);
                 }

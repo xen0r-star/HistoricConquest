@@ -3,7 +3,6 @@ package com.historicconquest.historicconquest.model.map;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.core.type.TypeReference;
-import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import javafx.scene.paint.Color;
 
 import java.io.InputStream;
@@ -76,8 +75,7 @@ public class WorldMap {
                         zone = new Zone(
                             zoneName,
                             blocName,
-                            TypeThemes.getRandom(),
-                            0,
+                                0,
                             zoneNode.get("x").asDouble(),
                             zoneNode.get("y").asDouble(),
                             icon,

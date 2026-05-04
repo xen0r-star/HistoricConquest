@@ -115,6 +115,10 @@ public final class GameNetworkService {
 
         if (controller == null) return;
 
+        if (difficulty != null) {
+            controller.setCurrentDifficulty(difficulty);
+        }
+
         switch (action) {
             case ACTION_ANSWER_RESULT -> {
                 if (difficulty == null || correct == null) return;

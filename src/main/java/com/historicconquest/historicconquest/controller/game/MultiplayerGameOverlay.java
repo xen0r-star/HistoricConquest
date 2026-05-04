@@ -50,12 +50,20 @@ public final class MultiplayerGameOverlay {
                 return;
             }
 
-            int difficulty = GameController.getInstance().getCurrentDistance();
 
             switch (action) {
-                case TRAVEL -> GameNetworkService.sendTravelAction(targetZone.getName(), difficulty);
-                case ATTACK -> GameNetworkService.sendAttackAction(targetZone.getName(), difficulty);
-                case POWER_UP -> GameNetworkService.sendPowerUpAction(targetZone.getName(), difficulty);
+                case TRAVEL -> GameNetworkService.sendTravelAction(
+                    targetZone.getName(),
+                    GameController.getInstance().getCurrentDistance()
+                );
+                case ATTACK -> GameNetworkService.sendAttackAction(
+                    targetZone.getName(),
+                    GameController.getInstance().getCurrentDifficulty()
+                );
+                case POWER_UP -> GameNetworkService.sendPowerUpAction(
+                    targetZone.getName(),
+                    GameController.getInstance().getCurrentDifficulty()
+                );
                 default -> { }
             }
             return;
@@ -75,6 +83,10 @@ public final class MultiplayerGameOverlay {
     public static void applyNetworkAction(String action, String zoneName, Integer difficulty, Boolean correct) {
         if (!isActive() || action == null) {
             return;
+        }
+
+        if (difficulty != null) {
+            controller.setCurrentDifficulty(difficulty);
         }
 
         switch (action) {

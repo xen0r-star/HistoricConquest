@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.view.map;
 
 import com.historicconquest.historicconquest.model.map.Zone;
+import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 public class ZoneView extends Group {
     private final Zone zone;
     private final Group zoneSVGGroup;
+    private Group currentIconGroup;
     private boolean hovered;
     private boolean focused;
     private boolean blockHover;
@@ -40,10 +42,25 @@ public class ZoneView extends Group {
         applyCurrentDisplayColor();
 
         zone.colorProperty().addListener((observable, oldColor, newColor) -> applyCurrentDisplayColor());
+        zone.themesProperty().addListener((observable, oldTheme, newTheme) -> refreshIcon());
 
-        if (zone.getIcon() != null) {
+        refreshIcon();
+
+        setOnMouseEntered(event -> setHovered(true));
+        setOnMouseExited(event -> setHovered(false));
+    }
+
+
+    public void refreshIcon() {
+        if (currentIconGroup != null) {
+            getChildren().remove(currentIconGroup);
+            currentIconGroup = null;
+        }
+
+        if (zone.getThemes() != TypeThemes.NONE && zone.getIcon() != null) {
             String iconSVG = "/map/icons/" + zone.getThemes().getLabel() + ".svg";
-            Group iconSVGGroup = loadSVG(
+
+            currentIconGroup = loadSVG(
                 iconSVG,
                 zone.getIcon().x(), zone.getIcon().y(),
                 zone.getIcon().width(), zone.getIcon().height(),
@@ -51,16 +68,14 @@ public class ZoneView extends Group {
                 Color.web("#635341")
             );
 
-            if (iconSVGGroup != null) {
-                iconSVGGroup.setOpacity(0.5);
-                iconSVGGroup.setMouseTransparent(true);
-                getChildren().add(iconSVGGroup);
+            if (currentIconGroup != null) {
+                currentIconGroup.setOpacity(0.5);
+                currentIconGroup.setMouseTransparent(true);
+                getChildren().add(currentIconGroup);
             }
         }
-
-        setOnMouseEntered(event -> setHovered(true));
-        setOnMouseExited(event -> setHovered(false));
     }
+
 
 
     public Zone getZone() {

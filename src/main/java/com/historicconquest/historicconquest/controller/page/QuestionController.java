@@ -5,6 +5,8 @@ import java.util.*;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
+import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
+import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
@@ -67,9 +69,22 @@ public class QuestionController {
     public void confirmDifficult() {
         difficultyQuestion = (int) Math.round(slider.getValue());
 
+        GameController gc = GameController.getInstance();
+        Zone target = gc.getTargetZone();
+
+        GameController.getInstance().setCurrentDifficulty(difficultyQuestion);
+
+        MultiplayerGameOverlay.requestZoneAction(
+            gc.getPendingAction(), target
+        );
+
+
         mainStackPane.getChildren().getLast().setVisible(true);
         destroyStackPane();
-        showQuestionPage();
+
+        if (!GameNetworkService.isEnabled()) {
+            showQuestionPage();
+        }
     }
 
     public static Theme findCurrentTheme() {

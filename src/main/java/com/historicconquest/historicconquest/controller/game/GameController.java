@@ -722,6 +722,14 @@ public class GameController implements GameAnimationPort {
         return currentDistance;
     }
 
+    public int getCurrentDifficulty() {
+        return currentDifficulty;
+    }
+
+    public void setCurrentDifficulty(int currentDifficulty) {
+        this.currentDifficulty = currentDifficulty;
+    }
+
     public Zone getTargetZone() {
         return targetZone;
     }

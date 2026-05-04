@@ -185,7 +185,6 @@ public class RoomService {
                         List<String> choices = new ArrayList<>();
                         payload.get("choices").forEach(choice -> choices.add(choice.asString()));
 
-                        System.out.println(questionText);
                         Platform.runLater(() ->
                             QuestionController.showQuestionPage(questionId, questionText, choices)
                         );
