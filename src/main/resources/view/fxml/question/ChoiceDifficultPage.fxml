@@ -2,55 +2,17 @@
 
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="370.0" prefWidth="514.0" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="370.0" prefWidth="514.0" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-insets: 0; -fx-border-width: 2;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
     <styleClass>
-        <String fx:value="button-blue" />
+        <String fx:value="button-beige" />
         <String fx:value="not-hover" />
     </styleClass>
-    <Label fx:id="theme_label" prefHeight="64.0" prefWidth="0.0" style="-fx-text-fill: #eeddc0;" StackPane.alignment="TOP_CENTER">
-        <StackPane.margin>
-            <Insets left="25.0" top="10.0" />
-        </StackPane.margin>
-        <font>
-            <Font name="Georgia Regular" size="40.0" />
-        </font>
-    </Label>
-    <Label style="-fx-text-fill: #eeddc0; -fx-underline-width: 3px;" text="Choose your difficult to go on :" StackPane.alignment="TOP_CENTER">
-        <font>
-            <Font name="Georgia Bold" size="23.0" />
-        </font>
-        <StackPane.margin>
-            <Insets top="75.0" />
-        </StackPane.margin>
-    </Label>
-    <Button fx:id="confirmDifficult" mnemonicParsing="false" onAction="#confirmDifficult" prefHeight="43.0" prefWidth="110.0" style="-fx-border-color: #6f5630; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-color: #eeddc0;" text="Confirm" StackPane.alignment="BOTTOM_CENTER">
-        <StackPane.margin>
-            <Insets bottom="25.0" />
-        </StackPane.margin>
-        <font>
-            <Font name="Georgia Bold" size="18.0" />
-        </font>
-    </Button>
-    <Label fx:id="describeDifficult" style="-fx-text-fill: #eeddc0;" StackPane.alignment="CENTER">
-        <StackPane.margin>
-            <Insets top="100.0" />
-        </StackPane.margin>
-        <font>
-            <Font name="Georgia Italic" size="17.0" />
-        </font>
-    </Label>
-    <Label style="-fx-text-fill: #eeddc0;" text="(Double click to confirm)" StackPane.alignment="BOTTOM_CENTER">
-        <font>
-            <Font name="Georgia Regular" size="8.0" />
-        </font>
-        <StackPane.margin>
-            <Insets bottom="5.0" />
-        </StackPane.margin>
-    </Label>
     <Slider fx:id="slider" blockIncrement="1.0" majorTickUnit="1.0" max="4.0" maxHeight="-Infinity" maxWidth="-Infinity" min="1.0" minorTickCount="0" prefHeight="97.0" prefWidth="428.0" showTickMarks="true" snapToTicks="true" stylesheets="@../../styles/style.css" value="1.0">
         <styleClass>
             <String fx:value="slider" />
@@ -58,4 +20,36 @@
             <String fx:value="axis-tick-mark" />
         </styleClass>
     </Slider>
+    <HBox alignment="CENTER" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" spacing="10.0" StackPane.alignment="TOP_CENTER">
+        <StackPane.margin>
+            <Insets top="25.0" />
+        </StackPane.margin>
+        <ImageView fx:id="IconThemeLabelChoice" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@../../icons/informatics-icon.png" />
+        </ImageView>
+        <Label fx:id="theme_label_choice" alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="51.0" text="Informatics" textAlignment="CENTER">
+            <font>
+                <Font name="Georgia Bold" size="40.0" />
+            </font>
+        </Label>
+    </HBox>
+    <Label style="-fx-underline-width: 3px;" text="Choose your difficult to go on :" StackPane.alignment="TOP_CENTER">
+        <font>
+            <Font name="Georgia Bold" size="23.0" />
+        </font>
+        <StackPane.margin>
+            <Insets top="90.0" />
+        </StackPane.margin>
+    </Label>
+    <Button fx:id="confirmDifficult" mnemonicParsing="false" onAction="#confirmDifficult" prefHeight="43.0" prefWidth="139.0" style="-fx-border-color: #343b22; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #6a7548; -fx-text-fill: #EEDCBE; -fx-background-radius: 5;" text="CONFIRM" StackPane.alignment="BOTTOM_CENTER">
+        <StackPane.margin>
+            <Insets bottom="25.0" />
+        </StackPane.margin>
+        <font>
+            <Font name="Georgia Bold" size="18.0" />
+        </font>
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
 </StackPane>

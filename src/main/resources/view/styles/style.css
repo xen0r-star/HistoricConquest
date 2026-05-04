@@ -275,7 +275,7 @@
 }
 
 .slider .track {
-    -fx-background-color: #75c2c6;
+    -fx-background-color: #00000080;
     -fx-pref-height: 10px;
 }
 .slider .axis {
@@ -298,4 +298,13 @@
 
 .button-selected {
     -fx-background-color: #c9c9c9;
+}
+
+.check-box .box {
+    -fx-background-color: #ffffff00;
+    -fx-background-radius: 5;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #313131;
 }

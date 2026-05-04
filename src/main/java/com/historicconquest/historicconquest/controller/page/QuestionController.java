@@ -16,10 +16,11 @@ import com.historicconquest.historicconquest.service.network.RoomService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
 public class QuestionController {
@@ -33,9 +34,10 @@ public class QuestionController {
     private Theme theme;
     private String myAnswer;
 
+    @FXML public ImageView IconThemeLabelChoice, IconThemeLabelQuestion;
     @FXML public Slider slider;
     @FXML public Button answer1, answer2, answer3, answer4;
-    @FXML public Label describeDifficult, theme_label, questionId;
+    @FXML public Label theme_label_question, theme_label_choice, questionId;
 
 
 
@@ -90,39 +92,30 @@ public class QuestionController {
     public static Theme findCurrentTheme() {
         if (themes.isEmpty()) throw new IllegalStateException("No themes available");
 
-        String targetLabel = GameController.getInstance().getTargetZone().getThemes().getLabel();
+        Zone targetZone = GameController.getInstance().getTargetZone();
+        if (targetZone == null || targetZone.getThemes() == null) return themes.getFirst();
+
+        String targetLabel = targetZone.getThemes().getLabel();
 
         return themes.stream()
                 .filter(t -> t.getName().getLabel().equalsIgnoreCase(targetLabel))
                 .findFirst()
-                .orElse(themes.isEmpty() ? null : themes.getFirst());
+                .orElse(themes.getFirst());
     }
 
-    public void setLabelsTheme(){
-        theme_label.setText(String.valueOf(theme.getName()));
-
+    public void setLabelsTheme() {
         Player player = GameController.getInstance().getCurrentPlayer();
 
         TypeThemes LabelTheme = player.getCurrentZone().getThemes();
-        theme_label.setText(LabelTheme.getLabel());
+        theme_label_choice.setText(LabelTheme.getLabel());
 
-        switch(LabelTheme) {
-            case MYSTERY -> {
-                theme_label.setPrefWidth(180);
-                theme_label.setAlignment(Pos.CENTER);
-            }
-            case INFORMATICS -> {
-                theme_label.setPrefWidth(200);
-                theme_label.setAlignment(Pos.CENTER);
-            }
-            case ENTERTAINMENT -> {
-                theme_label.setPrefWidth(260);
-                theme_label.setAlignment(Pos.CENTER);
-            }
-            case TOURISM -> {
-                theme_label.setPrefWidth(160);
-                theme_label.setAlignment(Pos.CENTER);
-            }
+
+        switch (LabelTheme) {
+            case ENTERTAINMENT -> IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
+            case INFORMATICS ->   IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
+            case TOURISM ->       IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
+            case MYSTERY ->       IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/mystery-icon.png")).toExternalForm()));
+            default ->            IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/default.png")).toExternalForm()));
         }
 
         difficultyQuestion = (int) Math.round(slider.getValue());
@@ -146,6 +139,20 @@ public class QuestionController {
 
             controller.theme = findCurrentTheme();
             controller.startQuestion();
+
+            Player player = GameController.getInstance().getCurrentPlayer();
+            TypeThemes LabelTheme = player.getCurrentZone().getThemes();
+
+            controller.theme_label_question.setText(LabelTheme.getLabel());
+
+
+            switch (LabelTheme) {
+                case ENTERTAINMENT -> controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
+                case INFORMATICS ->   controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
+                case TOURISM ->       controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
+                case MYSTERY ->       controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/mystery-icon.png")).toExternalForm()));
+                default ->            controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/default.png")).toExternalForm()));
+            }
 
             mainStackPane.getChildren().add(questionStackPane);
 

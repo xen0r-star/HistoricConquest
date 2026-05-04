@@ -27,7 +27,7 @@ public class HelpController {
             root = helpLoader.load();
 
             StackPane.setAlignment(root, Pos.TOP_RIGHT);
-            StackPane.setMargin(root, new Insets(30, 30, 0, 0));
+            StackPane.setMargin(root, new Insets(45, 45, 0, 0));
 
             root.setVisible(false);
             root.setManaged(false);
