@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +35,8 @@ public class RoomSocketController {
     private static final String ACTION_COALITION_ACCEPT = "COALITION_ACCEPT";
     private static final String ACTION_COALITION_DECLINE = "COALITION_DECLINE";
     private static final long BOT_THINKING_DELAY_MS = 1200L;
+    private static final long BOT_ANSWER_DELAY_MS = 800L;
+    private static final Random BOT_RANDOM = new Random();
 
     private final RoomService roomService;
     private final QuestionService questionService;
@@ -102,19 +106,182 @@ public class RoomSocketController {
             return;
         }
 
-        scheduler.schedule(() -> {
-            Room latestRoom = roomService.getRoom(roomCode);
-            if (latestRoom == null || !latestRoom.isGameStarted()) return;
-
-            String latestId = latestRoom.getCurrentPlayerId();
-            Player latestPlayer = latestId == null ? null : latestRoom.getPlayerById(latestId);
-            if (latestPlayer == null || latestPlayer.getType() != Player.Type.Bot) return;
-
-            latestRoom.advanceTurn();
-            broadcastTurnChanged(roomCode, latestRoom);
-            processBotTurns(roomCode, latestRoom, remainingSkips - 1);
-        }, BOT_THINKING_DELAY_MS, TimeUnit.MILLISECONDS);
+        scheduler.schedule(() -> executeBotTurn(roomCode, remainingSkips), BOT_THINKING_DELAY_MS, TimeUnit.MILLISECONDS);
     }
+
+    private void executeBotTurn(String roomCode, int remainingSkips) {
+        Room room = roomService.getRoom(roomCode);
+        if (room == null || !room.isGameStarted() || remainingSkips <= 0) return;
+
+        String currentId = room.getCurrentPlayerId();
+        Player current = currentId == null ? null : room.getPlayerById(currentId);
+        if (current == null || current.getType() != Player.Type.Bot) return;
+
+        BotAction choice = selectBotAction(room, currentId);
+        if (choice == null) {
+            room.advanceTurn();
+            broadcastTurnChanged(roomCode, room);
+            processBotTurns(roomCode, room, remainingSkips - 1);
+            return;
+        }
+
+        room.setPendingAction(choice.action());
+        room.setPendingZone(choice.zoneName());
+
+        broadcastGameAction(roomCode, Map.of(
+            "type", "ACTION_SELECTED",
+            "action", choice.action(),
+            "playerId", currentId,
+            "zone", choice.zoneName(),
+            "difficulty", choice.difficulty()
+        ));
+
+        scheduler.schedule(() -> resolveBotAnswer(roomCode, currentId, choice, remainingSkips), BOT_ANSWER_DELAY_MS, TimeUnit.MILLISECONDS);
+    }
+
+    private void resolveBotAnswer(String roomCode, String playerId, BotAction choice, int remainingSkips) {
+        Room room = roomService.getRoom(roomCode);
+        if (room == null || !room.isGameStarted()) return;
+
+        String currentId = room.getCurrentPlayerId();
+        if (currentId == null || !currentId.equals(playerId)) return;
+
+        boolean correct = rollBotAnswer(choice.difficulty());
+        if (correct) {
+            applyActionToRoom(room, playerId, choice.action(), choice.zoneName(), choice.difficulty());
+
+            Map<String, Object> moveMsg = new HashMap<>();
+            moveMsg.put("type", "GAME_ACTION");
+            moveMsg.put("action", choice.action());
+            moveMsg.put("zone", choice.zoneName());
+            moveMsg.put("playerId", playerId);
+            moveMsg.put("difficulty", choice.difficulty());
+            broadcastGameAction(roomCode, moveMsg);
+        }
+
+        broadcastGameAction(roomCode, Map.of(
+            "type", "ANSWER_RESULT",
+            "playerId", playerId,
+            "correct", correct,
+            "difficulty", choice.difficulty()
+        ));
+
+        room.advanceTurn();
+        broadcastTurnChanged(roomCode, room);
+        processBotTurns(roomCode, room, remainingSkips - 1);
+    }
+
+    private BotAction selectBotAction(Room room, String playerId) {
+        String currentZoneName = room.getCurrentZoneName(playerId);
+        Zone currentZone = currentZoneName == null ? null : room.getZone(currentZoneName);
+        if (currentZone == null) return null;
+
+        String ownerId = currentZone.getNameOwner();
+        if (ownerId == null || !ownerId.equals(playerId)) {
+            int difficulty = pickDifficulty(4);
+            return new BotAction(ACTION_ATTACK, currentZone.getName(), difficulty);
+        }
+
+        if (currentZone.getPower() < currentZone.getMAX_POWER_ZONE() && BOT_RANDOM.nextDouble() < 0.45) {
+            int maxBoost = Math.min(4, currentZone.getMAX_POWER_ZONE() - currentZone.getPower());
+            int difficulty = pickDifficulty(maxBoost);
+            return new BotAction(ACTION_POWER_UP, currentZone.getName(), difficulty);
+        }
+
+        BotAction travel = selectTravelAction(room, currentZone, playerId);
+        if (travel != null) return travel;
+
+        int difficulty = pickDifficulty(4);
+        return new BotAction(ACTION_POWER_UP, currentZone.getName(), difficulty);
+    }
+
+    private BotAction selectTravelAction(Room room, Zone currentZone, String playerId) {
+        List<Zone> inRange = List.copyOf(com.historicconquest.server.model.map.ZonePathfinder.getZonesWithinRange(currentZone, 4));
+        inRange = inRange.stream().filter(zone -> zone != currentZone).toList();
+        if (inRange.isEmpty()) return null;
+
+        Zone target = pickEnemyZone(inRange, playerId);
+        if (target == null) {
+            target = inRange.get(BOT_RANDOM.nextInt(inRange.size()));
+        }
+
+        var distance = com.historicconquest.server.model.map.ZonePathfinder.getShortestDistance(currentZone, target, 4);
+        int difficulty = Math.clamp(distance.distance(), 1, 4);
+        return new BotAction(ACTION_TRAVEL, target.getName(), difficulty);
+    }
+
+    private Zone pickEnemyZone(List<Zone> zones, String playerId) {
+        List<Zone> enemies = zones.stream()
+            .filter(zone -> zone.getNameOwner() == null || !zone.getNameOwner().equals(playerId))
+            .toList();
+
+        if (enemies.isEmpty()) return null;
+        return enemies.get(BOT_RANDOM.nextInt(enemies.size()));
+    }
+
+    private int pickDifficulty(int maxLevel) {
+        int max = Math.clamp(maxLevel, 1, 4);
+        double roll = BOT_RANDOM.nextDouble();
+        if (roll < 0.35) return Math.min(1, max);
+        if (roll < 0.65) return Math.min(2, max);
+        if (roll < 0.85) return Math.min(3, max);
+        return max;
+    }
+
+    private boolean rollBotAnswer(int difficulty) {
+        return BOT_RANDOM.nextDouble() < switch (difficulty) {
+            case 1 -> 0.85;
+            case 2 -> 0.70;
+            case 3 -> 0.55;
+            case 4 -> 0.35;
+            default -> 0.50;
+        };
+    }
+
+    private void applyActionToRoom(Room room, String playerId, String action, String zoneName, int difficulty) {
+        if (room == null || playerId == null || action == null || zoneName == null) return;
+
+        Zone target = room.getZone(zoneName);
+        if (target == null) return;
+
+        switch (action) {
+            case ACTION_TRAVEL -> room.setCurrentZoneName(playerId, zoneName);
+            case ACTION_ATTACK -> applyAttack(room, playerId, target, difficulty);
+            case ACTION_POWER_UP -> applyPowerUp(playerId, target, difficulty);
+            default -> { }
+        }
+    }
+
+    private void applyAttack(Room room, String playerId, Zone target, int difficulty) {
+        String currentZone = room.getCurrentZoneName(playerId);
+        if (!target.getName().equalsIgnoreCase(currentZone)) return;
+        if (playerId.equals(target.getNameOwner())) return;
+
+        int result = target.getPower() - difficulty;
+        if (result > 0) {
+            target.setPower(result);
+            return;
+        }
+
+        if (result == 0) {
+            target.setPower(0);
+            target.setNameOwner("Nobody");
+            return;
+        }
+
+        target.setPower(Math.abs(result));
+        target.setNameOwner(playerId);
+    }
+
+    private void applyPowerUp(String playerId, Zone target, int difficulty) {
+        if (!playerId.equals(target.getNameOwner())) return;
+
+        int maxPower = target.getMAX_POWER_ZONE();
+        int newPower = Math.min(target.getPower() + difficulty, maxPower);
+        target.setPower(newPower);
+    }
+
+    private record BotAction(String action, String zoneName, int difficulty) { }
 
 
 
@@ -288,6 +455,7 @@ public class RoomSocketController {
                                     "listThemeZone", latestRoom.getAllThemeZone()
                                 )
                             );
+                            latestRoom.initializeGameState(finalSelection.selectedZones());
                             broadcastTurnChanged(roomCode, latestRoom);
                             processBotTurns(roomCode, latestRoom);
 
@@ -891,6 +1059,7 @@ public class RoomSocketController {
                 boolean isCorrect = question.answer().equalsIgnoreCase(String.valueOf(answer));
 
                 if (isCorrect) {
+                    applyActionToRoom(room, playerId, room.getPendingAction(), room.getPendingZone(), question.difficulty());
                     Map<String, Object> moveMsg = new HashMap<>();
                     moveMsg.put("type", "GAME_ACTION");
                     moveMsg.put("action", room.getPendingAction());

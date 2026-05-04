@@ -27,6 +27,8 @@ public class Room {
     private final Map<String, String> selectedZones = new ConcurrentHashMap<>();
     private final List<String> playerOrder = new CopyOnWriteArrayList<>();
 
+    private final Map<String, String> currentZoneByPlayerId = new ConcurrentHashMap<>();
+
     private static final String ALLIANCE_COLOR_PRIMARY = "#F2F2F2";
     private static final String ALLIANCE_COLOR_SECONDARY = "#A9A9A9";
     private final Map<String, String> allianceByPlayer = new ConcurrentHashMap<>();
@@ -149,6 +151,7 @@ public class Room {
     public void removePlayer(String playerId) {
         players.remove(playerId);
         selectedZones.remove(playerId);
+        currentZoneByPlayerId.remove(playerId);
         pendingAllianceRequests.remove(playerId);
         pendingAllianceRequests.entrySet().removeIf(entry -> playerId.equals(entry.getValue()));
 
@@ -176,6 +179,37 @@ public class Room {
 
     public void generateWorldMap() {
         worldMap = new WorldMap();
+    }
+
+    public synchronized void initializeGameState(Map<String, String> selectedZonesByPlayerId) {
+        if (worldMap == null || selectedZonesByPlayerId == null) return;
+
+        currentZoneByPlayerId.clear();
+        for (Map.Entry<String, String> entry : selectedZonesByPlayerId.entrySet()) {
+            String playerId = entry.getKey();
+            String zoneName = entry.getValue();
+            if (zoneName == null) continue;
+
+            Zone zone = getZone(zoneName);
+            if (zone == null) continue;
+
+            zone.setNameOwner(playerId);
+            zone.setPower(4);
+            currentZoneByPlayerId.put(playerId, zoneName);
+        }
+    }
+
+    public synchronized String getCurrentZoneName(String playerId) {
+        return playerId == null ? null : currentZoneByPlayerId.get(playerId);
+    }
+
+    public synchronized void setCurrentZoneName(String playerId, String zoneName) {
+        if (playerId == null) return;
+        if (zoneName == null || zoneName.isBlank()) {
+            currentZoneByPlayerId.remove(playerId);
+        } else {
+            currentZoneByPlayerId.put(playerId, zoneName);
+        }
     }
 
 
