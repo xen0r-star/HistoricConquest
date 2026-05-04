@@ -79,22 +79,31 @@ public final class GameBootstrapper {
     }
 
     public static void launchSoloGame(StackPane root, List<Player> players) {
+        launchSoloGame(root, players, (List<String>) null);
+    }
+
+    public static void launchSoloGame(StackPane root, List<Player> players, List<String> preferredStartZoneNames) {
         if (root == null || players == null || players.isEmpty()) return;
 
         try {
             GameUIContext ctx = setupGameUI(root);
-            ctx.gameController.initializeGameState(players, ctx.worldMap, ctx.mapView, ctx.mapInterface);
-            QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
-            Game gameEngine = Game.init(false);
-
-            ctx.worldMap.getAllZones().forEach(zone ->
-                zone.setThemes(TypeThemes.getRandom())
-            );
-            setupZoneEvent(ctx, gameEngine);
+            List<Zone> resolvedStartZones = buildPreferredStartZones(preferredStartZoneNames, ctx.worldMap.getAllZones());
+            launchSoloGameInternal(ctx, players, resolvedStartZones);
 
         } catch (Exception exception) {
             logger.error("Error launching solo game", exception);
         }
+    }
+
+    private static void launchSoloGameInternal(GameUIContext ctx, List<Player> players, List<Zone> preferredStartZones) {
+        ctx.gameController.initializeGameState(players, ctx.worldMap, ctx.mapView, ctx.mapInterface, preferredStartZones);
+        QuestionController.setThemes(Theme.loadThemesFromResource("/datas/Questions.json"));
+        Game gameEngine = Game.init(false);
+
+        ctx.worldMap.getAllZones().forEach(zone ->
+            zone.setThemes(TypeThemes.getRandom())
+        );
+        setupZoneEvent(ctx, gameEngine);
     }
 
 
@@ -152,6 +161,23 @@ public final class GameBootstrapper {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    private static List<Zone> buildPreferredStartZones(List<String> preferredStartZoneNames, List<Zone> allZones) {
+        if (preferredStartZoneNames == null || preferredStartZoneNames.isEmpty() || allZones == null || allZones.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Zone> zonesByName = allZones.stream()
+            .collect(Collectors.toMap(Zone::getName, zone -> zone, (left, right) -> left, HashMap::new));
+
+        List<Zone> preferredStartZones = new ArrayList<>();
+        for (String zoneName : preferredStartZoneNames) {
+            Zone preferredStartZone = zoneName == null ? null : zonesByName.get(zoneName);
+            preferredStartZones.add(preferredStartZone);
+        }
+
+        return preferredStartZones;
     }
 
     private static List<Zone> buildPreferredStartZones(List<Player> playersSnapshot, List<RoomPlayer> roomPlayers, Map<String, String> selectedZonesByPlayerId, List<Zone> allZones) {

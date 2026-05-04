@@ -17,6 +17,7 @@ module com.historicconquest.historicconquest {
     exports com.historicconquest.historicconquest.controller.overlay;
     exports com.historicconquest.historicconquest.controller.page;
     exports com.historicconquest.historicconquest.controller.page.multiplayer;
+    exports com.historicconquest.historicconquest.controller.page.local;
     exports com.historicconquest.historicconquest.model.game;
     exports com.historicconquest.historicconquest.model.map;
     exports com.historicconquest.historicconquest.model.network.event;
@@ -35,6 +36,7 @@ module com.historicconquest.historicconquest {
     opens com.historicconquest.historicconquest.controller.overlay to javafx.fxml;
     opens com.historicconquest.historicconquest.controller.page to javafx.fxml;
     opens com.historicconquest.historicconquest.controller.page.multiplayer to javafx.fxml;
+    opens com.historicconquest.historicconquest.controller.page.local to javafx.fxml;
 
     // JACKSON
     opens com.historicconquest.historicconquest.model.network.model to com.fasterxml.jackson.databind;

@@ -3,11 +3,13 @@ package com.historicconquest.historicconquest.controller.page;
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.game.*;
+import com.historicconquest.historicconquest.controller.page.local.LocalZoneSelectionController;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
 import com.historicconquest.historicconquest.util.NameGenerator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -201,7 +203,25 @@ public class NewGameController {
             return;
         }
 
-        launchGame();
+        openLocalZoneSelection();
+    }
+
+    private void openLocalZoneSelection() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/local/LocalZoneSelection.fxml"));
+            StackPane overlay = loader.load();
+            LocalZoneSelectionController controller = loader.getController();
+            if (controller != null) {
+                controller.attach(root, new ArrayList<>(listPlayer));
+            }
+            if (!root.getChildren().contains(overlay)) {
+                root.getChildren().add(overlay);
+            }
+            overlay.toFront();
+
+        } catch (Exception exception) {
+            logger.error("Error loading local zone selection overlay", exception);
+        }
     }
 
     private void disableSelectedColorCircle(PlayerColor color) {
