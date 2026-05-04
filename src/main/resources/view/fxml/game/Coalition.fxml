@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: rgba(0,0,0,0.7);"
+           stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.historicconquest.historicconquest.controller.page.game.CoalitionController">
+    <VBox alignment="TOP_CENTER" maxHeight="650.0" maxWidth="450.0"
+          style="-fx-border-color: #907f66; -fx-background-color: #F7E7CE; -fx-border-width: 4; -fx-border-radius: 7; -fx-background-radius: 10;">
+        <styleClass>
+            <String fx:value="button-beige"/>
+            <String fx:value="button-small"/>
+            <String fx:value="not-hover"/>
+        </styleClass>
+        <VBox alignment="CENTER" minHeight="70.0" prefHeight="70.0"
+              style="-fx-background-color: #6B1515; -fx-background-radius: 5 5 0 0;">
+            <Label text="COALITION" textFill="#EEDCBE">
+                <font>
+                    <Font name="Georgia Bold" size="36.0"/>
+                </font>
+            </Label>
+        </VBox>
+        <VBox spacing="15.0" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets bottom="20.0" left="30.0" right="30.0" top="20.0"/>
+            </padding>
+            <VBox fx:id="panePendingRequest" spacing="10.0"
+                  style="-fx-background-color: #EEDCBE; -fx-border-color: #6B1515; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <padding>
+                    <Insets bottom="10.0" left="15.0" right="15.0" top="10.0"/>
+                </padding>
+                <Label text="PENDING REQUEST" textFill="#6B1515">
+                    <font>
+                        <Font name="Georgia Bold" size="14.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="lblRequesterName" text="PlayerX wants to ally!" textFill="#333333">
+                    <font>
+                        <Font name="Georgia" size="16.0"/>
+                    </font>
+                </Label>
+                <HBox spacing="10.0">
+                    <Button maxWidth="1.7976931348623157E308" onAction="#acceptAlliance" text="ACCEPT"
+                            HBox.hgrow="ALWAYS">
+                        <styleClass>
+                            <String fx:value="button-green"/>
+                            <String fx:value="button-small"/>
+                        </styleClass>
+                    </Button>
+                    <Button maxWidth="1.7976931348623157E308" onAction="#declineAlliance" text="DECLINE"
+                            HBox.hgrow="ALWAYS">
+                        <styleClass>
+                            <String fx:value="button-red"/>
+                            <String fx:value="button-small"/>
+                        </styleClass>
+                    </Button>
+                </HBox>
+            </VBox>
+            <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2e2a2a; -fx-font-family: &quot;Georgia&quot;;"
+                   text="SELECT A PLAYER :" textFill="#6B1515">
+                <font>
+                    <Font name="Georgia Bold" size="18.0"/>
+                </font>
+            </Label>
+            <ListView fx:id="listPlayers" prefHeight="200.0"
+                      style="-fx-background-color: #EEDCBE; -fx-border-color: #907f66; -fx-fixed-cell-size: 40;"
+                      VBox.vgrow="ALWAYS"/>
+            <VBox alignment="CENTER" spacing="10.0">
+                <Button fx:id="btnProposal" maxWidth="400.0" onAction="#sendProposal" prefHeight="35.0"
+                        text="SEND PROPOSAL">
+                    <font>
+                        <Font name="Georgia Bold" size="18.0"/>
+                    </font>
+                    <styleClass>
+                        <String fx:value="button-green"/>
+                        <String fx:value="button-small"/>
+                    </styleClass>
+                </Button>
+                <Button fx:id="btnClose" maxWidth="400.0" onAction="#closeAlliance" text="CLOSE">
+                    <font>
+                        <Font name="Georgia" size="14.0"/>
+                    </font>
+                    <styleClass>
+                        <String fx:value="button-red"/>
+                        <String fx:value="button-small"/>
+                    </styleClass>
+                </Button>
+            </VBox>
+        </VBox>
+    </VBox>
+</StackPane>

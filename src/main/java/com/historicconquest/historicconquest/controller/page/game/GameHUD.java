@@ -151,7 +151,7 @@ public class GameHUD {
 
         if (cachedCoalition == null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/coalitionnew.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/Coalition.fxml"));
                 coalitionNode = loader.load();
                 cachedCoalition = loader.getController();
 
@@ -159,7 +159,7 @@ public class GameHUD {
                 StackPane.setAlignment(coalitionNode, Pos.CENTER);
 
             } catch (IOException e) {
-                System.err.println("Error loading coalitionnew.fxml");
+                System.err.println("Error loading Coalition.fxml");
                 return;
             }
         }
