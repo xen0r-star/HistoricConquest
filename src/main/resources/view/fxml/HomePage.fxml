@@ -56,16 +56,16 @@
             <String fx:value="button-green" />
          </styleClass>
       </Button>
-      <Button fx:id="loadGameBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="LOAD GAME">
-         <styleClass>
-            <String fx:value="button-main" />
-            <String fx:value="button-green" />
-         </styleClass>
-      </Button>
       <Button fx:id="multiplayerBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="MULTIPLAYER">
          <styleClass>
             <String fx:value="button-main" />
             <String fx:value="button-blue" />
+         </styleClass>
+      </Button>
+      <Button fx:id="exitBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="EXIT">
+         <styleClass>
+            <String fx:value="button-main" />
+            <String fx:value="button-red" />
          </styleClass>
       </Button>
       <StackPane.margin>
@@ -94,19 +94,6 @@
          <graphic>
             <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
                <Image url="@../icons/help.png" />
-            </ImageView>
-         </graphic>
-         <padding>
-            <Insets bottom="0.5" left="0.5" right="0.5" top="0.5" />
-         </padding></Button>
-      <Button fx:id="exitBtn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../styles/style.css">
-         <styleClass>
-            <String fx:value="button-icon" />
-            <String fx:value="button-red" />
-         </styleClass>
-         <graphic>
-            <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../icons/exit.png" />
             </ImageView>
          </graphic>
          <padding>

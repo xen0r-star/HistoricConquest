@@ -11,12 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HomeController {
-    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
     public StackPane root;
     public Pane mapViewport;
 
     public Button newGameBtn;
-    public Button loadGameBtn;
     public Button multiplayerBtn;
 
     public Button settingsBtn;
@@ -26,7 +24,6 @@ public class HomeController {
     @FXML
     public void initialize() {
         newGameBtn.setOnAction(    e -> AppController.getInstance().showPage(AppPage.NEW_GAME));
-        loadGameBtn.setOnAction(   e -> logger.debug("Load game mode selected from HomePage"));
         multiplayerBtn.setOnAction(e -> AppController.getInstance().showPage(AppPage.MULTIPLAYER));
 
         settingsBtn.setOnAction(e -> AppController.getInstance().showSettings(true));

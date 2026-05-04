@@ -5,6 +5,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <StackPane fx:id="root" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #F7E7CE;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.local.LocalZoneSelectionController">
 	<Pane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #907f66; -fx-border-width: 2;">
 		<StackPane.margin>
@@ -25,12 +27,12 @@
 	<AnchorPane maxHeight="1030.0" maxWidth="1863.0" prefHeight="1030.0" prefWidth="1863.0" style="-fx-background-color: transparent;">
 		<VBox alignment="TOP_CENTER" spacing="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
 			<Label style="-fx-font-size: 32px; -fx-font-weight: bold;" text="ZONE SELECTION" textFill="#3b3936" />
-         <VBox alignment="TOP_CENTER">
-            <children>
-      			<Label fx:id="CurrentPlayerLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Player chooses a starting zone." textFill="#3b3936" wrapText="true" />
-      			<Label fx:id="StepLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Player (1 / 4)" textFill="#3b3936" />
-            </children>
-         </VBox>
+			<VBox alignment="TOP_CENTER">
+				<Label fx:id="CurrentPlayerLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;"
+				       text="Player chooses a starting zone." textFill="#3b3936" wrapText="true"/>
+				<Label fx:id="StepLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Player (1 / 4)"
+				       textFill="#3b3936"/>
+			</VBox>
 		</VBox>
 
 		<Pane fx:id="mapViewport" style="-fx-border-color: transparent;" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="420.0" AnchorPane.topAnchor="140.0" />
@@ -65,5 +67,13 @@
 			<String fx:value="button-small" />
 			<String fx:value="button-red" />
 		</styleClass>
+		<graphic>
+			<ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+				<Image url="@../../icons/caret-back.png" />
+			</ImageView>
+		</graphic>
+		<padding>
+			<Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+		</padding>
 	</Button>
 </StackPane>
