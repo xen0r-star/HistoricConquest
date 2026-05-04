@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -16,33 +17,23 @@ import java.util.ResourceBundle;
 public class SettingsController implements Initializable {
     private static StackPane root;
 
-    // Audio
     @FXML private Slider musicSlider;
     @FXML private Slider sfxSlider;
     @FXML private Label musicValueLabel;
     @FXML private Label sfxValueLabel;
     @FXML private CheckBox muteCheck;
 
-    // Affichage
     @FXML private ComboBox<String> resolutionCombo;
     @FXML private CheckBox fullscreenCheck;
-    @FXML private ComboBox<String> langCombo;
-
 
 
     public SettingsController() { }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Résolutions disponibles
-        resolutionCombo.getItems().addAll("1280 x 720","1920 x 1080","2560 x 1440");
+        resolutionCombo.getItems().addAll("1280 x 720", "1920 x 1080", "2560 x 1440");
         resolutionCombo.setValue("1280 x 720");
 
-        // Langues
-        langCombo.getItems().addAll("Français", "English", "Español", "Deutsch");
-        langCombo.setValue("Français");
-
-        // Sync labels sliders
         musicSlider.valueProperty().addListener((obs, old, val) ->
             musicValueLabel.setText((int) val.doubleValue() + "%")
         );
@@ -51,33 +42,38 @@ public class SettingsController implements Initializable {
             sfxValueLabel.setText((int) val.doubleValue() + "%")
         );
 
-        // Muet désactive les sliders
-        muteCheck.selectedProperty().addListener((obs, old, val) -> {
-            musicSlider.setDisable(val);
-            sfxSlider.setDisable(val);
+        muteCheck.selectedProperty().addListener((obs, old, muted) -> {
+            musicSlider.setDisable(muted);
+            sfxSlider.setDisable(muted);
         });
     }
 
     @FXML
     private void onSave() {
-        save(
-            (int) musicSlider.getValue(),
-            (int) sfxSlider.getValue(),
-            muteCheck.isSelected(),
-            resolutionCombo.getValue(),
-            fullscreenCheck.isSelected(),
-            langCombo.getValue()
-        );
-        goBack();
-    }
+        String resolution = resolutionCombo.getValue();
+        String[] parts = resolution.split(" x ");
+        int width  = Integer.parseInt(parts[0].trim());
+        int height = Integer.parseInt(parts[1].trim());
 
-    @FXML
-    private void onCancel() {
+        Stage stage = AppController.getInstance().getStage();
+        if (stage != null) {
+            stage.setWidth(width);
+            stage.setHeight(height);
+            stage.setFullScreen(fullscreenCheck.isSelected());
+        }
+
+        System.out.println("=== Paramètres sauvegardés ===");
+        System.out.println("Musique    : " + (int) musicSlider.getValue() + "%");
+        System.out.println("Effets     : " + (int) sfxSlider.getValue() + "%");
+        System.out.println("Muet       : " + muteCheck.isSelected());
+        System.out.println("Résolution : " + resolution);
+        System.out.println("Plein écran: " + fullscreenCheck.isSelected());
+
         AppController.getInstance().showSettings(false);
     }
 
     @FXML
-    private void goBack() {
+    private void onCancel() {
         AppController.getInstance().showSettings(false);
     }
 
@@ -96,16 +92,6 @@ public class SettingsController implements Initializable {
         } catch (Exception e) {
             System.err.println("Error loading settings");
         }
-    }
-
-    public static void save(int music, int effets, boolean sound, String resolution, boolean fullScreen, String lang) {
-        System.out.println("=== Paramètres sauvegardés ===");
-        System.out.println("Musique : " + music + "%");
-        System.out.println("Effets  : " + effets + "%");
-        System.out.println("Muet    : " + sound);
-        System.out.println("Résolution : " +resolution);
-        System.out.println("Plein écran: " + fullScreen);
-        System.out.println("Langue  : " + lang);
     }
 
     public static void show(){
@@ -127,4 +113,3 @@ public class SettingsController implements Initializable {
         return root;
     }
 }
-
