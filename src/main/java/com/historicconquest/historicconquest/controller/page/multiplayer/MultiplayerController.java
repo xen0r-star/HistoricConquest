@@ -4,6 +4,7 @@ import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
@@ -666,6 +667,26 @@ public class MultiplayerController {
                         3000
                     );
                 });
+            }
+
+            @Override
+            public void onCoalitionRequested(String requesterId, String targetId) {
+                Platform.runLater(() -> GameNetworkService.handleCoalitionRequested(requesterId, targetId));
+            }
+
+            @Override
+            public void onCoalitionAccepted(String playerAId, String playerBId, String allianceColor) {
+                Platform.runLater(() -> GameNetworkService.handleCoalitionAccepted(playerAId, playerBId, allianceColor));
+            }
+
+            @Override
+            public void onCoalitionDeclined(String requesterId, String targetId) {
+                Platform.runLater(() -> GameNetworkService.handleCoalitionDeclined(requesterId, targetId));
+            }
+
+            @Override
+            public void onCoalitionBroken(String playerAId, String playerBId) {
+                Platform.runLater(() -> GameNetworkService.handleCoalitionBroken(playerAId, playerBId));
             }
 
             @Override

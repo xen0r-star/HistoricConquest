@@ -16,6 +16,12 @@ public class Player {
     private Status status;
     private int ping;
 
+    private int consecutiveSuccesses;
+    private int consecutiveFailures;
+    private Player ally;
+    private Player pendingAllianceRequest;
+    private String currentAllianceColor;
+
 
     public Player(String pseudo, String roomCode) {
         this.id = UUID.randomUUID().toString();

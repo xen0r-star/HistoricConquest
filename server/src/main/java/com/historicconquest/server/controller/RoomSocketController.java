@@ -29,6 +29,9 @@ public class RoomSocketController {
     private static final String ACTION_POWER_UP = "POWER_UP";
     private static final String ACTION_SUBMIT_ANSWER = "SUBMIT_ANSWER";
     private static final String ACTION_SKIP = "SKIP";
+    private static final String ACTION_COALITION_REQUEST = "COALITION_REQUEST";
+    private static final String ACTION_COALITION_ACCEPT = "COALITION_ACCEPT";
+    private static final String ACTION_COALITION_DECLINE = "COALITION_DECLINE";
 
     private final RoomService roomService;
     private final QuestionService questionService;
@@ -462,6 +465,13 @@ public class RoomSocketController {
         Room room = roomService.getRoom(roomCode);
         boolean cancelFlow = isGameFlowLocked(room);
 
+        String allyId = room == null ? null : room.getAlliancePartner(playerId);
+        if (room != null) {
+            room.clearAllianceForPlayer(playerId);
+            room.clearPendingAllianceRequest(playerId);
+            room.clearPendingAllianceRequestsFrom(playerId);
+        }
+
         roomService.removePlayer(roomCode, playerId);
 
 
@@ -482,6 +492,14 @@ public class RoomSocketController {
                     "reason", "A player left the room"
                 )
             );
+        }
+
+        if (allyId != null && roomService.getRoom(roomCode) != null) {
+            broadcastGameAction(roomCode, Map.of(
+                "type", "COALITION_BROKEN",
+                "playerAId", playerId,
+                "playerBId", allyId
+            ));
         }
     }
 
@@ -513,6 +531,10 @@ public class RoomSocketController {
 
         if (room.isHost(player.getId())) {
             String playerIdToKick = payload.get("playerId");
+            String allyId = room.getAlliancePartner(playerIdToKick);
+            room.clearAllianceForPlayer(playerIdToKick);
+            room.clearPendingAllianceRequest(playerIdToKick);
+            room.clearPendingAllianceRequestsFrom(playerIdToKick);
             roomService.removePlayer(roomCode, playerIdToKick);
 
             messagingTemplate.convertAndSend(
@@ -522,6 +544,14 @@ public class RoomSocketController {
                     "playerId", playerIdToKick
                 )
             );
+
+            if (allyId != null && roomService.getRoom(roomCode) != null) {
+                broadcastGameAction(roomCode, Map.of(
+                    "type", "COALITION_BROKEN",
+                    "playerAId", playerIdToKick,
+                    "playerBId", allyId
+                ));
+            }
 
         } else {
             messagingTemplate.convertAndSendToUser(
@@ -583,6 +613,149 @@ public class RoomSocketController {
                 )
             );
         }
+    }
+
+    @MessageMapping("/game/coalition/request")
+    public void requestCoalition(@Payload Map<String, String> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Room does not exist");
+            return;
+        }
+
+        if (!room.isGameStarted()) {
+            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Game is not started");
+            return;
+        }
+
+        String targetPlayerId = payload == null ? null : payload.get("targetPlayerId");
+        if (targetPlayerId == null || targetPlayerId.isBlank()) {
+            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Missing target player");
+            return;
+        }
+
+        if (playerId.equals(targetPlayerId)) {
+            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "You cannot request an alliance with yourself");
+            return;
+        }
+
+        if (room.getPlayerById(targetPlayerId) == null) {
+            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Target player not found");
+            return;
+        }
+
+        if (!room.setPendingAllianceRequest(playerId, targetPlayerId)) {
+            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Alliance request cannot be sent");
+            return;
+        }
+
+        messagingTemplate.convertAndSendToUser(
+            targetPlayerId,
+            "/queue/reply",
+            Map.of(
+                "type", "COALITION_REQUESTED",
+                "requesterId", playerId,
+                "targetId", targetPlayerId
+            )
+        );
+    }
+
+    @MessageMapping("/game/coalition/accept")
+    public void acceptCoalition(@Payload Map<String, String> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, ACTION_COALITION_ACCEPT, "Room does not exist");
+            return;
+        }
+
+        if (!room.isGameStarted()) {
+            sendActionUnavailable(playerId, ACTION_COALITION_ACCEPT, "Game is not started");
+            return;
+        }
+
+        String requesterId = payload == null ? null : payload.get("requesterId");
+        if (requesterId == null || requesterId.isBlank()) {
+            requesterId = room.getPendingAllianceRequester(playerId);
+        }
+
+        if (requesterId == null || requesterId.isBlank()) {
+            sendActionUnavailable(playerId, ACTION_COALITION_ACCEPT, "No pending alliance request");
+            return;
+        }
+
+        String pendingRequester = room.getPendingAllianceRequester(playerId);
+        if (pendingRequester == null || !pendingRequester.equals(requesterId)) {
+            sendActionUnavailable(playerId, ACTION_COALITION_ACCEPT, "Alliance request no longer valid");
+            return;
+        }
+
+        if (room.getPlayerById(requesterId) == null) {
+            sendActionUnavailable(playerId, ACTION_COALITION_ACCEPT, "Requester not found");
+            return;
+        }
+
+        if (room.hasAlliance(playerId) || room.hasAlliance(requesterId)) {
+            sendActionUnavailable(playerId, ACTION_COALITION_ACCEPT, "One of the players is already allied");
+            return;
+        }
+
+        room.clearPendingAllianceRequest(playerId);
+        room.clearPendingAllianceRequestsFrom(requesterId);
+
+        String allianceColor = room.createAlliance(requesterId, playerId);
+
+        broadcastGameAction(roomCode, Map.of(
+            "type", "COALITION_ACCEPTED",
+            "playerAId", requesterId,
+            "playerBId", playerId,
+            "allianceColor", allianceColor
+        ));
+    }
+
+    @MessageMapping("/game/coalition/decline")
+    public void declineCoalition(@Payload Map<String, String> payload, Principal principal) {
+        StompPrincipal sp = (StompPrincipal) principal;
+        String playerId = sp.getName();
+        String roomCode = sp.getRoomCode();
+
+        Room room = roomService.getRoom(roomCode);
+        if (room == null) {
+            sendActionUnavailable(playerId, ACTION_COALITION_DECLINE, "Room does not exist");
+            return;
+        }
+
+        if (!room.isGameStarted()) {
+            sendActionUnavailable(playerId, ACTION_COALITION_DECLINE, "Game is not started");
+            return;
+        }
+
+        String requesterId = payload == null ? null : payload.get("requesterId");
+        if (requesterId == null || requesterId.isBlank()) {
+            requesterId = room.getPendingAllianceRequester(playerId);
+        }
+
+        String pendingRequester = room.getPendingAllianceRequester(playerId);
+        if (pendingRequester == null || !pendingRequester.equals(requesterId)) {
+            sendActionUnavailable(playerId, ACTION_COALITION_DECLINE, "No pending alliance request");
+            return;
+        }
+
+        room.clearPendingAllianceRequest(playerId);
+        room.clearPendingAllianceRequestsFrom(requesterId);
+
+        broadcastGameAction(roomCode, Map.of(
+            "type", "COALITION_DECLINED",
+            "requesterId", requesterId,
+            "targetId", playerId
+        ));
     }
 
     @MessageMapping("/game/action")

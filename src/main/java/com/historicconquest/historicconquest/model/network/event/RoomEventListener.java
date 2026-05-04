@@ -23,5 +23,10 @@ public interface RoomEventListener {
     void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex);
     void onAnswerResult(String currentPlayerId, Boolean currentCorrect, Integer currentDifficulty);
 
+    void onCoalitionRequested(String requesterId, String targetId);
+    void onCoalitionAccepted(String playerAId, String playerBId, String allianceColor);
+    void onCoalitionDeclined(String requesterId, String targetId);
+    void onCoalitionBroken(String playerAId, String playerBId);
+
     void onRoomDeleted();
 }

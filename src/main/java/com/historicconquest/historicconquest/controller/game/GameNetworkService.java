@@ -1,8 +1,12 @@
 package com.historicconquest.historicconquest.controller.game;
 
+import com.historicconquest.historicconquest.controller.overlay.Notification;
+import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
+import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.service.network.RoomService;
+import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +25,7 @@ public final class GameNetworkService {
     private static List<String> startTurnOrder;
     private static String startCurrentPlayerId;
     private static final Map<String, Integer> playerIndexById = new HashMap<>();
+    private static final Map<Integer, String> playerIdByIndex = new HashMap<>();
 
     private GameNetworkService() { }
 
@@ -39,6 +44,7 @@ public final class GameNetworkService {
         enabled = true;
         localPlayerId = RoomService.getPlayerId();
         playerIndexById.clear();
+        playerIdByIndex.clear();
 
         List<String> turnOrder = startTurnOrder != null && !startTurnOrder.isEmpty()
             ? startTurnOrder
@@ -46,6 +52,10 @@ public final class GameNetworkService {
 
         for (int i = 0; i < turnOrder.size(); i++) {
             playerIndexById.put(turnOrder.get(i), i);
+        }
+
+        for (int i = 0; i < roomPlayers.size(); i++) {
+            playerIdByIndex.put(i, roomPlayers.get(i).getId());
         }
 
         currentPlayerId = startCurrentPlayerId != null ? startCurrentPlayerId : (turnOrder.isEmpty() ? null : turnOrder.getFirst());
@@ -65,6 +75,7 @@ public final class GameNetworkService {
         localPlayerId = null;
         currentPlayerId = null;
         playerIndexById.clear();
+        playerIdByIndex.clear();
         startTurnOrder = null;
         startCurrentPlayerId = null;
     }
@@ -103,6 +114,33 @@ public final class GameNetworkService {
             "SKIP",
             Map.of()
         );
+    }
+
+    public static void sendCoalitionRequest(Player target) {
+        if (!enabled || target == null) return;
+
+        String targetId = getNetworkPlayerId(target);
+        if (targetId == null) return;
+
+        RoomService.sendCoalitionRequest(targetId);
+    }
+
+    public static void sendCoalitionAccept(Player requester) {
+        if (!enabled || requester == null) return;
+
+        String requesterId = getNetworkPlayerId(requester);
+        if (requesterId == null) return;
+
+        RoomService.sendCoalitionAccept(requesterId);
+    }
+
+    public static void sendCoalitionDecline(Player requester) {
+        if (!enabled || requester == null) return;
+
+        String requesterId = getNetworkPlayerId(requester);
+        if (requesterId == null) return;
+
+        RoomService.sendCoalitionDecline(requesterId);
     }
 
     public static void handleGameAction(String action, String zoneName, Integer difficulty, Boolean correct) {
@@ -145,6 +183,84 @@ public final class GameNetworkService {
         }
     }
 
+    public static void handleCoalitionRequested(String requesterId, String targetId) {
+        if (!enabled || controller == null || requesterId == null || targetId == null) return;
+
+        if (!targetId.equals(localPlayerId)) {
+            return;
+        }
+
+        Player requester = getPlayerByNetworkId(requesterId);
+        Player target = getPlayerByNetworkId(targetId);
+        if (requester == null || target == null) return;
+
+        target.setPendingAllianceRequest(requester);
+        NotificationController.show(
+            "Alliance Request",
+            requester.getPseudo() + " wants to form an alliance with you!",
+            Notification.Type.INFORMATION,
+            7000
+        );
+    }
+
+    public static void handleCoalitionAccepted(String playerAId, String playerBId, String allianceColor) {
+        if (!enabled || controller == null || playerAId == null || playerBId == null) return;
+
+        Player playerA = getPlayerByNetworkId(playerAId);
+        Player playerB = getPlayerByNetworkId(playerBId);
+        if (playerA == null || playerB == null) return;
+
+        Color color = parseAllianceColor(allianceColor);
+
+        applyAlliance(playerA, playerB, color);
+
+        if (playerAId.equals(localPlayerId) || playerBId.equals(localPlayerId)) {
+            NotificationController.show(
+                "Alliance",
+                "You are now allied with " + (playerAId.equals(localPlayerId) ? playerB.getPseudo() : playerA.getPseudo()),
+                Notification.Type.SUCCESS,
+                5000
+            );
+        }
+    }
+
+    public static void handleCoalitionDeclined(String requesterId, String targetId) {
+        if (!enabled || controller == null || requesterId == null || targetId == null) return;
+
+        Player target = getPlayerByNetworkId(targetId);
+        if (target != null) {
+            target.clearPendingRequest();
+        }
+
+        if (requesterId.equals(localPlayerId)) {
+            NotificationController.show(
+                "Alliance",
+                "Your alliance request was declined.",
+                Notification.Type.INFORMATION,
+                4000
+            );
+        }
+    }
+
+    public static void handleCoalitionBroken(String playerAId, String playerBId) {
+        if (!enabled || controller == null || playerAId == null || playerBId == null) return;
+
+        Player playerA = getPlayerByNetworkId(playerAId);
+        Player playerB = getPlayerByNetworkId(playerBId);
+        if (playerA == null || playerB == null) return;
+
+        clearAlliance(playerA, playerB);
+
+        if (playerAId.equals(localPlayerId) || playerBId.equals(localPlayerId)) {
+            NotificationController.show(
+                "Alliance",
+                "Your alliance has ended.",
+                Notification.Type.INFORMATION,
+                4000
+            );
+        }
+    }
+
     private static void applyZoneAction(String zoneName, ZoneAction actionHandler) {
         if (zoneName == null || zoneName.isBlank()) return;
 
@@ -152,6 +268,68 @@ public final class GameNetworkService {
         if (zone == null) return;
 
         actionHandler.apply(zone, false);
+    }
+
+    private static String getNetworkPlayerId(Player player) {
+        if (player == null) return null;
+        return playerIdByIndex.get(player.getId());
+    }
+
+    private static Player getPlayerByNetworkId(String playerId) {
+        if (controller == null || playerId == null) return null;
+
+        Integer index = playerIndexById.get(playerId);
+        if (index == null) return null;
+
+        List<Player> players = controller.getPlayers();
+        if (index < 0 || index >= players.size()) return null;
+
+        return players.get(index);
+    }
+
+    private static void applyAlliance(Player playerA, Player playerB, Color allianceColor) {
+        playerA.setAlly(playerB);
+        playerB.setAlly(playerA);
+        playerA.setCurrentAllianceColor(allianceColor);
+        playerB.setCurrentAllianceColor(allianceColor);
+        playerA.clearPendingRequest();
+        playerB.clearPendingRequest();
+
+        for (Zone zone : playerA.getZones()) {
+            zone.setColor(allianceColor);
+        }
+        for (Zone zone : playerB.getZones()) {
+            zone.setColor(allianceColor);
+        }
+    }
+
+    private static void clearAlliance(Player playerA, Player playerB) {
+        playerA.setAlly(null);
+        playerB.setAlly(null);
+        playerA.setCurrentAllianceColor(null);
+        playerB.setCurrentAllianceColor(null);
+        playerA.clearPendingRequest();
+        playerB.clearPendingRequest();
+
+        for (Zone zone : playerA.getZones()) {
+            zone.setColor(playerA.getColor().getJavafxColor());
+        }
+        for (Zone zone : playerB.getZones()) {
+            zone.setColor(playerB.getColor().getJavafxColor());
+        }
+    }
+
+    private static Color parseAllianceColor(String allianceColor) {
+        if (allianceColor == null || allianceColor.isBlank()) {
+            return GameController.ALLIANCE_1_COLOR;
+        }
+
+        try {
+            return Color.web(allianceColor.trim());
+
+        } catch (IllegalArgumentException e) {
+            return GameController.ALLIANCE_1_COLOR;
+        }
     }
 
     @FunctionalInterface

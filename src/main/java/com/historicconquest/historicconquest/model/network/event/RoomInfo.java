@@ -178,6 +178,37 @@ public enum RoomInfo {
         }
     },
 
+    COALITION_ACCEPTED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onCoalitionAccepted(
+                getText(node, "playerAId"),
+                getText(node, "playerBId"),
+                getText(node, "allianceColor")
+            ));
+        }
+    },
+
+    COALITION_DECLINED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onCoalitionDeclined(
+                getText(node, "requesterId"),
+                getText(node, "targetId")
+            ));
+        }
+    },
+
+    COALITION_BROKEN {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onCoalitionBroken(
+                getText(node, "playerAId"),
+                getText(node, "playerBId")
+            ));
+        }
+    },
+
     ROOM_DELETED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {

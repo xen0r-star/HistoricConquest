@@ -27,6 +27,13 @@ public class Room {
     private final Map<String, String> selectedZones = new ConcurrentHashMap<>();
     private final List<String> playerOrder = new CopyOnWriteArrayList<>();
 
+    private static final String ALLIANCE_COLOR_PRIMARY = "#F2F2F2";
+    private static final String ALLIANCE_COLOR_SECONDARY = "#A9A9A9";
+    private final Map<String, String> allianceByPlayer = new ConcurrentHashMap<>();
+    private final Map<String, String> allianceColorByPlayer = new ConcurrentHashMap<>();
+    private final Map<String, String> pendingAllianceRequests = new ConcurrentHashMap<>();
+    private int allianceCount;
+
     private int currentPlayerIndex;
     private String pendingZoneName;
     private String pendingAction;
@@ -142,6 +149,8 @@ public class Room {
     public void removePlayer(String playerId) {
         players.remove(playerId);
         selectedZones.remove(playerId);
+        pendingAllianceRequests.remove(playerId);
+        pendingAllianceRequests.entrySet().removeIf(entry -> playerId.equals(entry.getValue()));
 
         int removedIndex = playerOrder.indexOf(playerId);
         if (removedIndex >= 0) {
@@ -255,5 +264,68 @@ public class Room {
 
     public String getPendingAction() {
         return pendingAction;
+    }
+
+    public synchronized String getPendingAllianceRequester(String targetPlayerId) {
+        return pendingAllianceRequests.get(targetPlayerId);
+    }
+
+    public synchronized boolean hasPendingAllianceRequestFrom(String requesterId) {
+        return pendingAllianceRequests.values().stream().anyMatch(requesterId::equals);
+    }
+
+    public synchronized boolean setPendingAllianceRequest(String requesterId, String targetPlayerId) {
+        if (requesterId == null || targetPlayerId == null) return false;
+        if (requesterId.equals(targetPlayerId)) return false;
+        if (hasAlliance(requesterId) || hasAlliance(targetPlayerId)) return false;
+        if (pendingAllianceRequests.containsKey(targetPlayerId)) return false;
+        if (hasPendingAllianceRequestFrom(requesterId)) return false;
+
+        pendingAllianceRequests.put(targetPlayerId, requesterId);
+        return true;
+    }
+
+    public synchronized void clearPendingAllianceRequest(String targetPlayerId) {
+        pendingAllianceRequests.remove(targetPlayerId);
+    }
+
+    public synchronized void clearPendingAllianceRequestsFrom(String requesterId) {
+        pendingAllianceRequests.entrySet().removeIf(entry -> requesterId.equals(entry.getValue()));
+    }
+
+    public synchronized boolean hasAlliance(String playerId) {
+        return allianceByPlayer.containsKey(playerId);
+    }
+
+    public synchronized String getAlliancePartner(String playerId) {
+        return allianceByPlayer.get(playerId);
+    }
+
+    public synchronized String createAlliance(String playerAId, String playerBId) {
+        String color = nextAllianceColor();
+        allianceByPlayer.put(playerAId, playerBId);
+        allianceByPlayer.put(playerBId, playerAId);
+        allianceColorByPlayer.put(playerAId, color);
+        allianceColorByPlayer.put(playerBId, color);
+        return color;
+    }
+
+    public synchronized void clearAllianceForPlayer(String playerId) {
+        String allyId = allianceByPlayer.remove(playerId);
+        if (allyId != null) {
+            allianceByPlayer.remove(allyId);
+            allianceColorByPlayer.remove(playerId);
+            allianceColorByPlayer.remove(allyId);
+        }
+    }
+
+    public synchronized String getAllianceColor(String playerId) {
+        return allianceColorByPlayer.get(playerId);
+    }
+
+    private synchronized String nextAllianceColor() {
+        allianceCount++;
+        if (allianceCount == 1) return ALLIANCE_COLOR_PRIMARY;
+        return ALLIANCE_COLOR_SECONDARY;
     }
 }

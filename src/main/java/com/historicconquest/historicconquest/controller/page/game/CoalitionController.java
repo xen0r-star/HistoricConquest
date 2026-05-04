@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.controller.page.game;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.map.Zone;
@@ -64,6 +65,18 @@ public class CoalitionController {
         Player sender = GameController.getInstance().getCurrentPlayer();
 
         if (target != null && !target.hasAlly()) {
+            if (GameNetworkService.isEnabled()) {
+                GameNetworkService.sendCoalitionRequest(target);
+                NotificationController.show(
+                    "Proposal Sent",
+                    "Request sent to " + target.getPseudo(),
+                    Notification.Type.SUCCESS,
+                    5000
+                );
+                closeAlliance();
+                return;
+            }
+
             target.setPendingAllianceRequest(sender);
 
             NotificationController.show(
@@ -107,6 +120,14 @@ public class CoalitionController {
         Player current = GameController.getInstance().getCurrentPlayer();
         Player requester = current.getPendingAllianceRequest();
 
+        if (GameNetworkService.isEnabled()) {
+            if (requester != null) {
+                GameNetworkService.sendCoalitionAccept(requester);
+            }
+            closeAlliance();
+            return;
+        }
+
         Color allianceColor = GameController.getInstance().getNextAllianceColor();
 
         current.setAlly(requester);
@@ -132,6 +153,16 @@ public class CoalitionController {
     @FXML
     public void declineAlliance() {
         Player current = GameController.getInstance().getCurrentPlayer();
+        Player requester = current.getPendingAllianceRequest();
+
+        if (GameNetworkService.isEnabled()) {
+            if (requester != null) {
+                GameNetworkService.sendCoalitionDecline(requester);
+            }
+            closeAlliance();
+            return;
+        }
+
         current.clearPendingRequest();
         refreshPlayerList();
     }

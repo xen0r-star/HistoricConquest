@@ -190,6 +190,17 @@ public class RoomService {
                         );
                     }
 
+                    if ("COALITION_REQUESTED".equals(type)) {
+                        String requesterId = payload.get("requesterId").asString();
+                        String targetId = payload.get("targetId").asString();
+
+                        Platform.runLater(() -> {
+                            if (listener != null) {
+                                listener.onCoalitionRequested(requesterId, targetId);
+                            }
+                        });
+                    }
+
                 } catch (Exception e) {
                     System.err.println("Error reading private message (Reply) " + e);
                 }
@@ -462,6 +473,57 @@ public class RoomService {
             getInstance().notifyError(
                 "Failed to send game action",
                 "Impossible to send game action, Please try again."
+            );
+        }
+    }
+
+    public static void sendCoalitionRequest(String targetPlayerId) {
+        if (targetPlayerId == null || targetPlayerId.isBlank()) return;
+
+        try {
+            getInstance().socketClient.sendJson(
+                "/app/game/coalition/request",
+                Map.of("targetPlayerId", targetPlayerId)
+            );
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to send coalition request",
+                "Impossible to send coalition request, Please try again."
+            );
+        }
+    }
+
+    public static void sendCoalitionAccept(String requesterId) {
+        if (requesterId == null || requesterId.isBlank()) return;
+
+        try {
+            getInstance().socketClient.sendJson(
+                "/app/game/coalition/accept",
+                Map.of("requesterId", requesterId)
+            );
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to accept coalition",
+                "Impossible to accept coalition, Please try again."
+            );
+        }
+    }
+
+    public static void sendCoalitionDecline(String requesterId) {
+        if (requesterId == null || requesterId.isBlank()) return;
+
+        try {
+            getInstance().socketClient.sendJson(
+                "/app/game/coalition/decline",
+                Map.of("requesterId", requesterId)
+            );
+
+        } catch (Exception e) {
+            getInstance().notifyError(
+                "Failed to decline coalition",
+                "Impossible to decline coalition, Please try again."
             );
         }
     }
