@@ -50,13 +50,13 @@
       </StackPane.margin>
    </VBox>
    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
-      <Button fx:id="newGameBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="NEW GAME">
+      <Button fx:id="newGameBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="LOCAL">
          <styleClass>
             <String fx:value="button-main" />
             <String fx:value="button-green" />
          </styleClass>
       </Button>
-      <Button fx:id="multiplayerBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="MULTIPLAYER">
+      <Button fx:id="multiplayerBtn" mnemonicParsing="false" stylesheets="@../styles/style.css" text="ONLINE">
          <styleClass>
             <String fx:value="button-main" />
             <String fx:value="button-blue" />
@@ -73,19 +73,6 @@
       </StackPane.margin>
    </VBox>
    <VBox alignment="BOTTOM_RIGHT" pickOnBounds="false" prefHeight="200.0" prefWidth="100.0" spacing="15.0" StackPane.alignment="BOTTOM_RIGHT">
-      <Button fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../styles/style.css">
-         <styleClass>
-            <String fx:value="button-icon" />
-            <String fx:value="button-gray" />
-         </styleClass>
-         <graphic>
-            <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
-               <Image url="@../icons/settings.png" />
-            </ImageView>
-         </graphic>
-         <padding>
-            <Insets bottom="0.5" left="0.5" right="0.5" top="0.5" />
-         </padding></Button>
       <Button fx:id="helpBtn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../styles/style.css">
          <styleClass>
             <String fx:value="button-icon" />
@@ -94,6 +81,19 @@
          <graphic>
             <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
                <Image url="@../icons/help.png" />
+            </ImageView>
+         </graphic>
+         <padding>
+            <Insets bottom="0.5" left="0.5" right="0.5" top="0.5" />
+         </padding></Button>
+      <Button fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../styles/style.css">
+         <styleClass>
+            <String fx:value="button-icon" />
+            <String fx:value="button-gray" />
+         </styleClass>
+         <graphic>
+            <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@../icons/settings.png" />
             </ImageView>
          </graphic>
          <padding>

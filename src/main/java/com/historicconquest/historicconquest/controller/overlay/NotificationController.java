@@ -25,8 +25,8 @@ public class NotificationController {
 		root = new VBox(12);
 		root.setPickOnBounds(false);
 		root.setMouseTransparent(false);
-		root.setAlignment(Pos.BOTTOM_RIGHT);
-        StackPane.setAlignment(root, Pos.BOTTOM_RIGHT);
+		root.setAlignment(Pos.TOP_RIGHT);
+        StackPane.setAlignment(root, Pos.TOP_RIGHT);
         StackPane.setMargin(root, new Insets(40, 40, 40, 40));
     }
 

@@ -34,10 +34,9 @@ public class ZoneInfoPanel {
 
 
     public void setThemeImage(TypeThemes typeTheme) {
-        System.out.println();
         switch (typeTheme) {
             case ENTERTAINMENT ->   ThemeImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
-            case INFORMATICS ->      ThemeImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/view/icons/informatics-icon.png")).toExternalForm()));
+            case INFORMATICS ->     ThemeImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/view/icons/informatics-icon.png")).toExternalForm()));
             case TOURISM ->         ThemeImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/view/icons/tourism-icon.png")).toExternalForm()));
             case MYSTERY ->         ThemeImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/view/icons/mystery-icon.png")).toExternalForm()));
             default ->              ThemeImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/view/icons/default.png")).toExternalForm()));

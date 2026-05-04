@@ -27,7 +27,7 @@ public class DisplayInfoGame {
     @FXML public Label playerPower3;
     @FXML public Label playerPower4;
 
-    private static final String ROW_HIGHLIGHT_STYLE = "-fx-background-color: #C5A68266;";
+    private static final String ROW_HIGHLIGHT_STYLE = "-fx-background-color: #A47E5866;";
 
     public void updateGameInfo(List<Player> players, int currentPlayerIndex) {
         updateRow(0, players, currentPlayerIndex, row1, playerTop1, playerName1, playerPower1);
