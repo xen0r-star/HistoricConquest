@@ -7,7 +7,6 @@ import java.util.List;
 
 public class Zone {
     private final String name;
-    private final String blocName;
     private final TypeThemes themes;
     private int power;
     private static final int MAX_POWER_ZONE = 8;
@@ -19,9 +18,8 @@ public class Zone {
     private String oceanName;
 
 
-    public Zone(String name, String blocName, TypeThemes themes, int power) {
+    public Zone(String name, TypeThemes themes, int power) {
         this.name = name;
-        this.blocName = blocName;
         this.themes = themes;
         this.power = power;
         this.adjacentZones = new ArrayList<>();
@@ -64,16 +62,8 @@ public class Zone {
         return nameOwner ;
     }
 
-    public String getBlocName() {
-        return blocName;
-    }
-
     public TypeThemes getThemes() {
         return themes;
-    }
-
-    public String getPowerText() {
-        return String.valueOf(power);
     }
 
     public void setPower(int power) {

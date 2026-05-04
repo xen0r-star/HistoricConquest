@@ -77,32 +77,16 @@ public class Player {
 
 
     public enum Status {
-        Ready("Ready"),
-        Waiting("Waiting");
+        Ready(),
+        Waiting();
 
-        private final String label;
-
-        Status(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
+        Status() { }
     }
 
     public enum Type {
-        Bot("Bot"),
-        Player("Player");
+        Bot(),
+        Player();
 
-        private final String label;
-
-        Type(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
+        Type() { }
     }
 }

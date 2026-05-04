@@ -35,8 +35,7 @@ public class WorldMap {
                     String zoneName = zoneNode.get("name").asString();
                     Zone zone = new Zone(
                         zoneName,
-                        blocName,
-                        TypeThemes.getRandom(),
+                            TypeThemes.getRandom(),
                         0
                     );
 
@@ -80,9 +79,9 @@ public class WorldMap {
                 new TypeReference<>() {}
             );
             if (oceanAdjacencies != null) {
-                oceanAdjacencies.forEach((oceanName, zoneNames) -> {
-                    connectBoatAdjacencies(zonesByName, zoneNames, oceanName);
-                });
+                oceanAdjacencies.forEach((oceanName, zoneNames) ->
+                    connectBoatAdjacencies(zonesByName, zoneNames, oceanName)
+                );
             }
 
         } catch (Exception e) {

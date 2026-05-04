@@ -13,7 +13,7 @@ public class Theme {
     private static final Logger logger = LoggerFactory.getLogger(Theme.class);
 
     private TypeThemes name;
-    private List<Question> questions;
+    private final List<Question> questions;
 
     public Theme(TypeThemes name) {
         this.name = name;
@@ -64,9 +64,5 @@ public class Theme {
 
     public List<Question> getQuestions() {
         return questions;
-    }
-
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
     }
 }

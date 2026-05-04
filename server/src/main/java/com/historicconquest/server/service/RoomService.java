@@ -126,7 +126,7 @@ public class RoomService {
         }
 
         long startAt = System.currentTimeMillis() + 5000;
-        room.markGameStarting(startAt);
+        room.markGameStarting();
         return startAt;
     }
 
@@ -145,7 +145,7 @@ public class RoomService {
         }
 
         long startAt = System.currentTimeMillis() + 30_000L;
-        room.markZoneSelectionStarted(startAt);
+        room.markZoneSelectionStarted();
 
         autoAssignBotZones(room);
         return new ZoneSelectionStart(startAt, room.getSelectedZones());
@@ -205,13 +205,6 @@ public class RoomService {
         Room room = rooms.get(roomCode);
         if (room != null) {
             room.cancelGameStarting();
-        }
-    }
-
-    public void finishGameStart(String roomCode) {
-        Room room = rooms.get(roomCode);
-        if (room != null) {
-            room.markGameStarted();
         }
     }
 

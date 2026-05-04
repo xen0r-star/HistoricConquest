@@ -3,7 +3,6 @@ package com.historicconquest.server.model.questions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public record Question(
@@ -31,9 +30,5 @@ public record Question(
         if (choices == null || choices.size() != NUMBER_CHOICE) {
             throw new IllegalArgumentException("Choices must be a list of " + NUMBER_CHOICE + " items.");
         }
-    }
-
-    public boolean isCorrectAnswer(String input) {
-        return Objects.equals(this.answer, input);
     }
 }

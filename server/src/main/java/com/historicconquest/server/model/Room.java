@@ -19,7 +19,6 @@ public class Room {
     private boolean gameStarting;
     private boolean zoneSelectionStarted;
     private boolean gameStarted;
-    private long gameStartAt;
 
     private final Map<String, Player> players = new ConcurrentHashMap<>();
     private WorldMap worldMap;
@@ -32,7 +31,6 @@ public class Room {
     private static final String ALLIANCE_COLOR_PRIMARY = "#F2F2F2";
     private static final String ALLIANCE_COLOR_SECONDARY = "#A9A9A9";
     private final Map<String, String> allianceByPlayer = new ConcurrentHashMap<>();
-    private final Map<String, String> allianceColorByPlayer = new ConcurrentHashMap<>();
     private final Map<String, String> pendingAllianceRequests = new ConcurrentHashMap<>();
     private int allianceCount;
 
@@ -74,30 +72,23 @@ public class Room {
         return gameStarted;
     }
 
-    public synchronized long getGameStartAt() {
-        return gameStartAt;
-    }
-
-    public synchronized void markGameStarting(long gameStartAt) {
+    public synchronized void markGameStarting() {
         this.gameStarting = true;
         this.gameStarted = false;
         this.zoneSelectionStarted = false;
-        this.gameStartAt = gameStartAt;
         this.selectedZones.clear();
     }
 
-    public synchronized void markZoneSelectionStarted(long gameStartAt) {
+    public synchronized void markZoneSelectionStarted() {
         this.gameStarting = false;
         this.gameStarted = false;
         this.zoneSelectionStarted = true;
-        this.gameStartAt = gameStartAt;
         this.selectedZones.clear();
     }
 
     public synchronized void cancelGameStarting() {
         this.gameStarting = false;
         this.zoneSelectionStarted = false;
-        this.gameStartAt = 0L;
         this.selectedZones.clear();
     }
 
@@ -105,7 +96,6 @@ public class Room {
         this.gameStarting = false;
         this.zoneSelectionStarted = false;
         this.gameStarted = true;
-        this.gameStartAt = 0L;
         this.currentPlayerIndex = 0;
     }
 
@@ -134,10 +124,6 @@ public class Room {
 
     public synchronized boolean areAllPlayersAssigned() {
         return players.size() == MAX_PLAYER && selectedZones.size() == players.size();
-    }
-
-    public synchronized void removeSelectedZone(String playerId) {
-        selectedZones.remove(playerId);
     }
 
     public void addPlayer(Player player) throws Exception {
@@ -339,8 +325,6 @@ public class Room {
         String color = nextAllianceColor();
         allianceByPlayer.put(playerAId, playerBId);
         allianceByPlayer.put(playerBId, playerAId);
-        allianceColorByPlayer.put(playerAId, color);
-        allianceColorByPlayer.put(playerBId, color);
         return color;
     }
 
@@ -348,13 +332,7 @@ public class Room {
         String allyId = allianceByPlayer.remove(playerId);
         if (allyId != null) {
             allianceByPlayer.remove(allyId);
-            allianceColorByPlayer.remove(playerId);
-            allianceColorByPlayer.remove(allyId);
         }
-    }
-
-    public synchronized String getAllianceColor(String playerId) {
-        return allianceColorByPlayer.get(playerId);
     }
 
     private synchronized String nextAllianceColor() {
@@ -377,7 +355,7 @@ public class Room {
                 totalZones += countZonesForPlayer(allyId);
             }
 
-            if (totalZones >= 2) {
+            if (totalZones >= 21) {
                 return player;
             }
         }
