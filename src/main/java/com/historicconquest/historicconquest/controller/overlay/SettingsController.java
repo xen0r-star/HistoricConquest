@@ -1,6 +1,7 @@
 package com.historicconquest.historicconquest.controller.overlay;
 
 import com.historicconquest.historicconquest.controller.core.AppController;
+import com.historicconquest.historicconquest.util.Music;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,9 +19,7 @@ public class SettingsController implements Initializable {
     private static StackPane root;
 
     @FXML private Slider musicSlider;
-    @FXML private Slider sfxSlider;
     @FXML private Label musicValueLabel;
-    @FXML private Label sfxValueLabel;
     @FXML private CheckBox muteCheck;
 
     @FXML private ComboBox<String> resolutionCombo;
@@ -32,19 +31,16 @@ public class SettingsController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         resolutionCombo.getItems().addAll("1280 x 720", "1920 x 1080", "2560 x 1440");
-        resolutionCombo.setValue("1280 x 720");
+        resolutionCombo.setValue("1920 x 1080");
 
-        musicSlider.valueProperty().addListener((obs, old, val) ->
-            musicValueLabel.setText((int) val.doubleValue() + "%")
-        );
-
-        sfxSlider.valueProperty().addListener((obs, old, val) ->
-            sfxValueLabel.setText((int) val.doubleValue() + "%")
-        );
+        musicSlider.valueProperty().addListener((obs, old, val) -> {
+            musicValueLabel.setText((int) val.doubleValue() + "%");
+            Music.setVolume(val.doubleValue() / 100.0);
+        });
 
         muteCheck.selectedProperty().addListener((obs, old, muted) -> {
             musicSlider.setDisable(muted);
-            sfxSlider.setDisable(muted);
+            Music.setMuted(muted);
         });
     }
 
@@ -64,7 +60,6 @@ public class SettingsController implements Initializable {
 
         System.out.println("=== Paramètres sauvegardés ===");
         System.out.println("Musique    : " + (int) musicSlider.getValue() + "%");
-        System.out.println("Effets     : " + (int) sfxSlider.getValue() + "%");
         System.out.println("Muet       : " + muteCheck.isSelected());
         System.out.println("Résolution : " + resolution);
         System.out.println("Plein écran: " + fullscreenCheck.isSelected());

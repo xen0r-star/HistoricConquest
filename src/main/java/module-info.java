@@ -2,6 +2,7 @@ module com.historicconquest.historicconquest {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
+    requires javafx.media;
     requires java.net.http;
     requires tools.jackson.core;
     requires org.java_websocket;

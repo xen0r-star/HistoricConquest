@@ -23,7 +23,7 @@
                 <padding>
                     <Insets bottom="30" left="40" right="40" top="30" />
                 </padding>
-                <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                <VBox prefWidth="100.0" spacing="5.0">
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="AUDIO" textFill="WHITE" />
                     </HBox>
@@ -31,19 +31,14 @@
                         <Label minWidth="-Infinity" text="Music" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <Slider fx:id="musicSlider" prefWidth="320" value="50.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                         <Label fx:id="musicValueLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" minWidth="-Infinity" prefHeight="24.0" prefWidth="62.0" text="50%" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-
-                        <Label minWidth="-Infinity" text="Sound effects" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <Slider fx:id="sfxSlider" prefWidth="320" value="50.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label fx:id="sfxValueLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="82.0" text="50%" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Label minWidth="-Infinity" text="Silent" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                        <CheckBox fx:id="muteCheck" style="-fx-background-color: #ffffff; -fx-border-width: 0;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label minWidth="-Infinity" text="Silent" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="muteCheck" style="-fx-background-color: #ffffff; -fx-border-width: 0;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <columnConstraints>
                             <ColumnConstraints />
                             <ColumnConstraints maxWidth="307.0" minWidth="267.0" prefWidth="267.0" />
                             <ColumnConstraints maxWidth="83.5" minWidth="50.5" prefWidth="58.5" />
                         </columnConstraints>
                         <rowConstraints>
-                            <RowConstraints />
                             <RowConstraints />
                             <RowConstraints />
                         </rowConstraints>
