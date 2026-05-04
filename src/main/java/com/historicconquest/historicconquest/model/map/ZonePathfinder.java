@@ -19,45 +19,23 @@ public class ZonePathfinder {
             return new PathResult(List.of(start), PathType.SAME_ZONE);
         }
 
-        Queue<SearchNode> queue = new LinkedList<>();
-        Map<Zone, Zone> parent = new HashMap<>();
-        Map<Zone, Integer> depth = new HashMap<>();
-        Map<Zone, Boolean> usesBoatPath = new HashMap<>();
-        Set<Zone> visited = new HashSet<>();
+        List<Zone> landPath = findLandPath(start, end);
+        if (landPath != null && landPath.size() <= MAX_PATH_LENGTH) {
+            return new PathResult(landPath, PathType.DIRECT);
+        }
 
-        queue.add(new SearchNode(start, false));
-        visited.add(start);
-        depth.put(start, 0);
-        usesBoatPath.put(start, false);
+        if (isBoatReachable(start, end)) {
+            return new PathResult(List.of(start, end), PathType.BOAT);
+        }
 
-        while (!queue.isEmpty()) {
-            SearchNode currentNode = queue.poll();
-            Zone current = currentNode.zone();
-            int currentDepth = depth.get(current);
-
-            if (current == end) {
-                List<Zone> path = reconstructPath(parent, end);
-
-                PathType pathType = usesBoatPath.getOrDefault(end, false) ? PathType.BOAT : PathType.DIRECT;
-
-                if (path.size() <= MAX_PATH_LENGTH) {
-                    return new PathResult(path, pathType);
-
-                } else {
-                    NotificationController.show(
-                        "Movement Impossible",
-                        "Target is too far (" + (path.size() - 1) + " zones away). Check your movement range!",
-                        Notification.Type.ERROR,
-                        5000
-                    );
-                    return new PathResult(path, PathType.IMPOSSIBLE);
-                }
-            }
-
-            if (currentDepth >= MAX_SEARCH_DEPTH) continue;
-
-            enqueueNeighbors(queue, parent, depth, usesBoatPath, visited, current, currentNode.usesBoat(), current.getAdjacentZones(), false, currentDepth);
-            enqueueNeighbors(queue, parent, depth, usesBoatPath, visited, current, currentNode.usesBoat(), current.getAdjacentBoatZones(), true, currentDepth);
+        if (landPath != null) {
+            NotificationController.show(
+                "Movement Impossible",
+                "Target is too far (" + (landPath.size() - 1) + " zones away). Check your movement range!",
+                Notification.Type.ERROR,
+                5000
+            );
+            return new PathResult(landPath, PathType.IMPOSSIBLE);
         }
 
         GameController.getInstance().nextPlayer();
@@ -91,21 +69,10 @@ public class ZonePathfinder {
                     }
                 }
             }
+        }
 
-            if (current.getAdjacentBoatZones() != null) {
-                for (Zone neighbor : current.getAdjacentBoatZones()) {
-
-                    if (neighbor.getOceanName() != null && neighbor.getOceanName().equals(start.getOceanName())) {
-                        int newDist = 4;
-
-                        if (newDist <= maxDistance && (!distanceMap.containsKey(neighbor) || newDist < distanceMap.get(neighbor))) {
-                            visited.add(neighbor);
-                            distanceMap.put(neighbor, newDist);
-                            queue.add(neighbor);
-                        }
-                    }
-                }
-            }
+        if (maxDistance >= 4 && start.getAdjacentBoatZones() != null) {
+            visited.addAll(start.getAdjacentBoatZones());
         }
 
         return visited;
@@ -115,44 +82,93 @@ public class ZonePathfinder {
         if (start == null || end == null || maxDepth < 0) return new DistanceResult(-1, false);
         if (start == end) return new DistanceResult(0, false);
 
-        PriorityQueue<NodeDistance> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.distance));
-        Map<Zone, Integer> bestDistances = new HashMap<>();
+        int landDistance = computeLandDistance(start, end, maxDepth);
+        int boatDistance = (maxDepth >= 4 && isBoatReachable(start, end)) ? 4 : -1;
 
-        pq.add(new NodeDistance(start, 0, false));
-        bestDistances.put(start, 0);
+        if (landDistance > 0 && (boatDistance == -1 || landDistance <= boatDistance)) {
+            return new DistanceResult(landDistance, false);
+        }
 
-        while (!pq.isEmpty()) {
-            NodeDistance current = pq.poll();
+        if (boatDistance > 0) {
+            return new DistanceResult(boatDistance, true);
+        }
 
-            if (current.distance > maxDepth) continue;
-            if (current.zone == end) {
-                return new DistanceResult(current.distance, current.usesBoat);
+        return new DistanceResult(-1, false);
+    }
+
+    private static List<Zone> findLandPath(Zone start, Zone end) {
+        Queue<Zone> queue = new LinkedList<>();
+        Map<Zone, Zone> parent = new HashMap<>();
+        Set<Zone> visited = new HashSet<>();
+
+        queue.add(start);
+        visited.add(start);
+
+        while (!queue.isEmpty()) {
+            Zone current = queue.poll();
+            if (current == end) {
+                return reconstructPath(parent, end);
             }
 
-            if (current.distance > bestDistances.getOrDefault(current.zone, Integer.MAX_VALUE)) continue;
-
-            if (current.zone.getAdjacentZones() != null) {
-                for (Zone neighbor : current.zone.getAdjacentZones()) {
-                    int newDist = current.distance + 1;
-                    if (newDist <= maxDepth && newDist < bestDistances.getOrDefault(neighbor, Integer.MAX_VALUE)) {
-                        bestDistances.put(neighbor, newDist);
-                        pq.add(new NodeDistance(neighbor, newDist, current.usesBoat));
-                    }
-                }
+            if (current.getAdjacentZones() == null) continue;
+            for (Zone neighbor : current.getAdjacentZones()) {
+                if (visited.contains(neighbor)) continue;
+                visited.add(neighbor);
+                parent.put(neighbor, current);
+                queue.add(neighbor);
             }
+        }
 
-            if (current.zone.getAdjacentBoatZones() != null) {
-                for (Zone neighbor : current.zone.getAdjacentBoatZones()) {
-                    int newDist = 4;
-                    if (newDist <= maxDepth && newDist < bestDistances.getOrDefault(neighbor, Integer.MAX_VALUE)) {
-                        bestDistances.put(neighbor, newDist);
-                        pq.add(new NodeDistance(neighbor, newDist, true));
-                    }
+        return null;
+    }
+
+    private static int computeLandDistance(Zone start, Zone end, int maxDepth) {
+        Queue<Zone> queue = new LinkedList<>();
+        Map<Zone, Integer> distanceMap = new HashMap<>();
+
+        queue.add(start);
+        distanceMap.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            Zone current = queue.poll();
+            int dist = distanceMap.get(current);
+            if (dist > maxDepth) continue;
+            if (current == end) return dist;
+
+            if (current.getAdjacentZones() == null) continue;
+            for (Zone neighbor : current.getAdjacentZones()) {
+                int newDist = dist + 1;
+                if (newDist <= maxDepth && newDist < distanceMap.getOrDefault(neighbor, Integer.MAX_VALUE)) {
+                    distanceMap.put(neighbor, newDist);
+                    queue.add(neighbor);
                 }
             }
         }
 
-        return new DistanceResult(-1, false);
+        return -1;
+    }
+
+    private static boolean isBoatReachable(Zone start, Zone end) {
+        if (start.getAdjacentBoatZones() == null) return false;
+        if (start.getAdjacentBoatZones().contains(end)) return true;
+
+        Queue<Zone> queue = new LinkedList<>();
+        Set<Zone> visited = new HashSet<>();
+        queue.add(start);
+        visited.add(start);
+
+        while (!queue.isEmpty()) {
+            Zone current = queue.poll();
+            if (current == end) return true;
+            if (current.getAdjacentBoatZones() == null) continue;
+            for (Zone neighbor : current.getAdjacentBoatZones()) {
+                if (visited.add(neighbor)) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return false;
     }
 
     private static List<Zone> reconstructPath(Map<Zone, Zone> parent, Zone end) {
@@ -167,34 +183,6 @@ public class ZonePathfinder {
         return path;
     }
 
-    private static void enqueueNeighbors(
-            Queue<SearchNode> queue,
-            Map<Zone, Zone> parent,
-            Map<Zone, Integer> depth,
-            Map<Zone, Boolean> usesBoatPath,
-            Set<Zone> visited,
-            Zone current,
-            boolean currentUsesBoat,
-            List<Zone> neighbors,
-            boolean edgeIsBoat,
-            int currentDepth
-    ) {
-        if (neighbors == null) return;
-
-        for (Zone neighbor : neighbors) {
-            if (visited.contains(neighbor)) continue;
-
-            visited.add(neighbor);
-            parent.put(neighbor, current);
-            depth.put(neighbor, currentDepth + 1);
-            boolean pathUsesBoat = currentUsesBoat || edgeIsBoat;
-            usesBoatPath.put(neighbor, pathUsesBoat);
-            queue.add(new SearchNode(neighbor, pathUsesBoat));
-        }
-    }
-
-    private record SearchNode(Zone zone, boolean usesBoat) {}
-    private record NodeDistance(Zone zone, int distance, boolean usesBoat) {}
     public record DistanceResult(int distance, boolean isBoat) {}
 
 

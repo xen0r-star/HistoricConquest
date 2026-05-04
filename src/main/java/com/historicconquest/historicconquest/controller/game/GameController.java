@@ -1,10 +1,7 @@
 package com.historicconquest.historicconquest.controller.game;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
@@ -23,6 +20,7 @@ import com.historicconquest.historicconquest.view.map.ZoneView;
 import javafx.animation.PathTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -32,7 +30,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.QuadCurveTo;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.util.Duration;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+
+import java.io.InputStream;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class GameController implements GameAnimationPort {
@@ -52,7 +58,11 @@ public class GameController implements GameAnimationPort {
     public static final Color ALLIANCE_2_COLOR = Color.web("#A9A9A9");
 
     private static final int TRAVEL_HINT_MAX_DISTANCE = 4;
+    private static final double TRAVEL_PREVIEW_CORNER_RADIUS = 18.0;
+    private static final String OCEANS_CONFIG_PATH = "/map/oceans/oceans_config.json";
+    private static final Map<String, Point2D> OCEAN_CENTER_CACHE = new ConcurrentHashMap<>();
     private final Set<Zone> travelHintZones = new HashSet<>();
+    private Path travelPreviewPath;
 
     private int allianceCount = 0;
 
@@ -160,12 +170,26 @@ public class GameController implements GameAnimationPort {
             if (onFinished != null) onFinished.run();
             return;
         }
-        transitionPath.getElements().add(new MoveTo(startBounds.getCenterX(), startBounds.getCenterY()));
 
-        for (int i = 1; i < pathListe.size(); i++) {
-            Bounds b = getZoneBounds(pathListe.get(i));
-            if (b == null) continue;
-            transitionPath.getElements().add(new LineTo(b.getCenterX(), b.getCenterY()));
+        boolean isBoatPath = pathListe.size() == 2
+            && pathListe.getFirst().getAdjacentBoatZones().contains(pathListe.get(1));
+
+        if (isBoatPath) {
+            List<Point2D> boatPoints = buildBoatPreviewPoints(pathListe.getFirst(), pathListe.get(1));
+            Path boatPath = buildRoundedPath(boatPoints, TRAVEL_PREVIEW_CORNER_RADIUS);
+            if (boatPath != null) {
+                transitionPath.getElements().setAll(boatPath.getElements());
+            }
+        }
+
+        if (transitionPath.getElements().isEmpty()) {
+            transitionPath.getElements().add(new MoveTo(startBounds.getCenterX(), startBounds.getCenterY()));
+
+            for (int i = 1; i < pathListe.size(); i++) {
+                Bounds b = getZoneBounds(pathListe.get(i));
+                if (b == null) continue;
+                transitionPath.getElements().add(new LineTo(b.getCenterX(), b.getCenterY()));
+            }
         }
 
         PathTransition pt = new PathTransition();
@@ -201,11 +225,13 @@ public class GameController implements GameAnimationPort {
     public void previewTravelTarget() {
         Player current = getCurrentPlayer();
         if (current == null || targetZone == null) {
+            clearTravelPreviewLine();
             return;
         }
 
         Zone currentZone = current.getCurrentZone();
         if (currentZone == null || targetZone == currentZone) {
+            clearTravelPreviewLine();
             return;
         }
 
@@ -214,6 +240,14 @@ public class GameController implements GameAnimationPort {
 
         if (currentDistance > 0 && currentDistance <= TRAVEL_HINT_MAX_DISTANCE && gameHUD != null) {
             gameHUD.updateTravelTargetPrompt(targetZone.getName(), currentDistance, result.isBoat());
+
+            List<Point2D> previewPoints = result.isBoat()
+                ? buildBoatPreviewPoints(currentZone, targetZone)
+                : buildLandPreviewPoints(currentZone, targetZone, TRAVEL_HINT_MAX_DISTANCE);
+
+            renderTravelPreviewLine(previewPoints);
+        } else {
+            clearTravelPreviewLine();
         }
     }
 
@@ -281,7 +315,8 @@ public class GameController implements GameAnimationPort {
         ZonePathfinder.PathResult result = ZonePathfinder.findPath(current.getCurrentZone(), targetZone);
 
         if (result.type() == ZonePathfinder.PathType.DIRECT || result.type() == ZonePathfinder.PathType.BOAT) {
-            int distance = result.zones().size() - 1;
+            boolean isBoat = result.type() == ZonePathfinder.PathType.BOAT;
+            int distance = isBoat ? TRAVEL_HINT_MAX_DISTANCE : result.zones().size() - 1;
 
             if (distance > 0 && distance <= TRAVEL_HINT_MAX_DISTANCE) {
                 NotificationController.show(
@@ -292,11 +327,20 @@ public class GameController implements GameAnimationPort {
                 );
 
                 setPendingAction(PendingAction.NONE);
+                clearTravelPreviewLine();
+
+                if (isBoat) {
+                    applyPawnVisual(current, true);
+                }
 
                 animatePawnMove(
                     current.getPawnNode(),
                     result.zones(),
-                    null
+                    () -> {
+                        if (isBoat) {
+                            applyPawnVisual(current, false);
+                        }
+                    }
                 );
 
                 current.setCurrentZone(targetZone);
@@ -630,6 +674,7 @@ public class GameController implements GameAnimationPort {
 
     private void updateActionHint(PendingAction action) {
         clearTravelHint();
+        clearTravelPreviewLine();
 
         if (action == PendingAction.NONE) {
             return;
@@ -707,6 +752,7 @@ public class GameController implements GameAnimationPort {
     }
 
     private void clearTravelHint() {
+        clearTravelPreviewLine();
         if (travelHintZones.isEmpty()) return;
 
         for (Zone zone : travelHintZones) {
@@ -716,6 +762,216 @@ public class GameController implements GameAnimationPort {
             }
         }
         travelHintZones.clear();
+    }
+
+    private void renderTravelPreviewLine(List<Point2D> points) {
+        clearTravelPreviewLine();
+
+        if (points == null || points.size() < 2 || mapView == null) return;
+
+        Path path = buildRoundedPath(points, TRAVEL_PREVIEW_CORNER_RADIUS);
+        if (path == null) return;
+
+        path.setMouseTransparent(true);
+        path.setFill(null);
+        path.setStroke(Color.web("#00000080"));
+        path.setStrokeWidth(2.5);
+//        path.setStrokeLineCap(StrokeLineCap.ROUND);
+//        path.setStrokeLineJoin(StrokeLineJoin.ROUND);
+        path.getStrokeDashArray().setAll(12.0, 10.0);
+        path.setOpacity(0.9);
+
+        mapView.getRoot().getChildren().add(path);
+        path.toFront();
+        travelPreviewPath = path;
+    }
+
+    private Path buildRoundedPath(List<Point2D> points, double radius) {
+        if (points == null || points.size() < 2) return null;
+
+        Path path = new Path();
+        Point2D first = points.get(0);
+        path.getElements().add(new MoveTo(first.getX(), first.getY()));
+
+        for (int i = 1; i < points.size(); i++) {
+            Point2D current = points.get(i);
+
+            if (i < points.size() - 1) {
+                Point2D prev = points.get(i - 1);
+                Point2D next = points.get(i + 1);
+                Point2D v1 = current.subtract(prev);
+                Point2D v2 = next.subtract(current);
+
+                double len1 = v1.magnitude();
+                double len2 = v2.magnitude();
+                if (len1 < 0.001 || len2 < 0.001) {
+                    path.getElements().add(new LineTo(current.getX(), current.getY()));
+                    continue;
+                }
+
+                double cornerRadius = Math.min(radius, Math.min(len1, len2) * 0.45);
+                Point2D dir1 = v1.normalize();
+                Point2D dir2 = v2.normalize();
+
+                Point2D cornerStart = current.subtract(dir1.multiply(cornerRadius));
+                Point2D cornerEnd = current.add(dir2.multiply(cornerRadius));
+
+                path.getElements().add(new LineTo(cornerStart.getX(), cornerStart.getY()));
+                path.getElements().add(new QuadCurveTo(
+                    current.getX(), current.getY(),
+                    cornerEnd.getX(), cornerEnd.getY()
+                ));
+
+            } else {
+                path.getElements().add(new LineTo(current.getX(), current.getY()));
+            }
+        }
+
+        return path;
+    }
+
+    private List<Point2D> buildLandPreviewPoints(Zone startZone, Zone endZone, int maxDepth) {
+        List<Zone> zonePath = findLandPathPreview(startZone, endZone, maxDepth);
+        if (zonePath == null || zonePath.isEmpty()) return List.of();
+
+        List<Point2D> points = new ArrayList<>();
+        for (Zone zone : zonePath) {
+            Point2D center = getZoneCenterPoint(zone);
+            if (center != null) {
+                points.add(center);
+            }
+        }
+
+        return points;
+    }
+
+    private List<Point2D> buildBoatPreviewPoints(Zone startZone, Zone endZone) {
+        Point2D start = getZoneCenterPoint(startZone);
+        Point2D end = getZoneCenterPoint(endZone);
+        if (start == null || end == null) return List.of();
+
+        Point2D oceanMid = resolveOceanMidpoint(startZone, endZone);
+        if (oceanMid == null) {
+            oceanMid = start.midpoint(end);
+        }
+
+        return List.of(start, oceanMid, end);
+    }
+
+    private Point2D getZoneCenterPoint(Zone zone) {
+        Bounds bounds = getZoneBounds(zone);
+        if (bounds == null) return null;
+        return new Point2D(bounds.getCenterX(), bounds.getCenterY());
+    }
+
+    private Point2D resolveOceanMidpoint(Zone startZone, Zone endZone) {
+        String oceanName = startZone.getOceanName();
+        if (oceanName == null || oceanName.isBlank()) {
+            oceanName = endZone.getOceanName();
+        }
+        if (oceanName == null || oceanName.isBlank()) return null;
+
+        Point2D cached = OCEAN_CENTER_CACHE.get(oceanName);
+        if (cached != null) return cached;
+
+        try (InputStream is = GameController.class.getResourceAsStream(OCEANS_CONFIG_PATH)) {
+            if (is == null) return null;
+
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, Object>> oceans = mapper.readValue(is, new TypeReference<>() {});
+            for (Map<String, Object> ocean : oceans) {
+                Object nameValue = ocean.get("name");
+                if (nameValue == null || !oceanName.equalsIgnoreCase(nameValue.toString())) continue;
+
+                double x = toDouble(ocean.get("x"));
+                double y = toDouble(ocean.get("y"));
+                double w = toDouble(ocean.get("w"));
+                double h = toDouble(ocean.get("h"));
+                Point2D center = new Point2D(x + (w / 2.0), y + (h / 2.0));
+                OCEAN_CENTER_CACHE.put(oceanName, center);
+                return center;
+            }
+
+        } catch (Exception ignored) {
+            return null;
+        }
+
+        return null;
+    }
+
+    private double toDouble(Object value) {
+        if (value == null) return 0.0;
+        if (value instanceof Number number) return number.doubleValue();
+
+        try {
+            return Double.parseDouble(value.toString());
+        } catch (NumberFormatException ex) {
+            return 0.0;
+        }
+    }
+
+    private void clearTravelPreviewLine() {
+        if (travelPreviewPath == null) return;
+        if (mapView != null) {
+            mapView.getRoot().getChildren().remove(travelPreviewPath);
+        }
+        travelPreviewPath = null;
+    }
+
+    private void applyPawnVisual(Player player, boolean useBoat) {
+        if (player == null || player.getPawnNode() == null) return;
+        if (!(player.getPawnNode() instanceof Group pawnGroup)) return;
+
+        Group newPawn = useBoat
+            ? PawnController.createShipPawn(player.getColor(), 40.0)
+            : PawnController.createHorsePawn(player.getColor(), 40.0);
+
+        pawnGroup.getChildren().setAll(newPawn.getChildren());
+        pawnGroup.setScaleX(newPawn.getScaleX());
+        pawnGroup.setScaleY(newPawn.getScaleY());
+        pawnGroup.setMouseTransparent(true);
+    }
+
+    private List<Zone> findLandPathPreview(Zone start, Zone end, int maxDepth) {
+        if (start == null || end == null || maxDepth < 0) return List.of();
+
+        Queue<Zone> queue = new LinkedList<>();
+        Map<Zone, Zone> parent = new HashMap<>();
+        Map<Zone, Integer> depth = new HashMap<>();
+        Set<Zone> visited = new HashSet<>();
+
+        queue.add(start);
+        visited.add(start);
+        depth.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            Zone current = queue.poll();
+            int currentDepth = depth.get(current);
+            if (current == end) {
+                return reconstructPath(parent, end);
+            }
+
+            if (currentDepth >= maxDepth || current.getAdjacentZones() == null) continue;
+            for (Zone neighbor : current.getAdjacentZones()) {
+                if (visited.contains(neighbor)) continue;
+                visited.add(neighbor);
+                parent.put(neighbor, current);
+                depth.put(neighbor, currentDepth + 1);
+                queue.add(neighbor);
+            }
+        }
+
+        return List.of();
+    }
+
+    private List<Zone> reconstructPath(Map<Zone, Zone> parent, Zone end) {
+        LinkedList<Zone> path = new LinkedList<>();
+        Zone current = end;
+        while (current != null) {
+            path.addFirst(current);
+            current = parent.get(current);
+        }
+        return path;
     }
 
     public int getCurrentDistance() {

@@ -156,4 +156,9 @@ public class AppController {
 			root.getChildren().add(overlay);
 		}
 	}
+
+
+	public Stage getStage() {
+		return stage;
+	}
 }
