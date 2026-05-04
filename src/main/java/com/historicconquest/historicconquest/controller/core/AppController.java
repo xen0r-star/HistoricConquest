@@ -6,7 +6,6 @@ import com.historicconquest.historicconquest.controller.overlay.HelpController;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.controller.overlay.PauseGameController;
 import com.historicconquest.historicconquest.controller.overlay.SettingsController;
-import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

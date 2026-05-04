@@ -28,7 +28,6 @@ public class GameHUD {
     private DisplayInfoPlayer cachedPlayerInfo;
     private DisplayInfoGame cachedGameInfo;
     private PrincipalButton principalButtonController;
-    private Parent principalButtonPanel;
 
     private List<Player> pendingPlayers;
     private Integer pendingCurrentIndex;
@@ -65,7 +64,7 @@ public class GameHUD {
     private void setupPrincipalButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/PrincipalButton.fxml"));
-            principalButtonPanel = loader.load();
+            Parent principalButtonPanel = loader.load();
 
             PrincipalButton controller = loader.getController();
             principalButtonController = controller;

@@ -152,7 +152,7 @@ public enum RoomInfo {
                 getText(node, "playerId"),
                 getText(node, "zone"),
                 getInteger(node, "difficulty"),
-                getBoolean(node, "correct")
+                getBoolean(node)
             ));
         }
     },
@@ -184,7 +184,7 @@ public enum RoomInfo {
         public void handle(JsonNode node, RoomEventListener listener) {
             notifyIfPresent(listener, l -> l.onAnswerResult(
                 getText(node, "playerId"),
-                getBoolean(node, "correct"),
+                getBoolean(node),
                 getInteger(node, "difficulty")
             ));
         }
@@ -302,8 +302,8 @@ public enum RoomInfo {
         return value == null || value.isNull() ? null : value.asInt();
     }
 
-    private static Boolean getBoolean(JsonNode node, String field) {
-        JsonNode value = node.get(field);
+    private static Boolean getBoolean(JsonNode node) {
+        JsonNode value = node.get("correct");
         return value == null || value.isNull() ? null : value.asBoolean();
     }
 

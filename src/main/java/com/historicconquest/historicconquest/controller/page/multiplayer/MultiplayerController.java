@@ -19,8 +19,6 @@ import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.service.network.SocketClient;
 import com.historicconquest.historicconquest.util.MapPlayerColor;
 import com.historicconquest.historicconquest.util.NameGenerator;
-import com.historicconquest.historicconquest.model.player.Player;
-import com.historicconquest.historicconquest.model.player.PlayerColor;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -951,28 +949,6 @@ public class MultiplayerController {
         }
 
         return null;
-    }
-
-    private List<Player> toGamePlayers() {
-        List<Player> players = new ArrayList<>();
-        for (int i = 0; i < roomPlayers.size(); i++) {
-            RoomPlayer roomPlayer = roomPlayers.get(i);
-            PlayerColor color = parsePlayerColor(roomPlayer.getColor());
-            if (color == null) continue;
-
-            players.add(new Player(i, roomPlayer.getName(), color));
-        }
-        return players;
-    }
-
-    private PlayerColor parsePlayerColor(String rawColor) {
-        if (rawColor == null || rawColor.isBlank()) return null;
-
-        try {
-            return PlayerColor.valueOf(rawColor.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
     }
 
     private void refreshJoinUI() {

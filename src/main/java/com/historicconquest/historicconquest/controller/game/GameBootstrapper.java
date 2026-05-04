@@ -78,10 +78,6 @@ public final class GameBootstrapper {
         }
     }
 
-    public static void launchSoloGame(StackPane root, List<Player> players) {
-        launchSoloGame(root, players, (List<String>) null);
-    }
-
     public static void launchSoloGame(StackPane root, List<Player> players, List<String> preferredStartZoneNames) {
         if (root == null || players == null || players.isEmpty()) return;
 

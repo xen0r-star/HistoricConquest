@@ -7,7 +7,6 @@ import com.historicconquest.historicconquest.controller.page.local.LocalZoneSele
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.player.PlayerColor;
 import com.historicconquest.historicconquest.util.NameGenerator;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -253,16 +252,6 @@ public class NewGameController {
         } else {
             NextPlayer.setText("Next Player");
         }
-    }
-
-    private void launchGame() {
-        Platform.runLater(() -> {
-            try {
-                GameBootstrapper.launchSoloGame(root, listPlayer);
-            } catch (Exception exception) {
-                logger.error("Error launching game", exception);
-            }
-        });
     }
 
     private void showNameError(String message) {

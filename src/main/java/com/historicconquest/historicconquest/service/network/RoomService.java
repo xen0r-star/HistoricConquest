@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.service.network;
 
-import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.page.QuestionController;
 import javafx.application.Platform;
 import tools.jackson.databind.JsonNode;
@@ -11,7 +10,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.jackson.databind.ObjectMapper;
 
 import java.security.PublicKey;
 import java.util.ArrayList;

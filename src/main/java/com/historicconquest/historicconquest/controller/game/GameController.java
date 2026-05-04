@@ -33,8 +33,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
 import javafx.util.Duration;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -105,10 +103,6 @@ public class GameController implements GameAnimationPort {
 
 
 
-    public void initializeGameState(List<Player> playersData , WorldMap worldmap , MapView mapView , Group mapInterface) {
-        initializeGameState(playersData, worldmap, mapView, mapInterface, null);
-    }
-
     public void initializeGameState(List<Player> playersData, WorldMap worldmap, MapView mapView, Group mapInterface, List<Zone> preferredStartZones) {
         this.worldMap = worldmap;
         List<Zone> allZones = worldmap.getAllZones();
@@ -178,7 +172,7 @@ public class GameController implements GameAnimationPort {
 
         if (isBoatPath) {
             List<Point2D> boatPoints = buildBoatPreviewPoints(pathListe.getFirst(), pathListe.get(1));
-            Path boatPath = buildRoundedPath(boatPoints, TRAVEL_PREVIEW_CORNER_RADIUS);
+            Path boatPath = buildRoundedPath(boatPoints);
             if (boatPath != null) {
                 transitionPath.getElements().setAll(boatPath.getElements());
             }
@@ -245,7 +239,7 @@ public class GameController implements GameAnimationPort {
 
             List<Point2D> previewPoints = result.isBoat()
                 ? buildBoatPreviewPoints(currentZone, targetZone)
-                : buildLandPreviewPoints(currentZone, targetZone, TRAVEL_HINT_MAX_DISTANCE);
+                : buildLandPreviewPoints(currentZone, targetZone);
 
             renderTravelPreviewLine(previewPoints);
         } else {
@@ -799,15 +793,13 @@ public class GameController implements GameAnimationPort {
 
         if (points == null || points.size() < 2 || mapView == null) return;
 
-        Path path = buildRoundedPath(points, TRAVEL_PREVIEW_CORNER_RADIUS);
+        Path path = buildRoundedPath(points);
         if (path == null) return;
 
         path.setMouseTransparent(true);
         path.setFill(null);
         path.setStroke(Color.web("#00000080"));
         path.setStrokeWidth(2.5);
-//        path.setStrokeLineCap(StrokeLineCap.ROUND);
-//        path.setStrokeLineJoin(StrokeLineJoin.ROUND);
         path.getStrokeDashArray().setAll(12.0, 10.0);
         path.setOpacity(0.9);
 
@@ -816,11 +808,11 @@ public class GameController implements GameAnimationPort {
         travelPreviewPath = path;
     }
 
-    private Path buildRoundedPath(List<Point2D> points, double radius) {
+    private Path buildRoundedPath(List<Point2D> points) {
         if (points == null || points.size() < 2) return null;
 
         Path path = new Path();
-        Point2D first = points.get(0);
+        Point2D first = points.getFirst();
         path.getElements().add(new MoveTo(first.getX(), first.getY()));
 
         for (int i = 1; i < points.size(); i++) {
@@ -839,7 +831,7 @@ public class GameController implements GameAnimationPort {
                     continue;
                 }
 
-                double cornerRadius = Math.min(radius, Math.min(len1, len2) * 0.45);
+                double cornerRadius = Math.min(GameController.TRAVEL_PREVIEW_CORNER_RADIUS, Math.min(len1, len2) * 0.45);
                 Point2D dir1 = v1.normalize();
                 Point2D dir2 = v2.normalize();
 
@@ -860,8 +852,8 @@ public class GameController implements GameAnimationPort {
         return path;
     }
 
-    private List<Point2D> buildLandPreviewPoints(Zone startZone, Zone endZone, int maxDepth) {
-        List<Zone> zonePath = findLandPathPreview(startZone, endZone, maxDepth);
+    private List<Point2D> buildLandPreviewPoints(Zone startZone, Zone endZone) {
+        List<Zone> zonePath = findLandPathPreview(startZone, endZone);
         if (zonePath == null || zonePath.isEmpty()) return List.of();
 
         List<Point2D> points = new ArrayList<>();
@@ -962,8 +954,8 @@ public class GameController implements GameAnimationPort {
         pawnGroup.setMouseTransparent(true);
     }
 
-    private List<Zone> findLandPathPreview(Zone start, Zone end, int maxDepth) {
-        if (start == null || end == null || maxDepth < 0) return List.of();
+    private List<Zone> findLandPathPreview(Zone start, Zone end) {
+        if (start == null || end == null || GameController.TRAVEL_HINT_MAX_DISTANCE < 0) return List.of();
 
         Queue<Zone> queue = new LinkedList<>();
         Map<Zone, Zone> parent = new HashMap<>();
@@ -981,7 +973,7 @@ public class GameController implements GameAnimationPort {
                 return reconstructPath(parent, end);
             }
 
-            if (currentDepth >= maxDepth || current.getAdjacentZones() == null) continue;
+            if (currentDepth >= GameController.TRAVEL_HINT_MAX_DISTANCE || current.getAdjacentZones() == null) continue;
             for (Zone neighbor : current.getAdjacentZones()) {
                 if (visited.contains(neighbor)) continue;
                 visited.add(neighbor);

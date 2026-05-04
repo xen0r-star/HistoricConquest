@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="root" maxHeight="150.0" maxWidth="200.0" minHeight="150.0" minWidth="160.0" prefHeight="150.0" prefWidth="160.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.MapLegend">
+<AnchorPane maxHeight="150.0" maxWidth="200.0" minHeight="150.0" minWidth="160.0" prefHeight="150.0" prefWidth="160.0" style="-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-insets: 0;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.MapLegend">
     <styleClass>
         <String fx:value="button-beige" />
         <String fx:value="button-small" />
@@ -19,62 +19,46 @@
         </font>
     </Label>
     <VBox layoutX="14.0" layoutY="39.0" prefWidth="251.0" spacing="4.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="40.0">
-      <HBox alignment="CENTER_LEFT" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
-         <children>
+        <HBox alignment="CENTER_LEFT" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../icons/entertainment-icon.png" />
-               </image>
+                <Image url="@../../icons/entertainment-icon.png"/>
             </ImageView>
-              <Label text="Entertainment">
-                  <font>
-                      <Font name="Georgia" size="14.0" />
-                  </font>
-              </Label>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
-         <children>
+            <Label text="Entertainment">
+                <font>
+                    <Font name="Georgia" size="14.0"/>
+                </font>
+            </Label>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../icons/informatics-icon.png" />
-               </image>
+                <Image url="@../../icons/informatics-icon.png"/>
             </ImageView>
             <Label text="Informatics">
-               <font>
-                  <Font name="Georgia" size="14.0" />
-               </font>
+                <font>
+                    <Font name="Georgia" size="14.0"/>
+                </font>
             </Label>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="51.0" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
-         <children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="51.0" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../icons/tourism-icon.png" />
-               </image>
+                <Image url="@../../icons/tourism-icon.png"/>
             </ImageView>
             <Label text="Tourism">
-               <font>
-                  <Font name="Georgia" size="14.0" />
-               </font>
+                <font>
+                    <Font name="Georgia" size="14.0"/>
+                </font>
             </Label>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="65.0" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
-         <children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="65.0" prefHeight="20.0" prefWidth="200.0" spacing="6.0">
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../icons/mystery-icon.png" />
-               </image>
+                <Image url="@../../icons/mystery-icon.png"/>
             </ImageView>
             <Label text="Mystery">
-               <font>
-                  <Font name="Georgia" size="14.0" />
-               </font>
+                <font>
+                    <Font name="Georgia" size="14.0"/>
+                </font>
             </Label>
-         </children>
-      </HBox>
+        </HBox>
     </VBox>
    <cursor>
       <Cursor fx:constant="DEFAULT" />

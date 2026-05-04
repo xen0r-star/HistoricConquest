@@ -264,11 +264,6 @@ public class SocketClient extends WebSocketClient {
     }
 
 
-    public String toJson(Object object) {
-        return MAPPER.writeValueAsString(object);
-    }
-
-
     public String getHeaderValue(String frame, String headerName) {
         String[] lines = frame.split("\\n");
         for (String line : lines) {

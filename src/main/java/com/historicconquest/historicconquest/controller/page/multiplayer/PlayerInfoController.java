@@ -2,14 +2,12 @@ package com.historicconquest.historicconquest.controller.page.multiplayer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 
-import java.net.URL;
 import java.util.Objects;
 
 public class PlayerInfoController {

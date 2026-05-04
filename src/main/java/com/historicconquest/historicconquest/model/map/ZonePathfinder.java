@@ -8,8 +8,7 @@ import com.historicconquest.historicconquest.model.game.Game;
 import java.util.*;
 
 public class ZonePathfinder {
-    private static int MAX_PATH_LENGTH = 5;
-    private final static int MAX_SEARCH_DEPTH = 10;
+    private final static int MAX_PATH_LENGTH = 5;
 
     public static PathResult findPath(Zone start, Zone end) {
         if (start == null || end == null) {
@@ -198,7 +197,4 @@ public class ZonePathfinder {
 
     public record PathResult(List<Zone> zones, PathType type) {}
 
-    public static void setMaxPathLength(int maxPathLength) {
-        MAX_PATH_LENGTH = maxPathLength;
-    }
 }

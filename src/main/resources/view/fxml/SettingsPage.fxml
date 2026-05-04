@@ -14,7 +14,7 @@
                 <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                     <Image url="@../icons/settings.png" />
                 </ImageView>
-                <Label text="PARAMÈTRES" textFill="WHITE">
+                <Label text="SETTINGS" textFill="WHITE">
                 <font>
                    <Font name="Georgia Bold" size="36.0" />
                 </font></Label>
@@ -73,12 +73,12 @@
                 <padding>
                     <Insets bottom="20" left="30" right="30" top="15" />
                 </padding>
-                <Button onAction="#onCancel" text="ANNULER">
+                <Button onAction="#onCancel" text="CANCEL">
                     <styleClass>
                         <String fx:value="button-small" />
                         <String fx:value="button-red" />
                     </styleClass></Button>
-                <Button onAction="#onSave" text="SAUVEGARDER">
+                <Button onAction="#onSave" text="SAVE">
                     <styleClass>
                         <String fx:value="button-small" />
                         <String fx:value="button-beige" />

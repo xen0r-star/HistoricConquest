@@ -151,9 +151,9 @@ public class WorldMap {
                 new TypeReference<>() {}
             );
             if (oceanAdjacencies != null) {
-                oceanAdjacencies.forEach((oceanName, zoneNames) -> {
-                    connectBoatAdjacencies(zonesByName, zoneNames, oceanName);
-                });
+                oceanAdjacencies.forEach((oceanName, zoneNames) ->
+                    connectBoatAdjacencies(zonesByName, zoneNames, oceanName)
+                );
             }
 
         } catch (Exception e) {

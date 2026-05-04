@@ -50,10 +50,6 @@ public class ApiService {
         return buildPost("/gameroom/join?roomCode=%s".formatted(roomCode));
     }
 
-    public static HttpRequest getPlayersRoom(String token) {
-        return buildGet("/gameroom/players", token);
-    }
-
     public static HttpRequest pseudoIsUsed(String token, String pseudo) {
         String encodedPseudo = URLEncoder.encode(pseudo, StandardCharsets.UTF_8);
         return buildPost("/gameroom/pseudo/isUsed?pseudo=%s".formatted(encodedPseudo), token);
@@ -67,13 +63,6 @@ public class ApiService {
         return buildGet("/gameroom/start/status", token);
     }
 
-
-
-    private static HttpRequest buildGet(String endpoint) {
-        return HttpRequest.newBuilder()
-            .uri(URI.create(API_BASE_URL + endpoint))
-            .build();
-    }
 
     private static HttpRequest buildGet(String endpoint, String token) {
         return HttpRequest.newBuilder()
