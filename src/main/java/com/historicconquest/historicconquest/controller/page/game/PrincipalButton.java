@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 public class PrincipalButton {
@@ -22,6 +23,9 @@ public class PrincipalButton {
     @FXML private Button powerUpButton;
     @FXML private AnchorPane actionContainer;
     @FXML private Label actionLabel;
+    @FXML private HBox mainActionsBox;
+    @FXML private HBox utilityActionsBox;
+    @FXML private Label turnStatusLabel;
 
 
     public void attack() {
@@ -172,6 +176,44 @@ public class PrincipalButton {
         if (actionContainer != null) {
             actionContainer.setVisible(false);
             actionContainer.setManaged(false);
+        }
+    }
+
+    public void setActionButtonsVisible(boolean isVisible) {
+        if (mainActionsBox != null) {
+            mainActionsBox.setVisible(isVisible);
+            mainActionsBox.setManaged(isVisible);
+        }
+        if (utilityActionsBox != null) {
+            utilityActionsBox.setVisible(isVisible);
+            utilityActionsBox.setManaged(isVisible);
+        }
+
+        if (isVisible) {
+            clearTurnStatus();
+        }
+    }
+
+    public void showTurnStatus(String message) {
+        if (message == null || message.isBlank()) {
+            clearTurnStatus();
+            return;
+        }
+
+        setActionButtonsVisible(false);
+        hideActionContainer();
+
+        if (turnStatusLabel != null) {
+            turnStatusLabel.setText(message);
+            turnStatusLabel.setVisible(true);
+            turnStatusLabel.setManaged(true);
+        }
+    }
+
+    public void clearTurnStatus() {
+        if (turnStatusLabel != null) {
+            turnStatusLabel.setVisible(false);
+            turnStatusLabel.setManaged(false);
         }
     }
 

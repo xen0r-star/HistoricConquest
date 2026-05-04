@@ -32,6 +32,7 @@ public class RoomSocketController {
     private static final String ACTION_COALITION_REQUEST = "COALITION_REQUEST";
     private static final String ACTION_COALITION_ACCEPT = "COALITION_ACCEPT";
     private static final String ACTION_COALITION_DECLINE = "COALITION_DECLINE";
+    private static final long BOT_THINKING_DELAY_MS = 1200L;
 
     private final RoomService roomService;
     private final QuestionService questionService;
@@ -83,6 +84,36 @@ public class RoomSocketController {
             "/topic/room-" + roomCode,
             (Object) payload
         );
+    }
+
+    private void processBotTurns(String roomCode, Room room) {
+        if (room == null || !room.isGameStarted()) return;
+        processBotTurns(roomCode, room, room.getPlayerOrder().size());
+    }
+
+    private void processBotTurns(String roomCode, Room room, int remainingSkips) {
+        if (room == null || !room.isGameStarted() || remainingSkips <= 0) return;
+
+        String currentId = room.getCurrentPlayerId();
+        if (currentId == null) return;
+
+        Player current = room.getPlayerById(currentId);
+        if (current == null || current.getType() != Player.Type.Bot) {
+            return;
+        }
+
+        scheduler.schedule(() -> {
+            Room latestRoom = roomService.getRoom(roomCode);
+            if (latestRoom == null || !latestRoom.isGameStarted()) return;
+
+            String latestId = latestRoom.getCurrentPlayerId();
+            Player latestPlayer = latestId == null ? null : latestRoom.getPlayerById(latestId);
+            if (latestPlayer == null || latestPlayer.getType() != Player.Type.Bot) return;
+
+            latestRoom.advanceTurn();
+            broadcastTurnChanged(roomCode, latestRoom);
+            processBotTurns(roomCode, latestRoom, remainingSkips - 1);
+        }, BOT_THINKING_DELAY_MS, TimeUnit.MILLISECONDS);
     }
 
 
@@ -258,6 +289,7 @@ public class RoomSocketController {
                                 )
                             );
                             broadcastTurnChanged(roomCode, latestRoom);
+                            processBotTurns(roomCode, latestRoom);
 
                         } catch (Exception ignored) { }
                     }, 30, TimeUnit.SECONDS);
@@ -614,7 +646,6 @@ public class RoomSocketController {
             );
         }
     }
-
     @MessageMapping("/game/coalition/request")
     public void requestCoalition(@Payload Map<String, String> payload, Principal principal) {
         StompPrincipal sp = (StompPrincipal) principal;
@@ -831,6 +862,15 @@ public class RoomSocketController {
                     question = questionService.getRandomQuestion(zone.getThemes(), 4);
                 }
 
+                Number number = (Number) difficulty;
+                broadcastGameAction(roomCode, Map.of(
+                    "type", "ACTION_SELECTED",
+                    "action", action,
+                    "playerId", playerId,
+                    "zone", zoneName,
+                    "difficulty", number.intValue()
+                ));
+
 
                 messagingTemplate.convertAndSendToUser(
                     playerId,
@@ -870,10 +910,12 @@ public class RoomSocketController {
 
                 room.advanceTurn();
                 broadcastTurnChanged(roomCode, room);
+                processBotTurns(roomCode, room);
             }
             case "SKIP" -> {
                 room.advanceTurn();
                 broadcastTurnChanged(roomCode, room);
+                processBotTurns(roomCode, room);
             }
         }
     }

@@ -196,9 +196,21 @@ public class GameHUD {
     }
 
     public void updateActionButtonVisibility(boolean isVisible) {
-        if (principalButtonPanel != null) {
-            principalButtonPanel.setVisible(isVisible);
-            principalButtonPanel.setManaged(isVisible);
+        if (principalButtonController != null) {
+            principalButtonController.setActionButtonsVisible(isVisible);
         }
+    }
+
+    public void updateTurnStatus(String message) {
+        if (principalButtonController == null) {
+            return;
+        }
+
+        if (message == null || message.isBlank()) {
+            principalButtonController.clearTurnStatus();
+            return;
+        }
+
+        principalButtonController.showTurnStatus(message);
     }
 }

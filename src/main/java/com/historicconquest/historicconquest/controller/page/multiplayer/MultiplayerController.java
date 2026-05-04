@@ -4,7 +4,6 @@ import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
-import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MapBackgroundController;
 import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
@@ -637,7 +636,12 @@ public class MultiplayerController {
 
             @Override
             public void onGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct) {
-                Platform.runLater(() -> GameNetworkService.handleGameAction(action, zoneName, difficulty, correct));
+                Platform.runLater(() -> GameNetworkService.handleGameAction(action, playerId, zoneName, difficulty, correct));
+            }
+
+            @Override
+            public void onActionSelected(String action, String playerId, String zoneName, Integer difficulty) {
+                Platform.runLater(() -> GameNetworkService.handleActionSelected(action, playerId, zoneName, difficulty));
             }
 
             @Override
@@ -648,6 +652,7 @@ public class MultiplayerController {
             @Override
             public void onAnswerResult(String playerId, Boolean correct, Integer difficulty) {
                 Platform.runLater(() -> {
+                    GameNetworkService.handleAnswerResult(playerId, correct);
                     GameController.getInstance().applyQuestionResult(difficulty, correct);
 
                     RoomPlayer roomPlayer = roomPlayers.stream()

@@ -157,6 +157,18 @@ public enum RoomInfo {
         }
     },
 
+    ACTION_SELECTED {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onActionSelected(
+                getText(node, "action"),
+                getText(node, "playerId"),
+                getText(node, "zone"),
+                getInteger(node, "difficulty")
+            ));
+        }
+    },
+
     TURN_CHANGED {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {

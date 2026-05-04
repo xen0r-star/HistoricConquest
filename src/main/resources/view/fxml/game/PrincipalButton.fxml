@@ -8,7 +8,7 @@
 <?import javafx.scene.text.*?>
 
 <AnchorPane id="class" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="117.0" prefWidth="585.0" style="-fx-border-radius: 10 10 0 0; -fx-background-radius: 10 10 0 0; -fx-border-width: 0;" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.game.PrincipalButton">
-   <HBox layoutX="22.0" layoutY="32.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
+   <HBox fx:id="mainActionsBox" layoutX="22.0" layoutY="32.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
       <Button fx:id="attackButton" onAction="#attack" prefHeight="46.0" prefWidth="122.0" style="-fx-background-color: #732626;" text="Attack">
          <styleClass>
             <String fx:value="button-blue" />
@@ -57,7 +57,7 @@
          </graphic>
       </Button>
    </HBox>
-   <HBox layoutX="343.0" layoutY="-12.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0">
+   <HBox fx:id="utilityActionsBox" layoutX="343.0" layoutY="-12.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0">
       <Button maxHeight="46.0" maxWidth="46.0" minHeight="46.0" minWidth="46.0" onAction="#coalition" prefHeight="46.0" prefWidth="46.0" style="-fx-border-insets: 0, 0;">
          <styleClass>
             <String fx:value="button-green" />
@@ -102,4 +102,9 @@
          </font>
       </Label>
    </AnchorPane>
+   <Label fx:id="turnStatusLabel" alignment="CENTER" layoutX="15.0" layoutY="15.0" managed="false" prefHeight="32.0" prefWidth="556.0" text="Player is choosing an action..." textFill="#252423e5" visible="false" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+      <font>
+         <Font name="Georgia" size="16.0" />
+      </font>
+   </Label>
 </AnchorPane>

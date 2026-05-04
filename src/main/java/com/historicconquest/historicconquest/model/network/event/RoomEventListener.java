@@ -19,6 +19,7 @@ public interface RoomEventListener {
     void onGameStartCancelled(String reason);
     void onGameStarted(Map<String, String> selectedZones, List<String> turnOrder, String currentPlayerId, Map<String, String> listThemeZone);
 
+    void onActionSelected(String action, String playerId, String zoneName, Integer difficulty);
     void onGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct);
     void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex);
     void onAnswerResult(String currentPlayerId, Boolean currentCorrect, Integer currentDifficulty);

@@ -726,9 +726,24 @@ public class GameController implements GameAnimationPort {
             boolean isMyTurn = GameNetworkService.isLocalTurn();
             gameHUD.updateActionButtonVisibility(isMyTurn);
 
+            if (isMyTurn) {
+                gameHUD.updateTurnStatus(null);
+            } else {
+                gameHUD.updateTurnStatus(buildTurnStatusMessage(currentPlayer));
+            }
+
         } else {
             gameHUD.updateActionButtonVisibility(true);
+            gameHUD.updateTurnStatus(null);
         }
+    }
+
+    private String buildTurnStatusMessage(Player currentPlayer) {
+        if (currentPlayer == null) {
+            return "A player is choosing an action...";
+        }
+
+        return currentPlayer.getPseudo() + " is choosing an action...";
     }
 
 
@@ -1010,5 +1025,11 @@ public class GameController implements GameAnimationPort {
 
     public void setTargetZone(Zone targetZone) {
         this.targetZone = targetZone;
+    }
+
+    public void setTurnStatusMessage(String message) {
+        if (gameHUD != null) {
+            gameHUD.updateTurnStatus(message);
+        }
     }
 }

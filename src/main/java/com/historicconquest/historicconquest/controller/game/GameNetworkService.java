@@ -143,7 +143,7 @@ public final class GameNetworkService {
         RoomService.sendCoalitionDecline(requesterId);
     }
 
-    public static void handleGameAction(String action, String zoneName, Integer difficulty, Boolean correct) {
+    public static void handleGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct) {
         if (!enabled || action == null) return;
 
         if (MultiplayerGameOverlay.isActive()) {
@@ -155,6 +155,13 @@ public final class GameNetworkService {
 
         if (difficulty != null) {
             controller.setCurrentDifficulty(difficulty);
+        }
+
+        if (!isLocalTurn()) {
+            String statusMessage = buildActionStatusMessage(action, playerId, zoneName, correct);
+            if (statusMessage != null) {
+                controller.setTurnStatusMessage(statusMessage);
+            }
         }
 
         switch (action) {
@@ -181,6 +188,27 @@ public final class GameNetworkService {
         if (index != null) {
             controller.setCurrentPlayerIndexFromNetwork(index);
         }
+    }
+
+    public static void handleAnswerResult(String playerId, Boolean correct) {
+        if (!enabled || controller == null || playerId == null || correct == null) return;
+        if (isLocalTurn()) return;
+
+        Player player = getPlayerByNetworkId(playerId);
+        String name = player == null ? "Player" : player.getPseudo();
+        String message = correct
+            ? name + " answered the question correctly."
+            : name + " answered the question incorrectly.";
+
+        controller.setTurnStatusMessage(message);
+    }
+
+    public static void handleActionSelected(String action, String playerId, String zoneName, Integer difficulty) {
+        if (!enabled || controller == null || playerId == null) return;
+        if (isLocalTurn()) return;
+
+        String message = buildActionSelectedMessage(action, playerId, zoneName, difficulty);
+        controller.setTurnStatusMessage(message);
     }
 
     public static void handleCoalitionRequested(String requesterId, String targetId) {
@@ -268,6 +296,41 @@ public final class GameNetworkService {
         if (zone == null) return;
 
         actionHandler.apply(zone, false);
+    }
+
+    private static String buildActionStatusMessage(String action, String playerId, String zoneName, Boolean correct) {
+        Player player = getPlayerByNetworkId(playerId);
+        String name = player == null ? "Player" : player.getPseudo();
+
+        return switch (action) {
+            case ACTION_TRAVEL -> name + " wants to travel to " + safeZone(zoneName) + ".";
+            case ACTION_ATTACK -> name + " wants to attack " + safeZone(zoneName) + ".";
+            case ACTION_POWER_UP -> name + " wants to power up " + safeZone(zoneName) + ".";
+            case ACTION_ANSWER_RESULT -> {
+                if (correct == null) yield name + " is answering the question...";
+                yield correct
+                    ? name + " answered the question correctly."
+                    : name + " answered the question incorrectly.";
+            }
+            default -> null;
+        };
+    }
+
+    private static String buildActionSelectedMessage(String action, String playerId, String zoneName, Integer difficulty) {
+        Player player = getPlayerByNetworkId(playerId);
+        String name = player == null ? "Player" : player.getPseudo();
+        String level = difficulty == null ? "a" : "level " + difficulty;
+
+        return switch (action) {
+            case ACTION_TRAVEL -> name + " chose to travel to " + safeZone(zoneName) + " and is answering a " + level + " question.";
+            case ACTION_ATTACK -> name + " chose to attack " + safeZone(zoneName) + " and is answering a " + level + " question.";
+            case ACTION_POWER_UP -> name + " chose to power up " + safeZone(zoneName) + " and is answering a " + level + " question.";
+            default -> name + " chose an action and is answering a " + level + " question.";
+        };
+    }
+
+    private static String safeZone(String zoneName) {
+        return zoneName == null || zoneName.isBlank() ? "a zone" : zoneName;
     }
 
     private static String getNetworkPlayerId(Player player) {
