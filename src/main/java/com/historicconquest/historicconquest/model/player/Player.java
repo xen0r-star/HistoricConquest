@@ -14,13 +14,11 @@ public class Player {
     private final List<Zone> zones;
     private int consecutiveSuccesses;
     private int consecutiveFailures;
-    private Alliance alliance;
-    private List<Pawn> pawns;
     private Zone currentZone;
     private Node pawnNode;
-    private Player ally ;
-    private Player pendingAllianceRequest ;
-    private Color currentAllianceColor ;
+    private Player ally;
+    private Player pendingAllianceRequest;
+    private Color currentAllianceColor;
 
     public Player(int id, String pseudo, PlayerColor color) {
         this.id = id;
@@ -29,7 +27,7 @@ public class Player {
         this.consecutiveSuccesses = 0;
         this.consecutiveFailures = 0;
 
-        zones = new ArrayList<>() ;
+        zones = new ArrayList<>();
     }
 
     public Player getPendingAllianceRequest() {
@@ -55,14 +53,13 @@ public class Player {
     public void clearPendingRequest() {
         this.pendingAllianceRequest = null;
     }
-    public boolean hasAlly()
-    {
-        return ally != null ;
+
+    public boolean hasAlly() {
+        return ally != null;
     }
 
-    public Player getAlly()
-    {
-        return ally ;
+    public Player getAlly() {
+        return ally;
     }
 
     public void setAlly(Player ally) {
@@ -83,10 +80,6 @@ public class Player {
 
     public void setConsecutiveFailures(int consecutiveFailures) {
         this.consecutiveFailures = consecutiveFailures;
-    }
-
-    public void setAlliance(Alliance alliance) {
-        this.alliance = alliance;
     }
 
 
@@ -121,10 +114,8 @@ public class Player {
     }
 
 
-    public void addZone(Zone zone)
-    {
+    public void addZone(Zone zone) {
        zones.add(zone);
-       //zone.setColor(color.getJavafxColor());
     }
 
 
@@ -134,10 +125,9 @@ public class Player {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Player p)
-        {
+        if (obj instanceof Player p) {
             return p.getPseudo().equalsIgnoreCase(this.pseudo);
         }
-        return false ;
+        return false;
     }
 }

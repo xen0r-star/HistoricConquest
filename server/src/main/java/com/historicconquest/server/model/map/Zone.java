@@ -1,6 +1,5 @@
 package com.historicconquest.server.model.map;
 
-import com.historicconquest.server.model.player.Pawn;
 import com.historicconquest.server.model.questions.TypeThemes;
 
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ public class Zone {
 
     private String nameOwner = "Nobody";
 
-    private final List<Pawn> pawns;
     private final List<Zone> adjacentZones;
     private final List<Zone> adjacentBoatZones;
     private String oceanName;
@@ -26,7 +24,6 @@ public class Zone {
         this.blocName = blocName;
         this.themes = themes;
         this.power = power;
-        this.pawns = new ArrayList<>();
         this.adjacentZones = new ArrayList<>();
         this.adjacentBoatZones = new ArrayList<>();
     }

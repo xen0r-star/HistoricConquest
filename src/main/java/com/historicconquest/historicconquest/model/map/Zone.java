@@ -1,6 +1,5 @@
 package com.historicconquest.historicconquest.model.map;
 
-import com.historicconquest.historicconquest.model.player.Pawn;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -17,7 +16,6 @@ public class Zone {
 
     private String nameOwner = "Nobody";
 
-    private final List<Pawn> pawns;
     private final List<Zone> adjacentZones;
     private final List<Zone> adjacentBoatZones;
     private String oceanName;
@@ -46,7 +44,6 @@ public class Zone {
         this.baseColor = color;
         this.colorProperty = new SimpleObjectProperty<>(color);
         this.borderColor = borderColor;
-        this.pawns = new ArrayList<>();
         this.adjacentZones = new ArrayList<>();
         this.adjacentBoatZones = new ArrayList<>();
     }
