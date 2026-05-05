@@ -8,6 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,9 +26,18 @@ public class PauseGameController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         resumeBtn.setOnAction(e -> PauseGameController.close());
         quitMenuBtn.setOnAction(e -> {
-            AppController.getInstance().showPage(AppPage.HOME);
-            GameController.clearGame();
-            PauseGameController.close();
+            if (root.getParent() instanceof Pane mainStackPane) {
+                ConfirmChoiceController.show(
+                    mainStackPane,
+                    "Would you like to leave?",
+                    "Yes", () -> {
+                        AppController.getInstance().showPage(AppPage.HOME);
+                        GameController.clearGame();
+                        PauseGameController.close();
+                    },
+                    "No", () -> { }
+                );
+            }
         });
 
         settingsBtn.setOnAction(e -> AppController.getInstance().showSettings(true));
