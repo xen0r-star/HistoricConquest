@@ -2,8 +2,6 @@ package com.historicconquest.historicconquest.controller.page.game;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
-import com.historicconquest.historicconquest.controller.overlay.Notification;
-import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.player.Player;
 import javafx.collections.FXCollections;
@@ -67,24 +65,13 @@ public class CoalitionController {
         if (target != null && !target.hasAlly()) {
             if (GameNetworkService.isEnabled()) {
                 GameNetworkService.sendCoalitionRequest(target);
-                NotificationController.show(
-                    "Proposal Sent",
-                    "Request sent to " + target.getPseudo(),
-                    Notification.Type.SUCCESS,
-                    5000
-                );
                 closeAlliance();
                 return;
             }
 
             target.setPendingAllianceRequest(sender);
 
-            NotificationController.show(
-                "Proposal Sent",
-                "Request sent to " + target.getPseudo(),
-                Notification.Type.SUCCESS,
-                5000
-            );
+
             closeAlliance();
         }
     }
@@ -141,12 +128,6 @@ public class CoalitionController {
 
         current.clearPendingRequest();
         closeAlliance();
-        NotificationController.show(
-            "Alliance",
-            "You are now allied with " + requester.getPseudo(),
-            Notification.Type.SUCCESS,
-            5000
-        );
     }
 
 

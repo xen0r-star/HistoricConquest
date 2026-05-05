@@ -15,7 +15,6 @@ import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.map.ZonePathfinder;
 import com.historicconquest.historicconquest.model.player.Player;
-import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 
@@ -255,15 +254,6 @@ public class GameController implements GameAnimationPort {
         boolean networkGame = Game.getInstance() != null && Game.getInstance().isNetworkGame();
 
         if (!correct) {
-            if (!networkGame || current.getPseudo().equalsIgnoreCase(RoomService.getCurrentPseudo())) {
-                NotificationController.show(
-                    "Wrong Answer",
-                    "Incorrect! Your turn is over.",
-                    Notification.Type.ERROR,
-                    5000
-                );
-            }
-
             current.setConsecutiveFailures(current.getConsecutiveFailures() + 1);
             current.setConsecutiveSuccesses(0);
 
@@ -320,12 +310,6 @@ public class GameController implements GameAnimationPort {
             int distance = isBoat ? TRAVEL_HINT_MAX_DISTANCE : result.zones().size() - 1;
 
             if (distance > 0 && distance <= TRAVEL_HINT_MAX_DISTANCE) {
-                NotificationController.show(
-                    "Traveling",
-                    "Moving to " + targetZone.getName() + " (" + distance + " zones).",
-                    Notification.Type.INFORMATION,
-                    3000
-                );
 
                 setPendingAction(PendingAction.NONE);
                 clearTravelPreviewLine();
@@ -347,13 +331,6 @@ public class GameController implements GameAnimationPort {
                 current.setCurrentZone(targetZone);
                 refreshTurnUI();
 
-            } else {
-                NotificationController.show(
-                    "Too Far",
-                    "Target is " + distance + " zones away, but your answer only allows " + TRAVEL_HINT_MAX_DISTANCE + " steps!",
-                    Notification.Type.ERROR,
-                    6000
-                );
             }
         }
     }
@@ -383,12 +360,7 @@ public class GameController implements GameAnimationPort {
         }
 
         if (current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
-            NotificationController.show(
-                "Invalid Target",
-                "You cannot attack your own territory. Please select a different action (Power Up or Travel).",
-                Notification.Type.SUCCESS,
-                8000
-            );
+
 
             setPendingAction(PendingAction.NONE);
             return;
@@ -445,13 +417,6 @@ public class GameController implements GameAnimationPort {
             }
 
             current.addZone(targetZone);
-            NotificationController.show(
-                "Victory!",
-                "You have captured " + targetZone.getName() + " with " + finalPower + " power!",
-                Notification.Type.SUCCESS,
-                6000
-            );
-
             checkWinCondition();
         }
 
@@ -476,7 +441,7 @@ public class GameController implements GameAnimationPort {
                 "Action Denied",
                 "You can only power up your own zones!",
                 Notification.Type.ERROR,
-                3000
+                5000
             );
             return;
         }
