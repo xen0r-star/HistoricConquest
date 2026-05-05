@@ -13,6 +13,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class ApiService {
@@ -53,6 +55,10 @@ public class ApiService {
     public static HttpRequest pseudoIsUsed(String token, String pseudo) {
         String encodedPseudo = URLEncoder.encode(pseudo, StandardCharsets.UTF_8);
         return buildPost("/gameroom/pseudo/isUsed?pseudo=%s".formatted(encodedPseudo), token);
+    }
+
+    public static HttpRequest getInfoRoomForReconnection(String token) {
+        return buildPost("/gameroom/reconnection", token);
     }
 
     public static HttpRequest getUsedColors(String token) {
@@ -134,9 +140,9 @@ public class ApiService {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record GetPlayersRoomResponse(
-            Collection<NetworkPlayer> players,
+        Collection<NetworkPlayer> players,
 
-            ErrorRequest error
+        ErrorRequest error
     ) {}
 
 
@@ -163,6 +169,23 @@ public class ApiService {
         Boolean isSelecting,
         Integer playerCount,
         Integer requiredPlayers,
+
+        ErrorRequest error
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ReconnectionRoomResponse(
+        String pseudo,
+        String color,
+        int consecutiveSuccesses,
+        int consecutiveFailures,
+        Collection<NetworkPlayer> players,
+
+        String currentPhase, // IN_PROGRESS, STARTING, ZONE_SELECTION, LOBBY
+        Map<String, String> selectedZones,
+        String currentPlayerId,
+        List<String> turnOrder,
+        String pendingAction,
 
         ErrorRequest error
     ) {}

@@ -1,5 +1,6 @@
 package com.historicconquest.historicconquest.service.network;
 
+import com.historicconquest.historicconquest.app.App;
 import com.historicconquest.historicconquest.controller.page.QuestionController;
 import javafx.application.Platform;
 import tools.jackson.databind.JsonNode;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 public class RoomService {
     private static final long PING_INTERVAL_MS = 2000;
@@ -61,6 +63,10 @@ public class RoomService {
         this.replyListener = buildReplyListener();
         this.roomListener = buildRoomListener();
         this.errorListener = buildErrorListener();
+
+        Preferences prefs = Preferences.userNodeForPackage(App.class);
+        prefs.put("room_token", token);
+        prefs.putLong("token_timestamp", System.currentTimeMillis());
 
         subscribeAll();
         socketClient.connect();

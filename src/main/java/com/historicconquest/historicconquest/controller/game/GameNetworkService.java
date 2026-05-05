@@ -5,6 +5,8 @@ import com.historicconquest.historicconquest.controller.overlay.NotificationCont
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.network.model.RoomPlayer;
 import com.historicconquest.historicconquest.model.player.Player;
+import com.historicconquest.historicconquest.model.specialCard.SpecialCard;
+import com.historicconquest.historicconquest.model.specialCard.SpecialCardFactory;
 import com.historicconquest.historicconquest.service.network.RoomService;
 import javafx.scene.paint.Color;
 
@@ -187,6 +189,7 @@ public final class GameNetworkService {
 
         if (index != null) {
             controller.setCurrentPlayerIndexFromNetwork(index);
+            controller.applyPlayerChange();
         }
     }
 
@@ -201,6 +204,41 @@ public final class GameNetworkService {
             : name + " answered the question incorrectly.";
 
         controller.setTurnStatusMessage(message);
+    }
+
+    public static void handleBonusMalus(String playerId, String kind, String nameKind, Map<String, Object> resultSpecialCard) {
+        if (!enabled || playerId == null || kind == null || nameKind == null) return;
+
+        Player player = getPlayerByNetworkId(playerId);
+        if (player == null) return;
+
+        if (kind.trim().equalsIgnoreCase("BONUS")) {
+            SpecialCard specialCard = SpecialCardFactory.getBonus(nameKind);
+            if (specialCard == null) return;
+            specialCard.apply(player, resultSpecialCard);
+
+            NotificationController.show(
+                "Epic Series for " + player.getPseudo(),
+                specialCard.getName() + ": " + specialCard.getDescription(),
+                Notification.Type.SUCCESS,
+                10000
+            );
+            player.setConsecutiveSuccesses(0);
+
+        } else {
+            SpecialCard specialCard = SpecialCardFactory.getMalus(nameKind);
+            if (specialCard == null) return;
+            specialCard.apply(player, resultSpecialCard);
+
+            NotificationController.show(
+                "Critical Failure for " + player.getPseudo(),
+                specialCard.getName() + ": " + specialCard.getDescription(),
+                Notification.Type.ERROR,
+                10000
+            );
+
+            player.setConsecutiveFailures(0);
+        }
     }
 
     public static void handleActionSelected(String action, String playerId, String zoneName, Integer difficulty) {
@@ -297,7 +335,7 @@ public final class GameNetworkService {
     private static void applyZoneAction(String zoneName, ZoneAction actionHandler) {
         if (zoneName == null || zoneName.isBlank()) return;
 
-        Zone zone = controller.findZoneByName(zoneName);
+        Zone zone = controller.getWorldMap().findZoneByName(zoneName);
         if (zone == null) return;
 
         actionHandler.apply(zone, false);

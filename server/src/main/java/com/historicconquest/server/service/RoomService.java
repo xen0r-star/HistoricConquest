@@ -1,15 +1,12 @@
 package com.historicconquest.server.service;
 
+import com.historicconquest.server.model.map.TypeBloc;
+import com.historicconquest.server.model.map.WorldMap;
 import com.historicconquest.server.model.player.Player;
 import com.historicconquest.server.model.Room;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -147,7 +144,7 @@ public class RoomService {
         long startAt = System.currentTimeMillis() + 30_000L;
         room.markZoneSelectionStarted();
 
-        autoAssignBotZones(room);
+        autoAssignBotZones(room, room.getWorldMap());
         return new ZoneSelectionStart(startAt, room.getSelectedZones());
     }
 
@@ -189,7 +186,7 @@ public class RoomService {
         }
 
         if (!room.isGameStarted()) {
-            fillMissingZones(room);
+            fillMissingZones(room, room.getWorldMap());
             room.markGameStarted();
         }
 
@@ -255,63 +252,88 @@ public class RoomService {
             .toList();
     }
 
-    private void autoAssignBotZones(Room room) throws Exception {
+    private void autoAssignBotZones(Room room, WorldMap worldMap) throws Exception {
         Set<String> alreadySelected = room.getSelectedZones().values().stream()
-            .filter(zone -> zone != null && !zone.isBlank())
-            .map(String::toUpperCase)
-            .collect(Collectors.toSet());
+                .filter(zone -> zone != null && !zone.isBlank())
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+
+        Set<TypeBloc> occupiedBlocks = alreadySelected.stream()
+                .map(worldMap::getBlocTypeForZone)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         for (Player player : room.getPlayers()) {
-            if (!(Player.Type.Bot == player.getType())) {
+            if (player.getType() != Player.Type.Bot || room.getSelectedZones().containsKey(player.getId())) {
                 continue;
             }
 
-            if (room.getSelectedZones().containsKey(player.getId())) {
-                continue;
+            String freeZone = pickFreeZone(alreadySelected, occupiedBlocks, worldMap);
+
+            if (freeZone == null) {
+                freeZone = pickAnyFreeZone(alreadySelected);
             }
 
-            String freeZone = pickFreeZone(alreadySelected);
             if (freeZone == null) {
                 throw new Exception("Not enough free zones for every player");
             }
 
             room.selectZone(player.getId(), freeZone);
+
             alreadySelected.add(freeZone.toUpperCase());
+            occupiedBlocks.add(worldMap.getBlocTypeForZone(freeZone));
         }
     }
 
-    private void fillMissingZones(Room room) throws Exception {
-        Set<String> occupied = room.getSelectedZones().values().stream()
-            .filter(zone -> zone != null && !zone.isBlank())
-            .map(String::toUpperCase)
-            .collect(Collectors.toSet());
+    private void fillMissingZones(Room room, WorldMap worldMap) throws Exception {
+        Set<String> occupiedZones = room.getSelectedZones().values().stream()
+                .filter(zone -> zone != null && !zone.isBlank())
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+
+        Set<TypeBloc> occupiedBlocks = occupiedZones.stream()
+                .map(worldMap::getBlocTypeForZone)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         for (Player player : room.getPlayers()) {
             if (room.getSelectedZones().containsKey(player.getId())) {
                 continue;
             }
 
-            String freeZone = pickFreeZone(occupied);
-            if (freeZone == null) {
-                throw new Exception("Not enough free zones for every player");
-            }
+            String freeZone = pickFreeZone(occupiedZones, occupiedBlocks, worldMap);
+
+            if (freeZone == null) return;
 
             room.selectZone(player.getId(), freeZone);
-            occupied.add(freeZone.toUpperCase());
+
+            occupiedZones.add(freeZone.toUpperCase());
+            occupiedBlocks.add(worldMap.getBlocTypeForZone(freeZone));
         }
     }
 
-    private String pickFreeZone(Set<String> occupiedZones) {
-        List<String> freeZones = AVAILABLE_ZONES.stream()
-            .filter(zone -> !occupiedZones.contains(zone.toUpperCase()))
-            .toList();
+    private String pickFreeZone(Set<String> occupiedZones, Set<TypeBloc> occupiedBlocks, WorldMap worldMap) {
+        List<String> validZones = AVAILABLE_ZONES.stream()
+                .filter(zoneName -> !occupiedZones.contains(zoneName.toUpperCase()))
+                .filter(zoneName -> !occupiedBlocks.contains(worldMap.getBlocTypeForZone(zoneName)))
+                .toList();
 
-        if (freeZones.isEmpty()) {
+        if (validZones.isEmpty()) {
             return null;
         }
 
-        return freeZones.get(new Random().nextInt(freeZones.size()));
+        return validZones.get(new Random().nextInt(validZones.size()));
     }
+
+    private String pickAnyFreeZone(Set<String> occupiedZones) {
+        List<String> validZones = AVAILABLE_ZONES.stream()
+                .filter(name -> !occupiedZones.contains(name.toUpperCase()))
+                .toList();
+
+        if (validZones.isEmpty()) return null;
+        return validZones.get(new Random().nextInt(validZones.size()));
+    }
+
 
     private String normalizeZoneName(String zoneName) {
         if (zoneName == null || zoneName.isBlank()) {

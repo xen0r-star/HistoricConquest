@@ -98,9 +98,8 @@ public class Zone {
         this.nameOwner = nameOwner;
     }
 
-    public String getNameOwner()
-    {
-        return nameOwner ;
+    public String getNameOwner() {
+        return nameOwner;
     }
 
     public String getBlocName() {

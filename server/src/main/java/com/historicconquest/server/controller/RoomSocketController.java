@@ -3,6 +3,8 @@ package com.historicconquest.server.controller;
 import com.historicconquest.server.model.map.Zone;
 import com.historicconquest.server.model.map.ZonePathfinder;
 import com.historicconquest.server.model.questions.Question;
+import com.historicconquest.server.model.specialCard.SpecialCard;
+import com.historicconquest.server.model.specialCard.SpecialCardFactory;
 import com.historicconquest.server.security.StompPrincipal;
 import com.historicconquest.server.model.Room;
 import com.historicconquest.server.model.player.Player;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.Map;
 
@@ -27,16 +30,23 @@ import java.util.Map;
 @Controller
 public class RoomSocketController {
     private static final int GAME_COUNTDOWN_SECONDS = 5;
+    private static final int ZONE_SELECTION_COUNTDOWN_SECONDS = 30;
+    private static final int ANSWER_STREAK_THRESHOLD = 3;
     private static final String ACTION_TRAVEL = "TRAVEL";
     private static final String ACTION_ATTACK = "ATTACK";
     private static final String ACTION_POWER_UP = "POWER_UP";
     private static final String ACTION_SUBMIT_ANSWER = "SUBMIT_ANSWER";
     private static final String ACTION_SKIP = "SKIP";
+    private static final String EVENT_BONUS_MALUS = "BONUS_MALUS";
+    private static final String STREAK_KIND_BONUS = "BONUS";
+    private static final String STREAK_KIND_MALUS = "MALUS";
     private static final String ACTION_COALITION_REQUEST = "COALITION_REQUEST";
     private static final String ACTION_COALITION_ACCEPT = "COALITION_ACCEPT";
     private static final String ACTION_COALITION_DECLINE = "COALITION_DECLINE";
-    private static final long BOT_THINKING_DELAY_MS = 1200L;
-    private static final long BOT_ANSWER_DELAY_MS = 800L;
+    private static final long BOT_THINKING_MIN_DELAY_MS = 2500L;
+    private static final long BOT_THINKING_MAX_DELAY_MS = 4000L;
+    private static final long BOT_ANSWER_MIN_DELAY_MS = 4000L;
+    private static final long BOT_ANSWER_MAX_DELAY_MS = 8000L;
     private static final Random BOT_RANDOM = new Random();
 
     private final RoomService roomService;
@@ -91,6 +101,18 @@ public class RoomSocketController {
         );
     }
 
+    private void broadcastBonusMalus(String roomCode, Player player, String kind, String nameKind, Map<String, Object> resultSpecialCard) {
+        if (roomCode == null || player == null || kind == null) return;
+
+        broadcastPayload(roomCode, Map.of(
+            "type", EVENT_BONUS_MALUS,
+            "playerId", player.getId(),
+            "kind", kind,
+            "nameKind", nameKind,
+            "resultSpecialCard", resultSpecialCard
+        ));
+    }
+
 
     private void processBotTurns(String roomCode, Room room) {
         if (room == null || !room.isGameStarted()) return;
@@ -108,7 +130,8 @@ public class RoomSocketController {
             return;
         }
 
-        scheduler.schedule(() -> executeBotTurn(roomCode, remainingSkips), BOT_THINKING_DELAY_MS, TimeUnit.MILLISECONDS);
+        long delay = ThreadLocalRandom.current().nextLong(BOT_THINKING_MIN_DELAY_MS, BOT_THINKING_MAX_DELAY_MS);
+        scheduler.schedule(() -> executeBotTurn(roomCode, remainingSkips), delay, TimeUnit.MILLISECONDS);
     }
 
     private void executeBotTurn(String roomCode, int remainingSkips) {
@@ -138,7 +161,8 @@ public class RoomSocketController {
             "difficulty", choice.difficulty()
         ));
 
-        scheduler.schedule(() -> resolveBotAnswer(roomCode, currentId, choice, remainingSkips), BOT_ANSWER_DELAY_MS, TimeUnit.MILLISECONDS);
+        long delay = ThreadLocalRandom.current().nextLong(BOT_ANSWER_MIN_DELAY_MS, BOT_ANSWER_MAX_DELAY_MS);
+        scheduler.schedule(() -> resolveBotAnswer(roomCode, currentId, choice, remainingSkips), delay, TimeUnit.MILLISECONDS);
     }
 
     private void resolveBotAnswer(String roomCode, String playerId, BotAction choice, int remainingSkips) {
@@ -160,6 +184,8 @@ public class RoomSocketController {
             moveMsg.put("difficulty", choice.difficulty());
             broadcastPayload(roomCode, moveMsg);
         }
+
+        updateAnswerStreak(room, roomCode, playerId, correct);
 
         broadcastPayload(roomCode, Map.of(
             "type", "ANSWER_RESULT",
@@ -248,6 +274,51 @@ public class RoomSocketController {
             case 4 -> 0.35;
             default -> 0.50;
         };
+    }
+
+    private void updateAnswerStreak(Room room, String roomCode, String playerId, boolean correct) {
+        if (room == null || roomCode == null || playerId == null) return;
+
+        Player player = room.getPlayerById(playerId);
+        if (player == null) return;
+
+        if (correct) {
+            player.setConsecutiveSuccesses(player.getConsecutiveSuccesses() + 1);
+            player.setConsecutiveFailures(0);
+
+            if (player.getConsecutiveSuccesses() >= ANSWER_STREAK_THRESHOLD) {
+                SpecialCard specialCard = SpecialCardFactory.drawBonus();
+                Map<String, Object> resultSpecialCard = specialCard.apply(room, player);
+
+                broadcastBonusMalus(
+                    roomCode,
+                    player,
+                    STREAK_KIND_BONUS,
+                    specialCard.getName(),
+                    resultSpecialCard
+                );
+                player.resetStreaks();
+            }
+
+            return;
+        }
+
+        player.setConsecutiveFailures(player.getConsecutiveFailures() + 1);
+        player.setConsecutiveSuccesses(0);
+
+        if (player.getConsecutiveFailures() >= ANSWER_STREAK_THRESHOLD) {
+            SpecialCard specialCard = SpecialCardFactory.drawBonus();
+            Map<String, Object> resultSpecialCard = specialCard.apply(room, player);
+
+            broadcastBonusMalus(
+                roomCode,
+                player,
+                STREAK_KIND_MALUS,
+                specialCard.getName(),
+                resultSpecialCard
+            );
+            player.resetStreaks();
+        }
     }
 
     private void applyActionToRoom(Room room, String playerId, String action, String zoneName, int difficulty) {
@@ -427,19 +498,19 @@ public class RoomSocketController {
                 }
 
                 try {
+                    currentRoom.generateWorldMap();
                     RoomService.ZoneSelectionStart selectionStart = roomService.startZoneSelection(roomCode);
 
                     broadcastPayload(roomCode, Map.of(
                         "type", "ZONE_SELECTION_STARTED",
-                        "seconds", 30,
+                        "seconds", ZONE_SELECTION_COUNTDOWN_SECONDS,
                         "startAt", selectionStart.startAt(),
                         "selectedZones", selectionStart.selectedZones()
                     ));
 
-                    currentRoom.generateWorldMap();
-
                     scheduler.schedule(() -> {
                         Room latestRoom = roomService.getRoom(roomCode);
+
                         if (latestRoom == null || latestRoom.isGameStarted()) return;
                         if (!latestRoom.isZoneSelectionStarted()) return;
 
@@ -457,7 +528,7 @@ public class RoomSocketController {
                             processBotTurns(roomCode, latestRoom);
 
                         } catch (Exception ignored) { }
-                    }, 30, TimeUnit.SECONDS);
+                    }, ZONE_SELECTION_COUNTDOWN_SECONDS, TimeUnit.SECONDS);
 
                 } catch (Exception e) {
                     roomService.cancelGameStart(roomCode);
@@ -1033,6 +1104,8 @@ public class RoomSocketController {
             case "SUBMIT_ANSWER" -> {
                 Question question = questionService.getQuestion((String) questionId);
                 boolean isCorrect = question.answer().equalsIgnoreCase(String.valueOf(answer));
+
+                updateAnswerStreak(room, roomCode, playerId, isCorrect);
 
                 if (isCorrect) {
                     applyActionToRoom(room, playerId, room.getPendingAction(), room.getPendingZone(), question.difficulty());

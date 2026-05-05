@@ -55,6 +55,12 @@ public class Player {
     @JsonProperty public int getPing() {
         return ping;
     }
+    @JsonProperty public int getConsecutiveSuccesses() {
+        return consecutiveSuccesses;
+    }
+    @JsonProperty public int getConsecutiveFailures() {
+        return consecutiveFailures;
+    }
 
     @JsonIgnore public String getToken() {
         return token;
@@ -72,6 +78,17 @@ public class Player {
     }
     public void setPing(int ping) {
         this.ping = ping;
+    }
+    public void setConsecutiveSuccesses(int consecutiveSuccesses) {
+        this.consecutiveSuccesses = consecutiveSuccesses;
+    }
+    public void setConsecutiveFailures(int consecutiveFailures) {
+        this.consecutiveFailures = consecutiveFailures;
+    }
+
+    public void resetStreaks() {
+        this.consecutiveSuccesses = 0;
+        this.consecutiveFailures = 0;
     }
 
 

@@ -6,20 +6,32 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane prefHeight="1080.0" prefWidth="1920.0" onScroll="#handleScroll" onMousePressed="#consumeEvent" onMouseDragged="#consumeEvent" style="-fx-background-color: rgba(0,0,0,0.875);" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
+<StackPane onMouseDragged="#consumeEvent" onMousePressed="#consumeEvent" onScroll="#handleScroll" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: rgba(0,0,0,0.875);" stylesheets="@../../styles/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.historicconquest.historicconquest.controller.page.QuestionController">
     <StackPane maxHeight="370.0" maxWidth="514.0" minHeight="370.0" minWidth="514.0" prefHeight="370.0" prefWidth="514.0" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-insets: 0; -fx-border-width: 2;">
         <styleClass>
             <String fx:value="button-beige" />
             <String fx:value="not-hover" />
         </styleClass>
+      <Pane maxHeight="97.0" maxWidth="428.0" minHeight="97.0" minWidth="428.0" prefHeight="97.0" prefWidth="428.0">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#909090" height="11.0" layoutX="409.0" layoutY="37.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="11.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#909090" height="11.0" layoutX="8.0" layoutY="37.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="11.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#909090" height="11.0" layoutX="140.0" layoutY="37.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="11.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#909090" height="11.0" layoutX="276.0" layoutY="37.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="11.0" />
+         </children>
+      </Pane>
         <Slider fx:id="slider" blockIncrement="1.0" majorTickUnit="1.0" max="4.0" maxHeight="-Infinity" maxWidth="-Infinity" min="1.0" minorTickCount="0" prefHeight="97.0" prefWidth="428.0" showTickMarks="true" snapToTicks="true" stylesheets="@../../styles/style.css" value="1.0">
             <styleClass>
                 <String fx:value="slider" />
                 <String fx:value="axis" />
                 <String fx:value="axis-tick-mark" />
             </styleClass>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
         </Slider>
         <HBox alignment="CENTER" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" spacing="10.0" StackPane.alignment="TOP_CENTER">
             <StackPane.margin>
@@ -53,5 +65,13 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+      <Label fx:id="LevelLabel" layoutX="87.0" layoutY="113.0" style="-fx-underline-width: 3px;" text="LEVEL 1">
+         <font>
+            <Font name="Georgia Bold" size="23.0" />
+         </font>
+         <StackPane.margin>
+            <Insets top="70.0" />
+         </StackPane.margin>
+      </Label>
     </StackPane>
 </StackPane>

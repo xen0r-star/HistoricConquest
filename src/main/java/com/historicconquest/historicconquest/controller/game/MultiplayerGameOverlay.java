@@ -4,6 +4,7 @@ import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
+import com.historicconquest.historicconquest.model.player.Player;
 
 public final class MultiplayerGameOverlay {
     private static GameController controller;
@@ -21,13 +22,13 @@ public final class MultiplayerGameOverlay {
         return controller != null && worldMap != null;
     }
 
-    public static boolean ensureLocalTurn(String actionLabel) {
+    public static boolean ensureRemoteTurn(String actionLabel) {
         if (!GameNetworkService.isEnabled()) {
-            return true;
+            return false;
         }
 
         if (GameNetworkService.isLocalTurn()) {
-            return true;
+            return false;
         }
 
         String label = (actionLabel == null || actionLabel.isBlank()) ? "perform this action" : actionLabel;
@@ -37,16 +38,22 @@ public final class MultiplayerGameOverlay {
             Notification.Type.INFORMATION,
             3000
         );
-        return false;
+        return true;
     }
 
     public static void requestZoneAction(GameController.PendingAction action, Zone targetZone) {
-        if (action == null || targetZone == null) {
-            return;
+        if (action == null) return;
+        if (targetZone == null) {
+            GameController controller = GameController.getInstance();
+            if (controller == null) return;
+
+            Player current = controller.getCurrentPlayer();
+            if (current == null || current.getCurrentZone() == null) return;
+            targetZone = current.getCurrentZone();
         }
 
         if (GameNetworkService.isEnabled()) {
-            if (!ensureLocalTurn("choose an action")) {
+            if (ensureRemoteTurn("choose an action")) {
                 return;
             }
 
@@ -106,7 +113,7 @@ public final class MultiplayerGameOverlay {
             return;
         }
 
-        Zone zone = findZoneByName(zoneName);
+        Zone zone = worldMap.findZoneByName(zoneName);
         if (zone == null) {
             return;
         }
@@ -114,19 +121,6 @@ public final class MultiplayerGameOverlay {
         actionHandler.apply(zone, false);
     }
 
-    private static Zone findZoneByName(String zoneName) {
-        if (zoneName == null || zoneName.isBlank() || worldMap == null) {
-            return null;
-        }
-
-        for (Zone zone : worldMap.getAllZones()) {
-            if (zoneName.equalsIgnoreCase(zone.getName())) {
-                return zone;
-            }
-        }
-
-        return null;
-    }
 
     @FunctionalInterface
     private interface ZoneAction {

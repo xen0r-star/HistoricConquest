@@ -15,6 +15,9 @@ import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.map.ZonePathfinder;
 import com.historicconquest.historicconquest.model.player.Player;
+import com.historicconquest.historicconquest.model.specialCard.SpecialCard;
+import com.historicconquest.historicconquest.model.specialCard.SpecialCardFactory;
+import com.historicconquest.historicconquest.service.network.RoomService;
 import com.historicconquest.historicconquest.view.map.MapView;
 import com.historicconquest.historicconquest.view.map.ZoneView;
 
@@ -254,17 +257,32 @@ public class GameController implements GameAnimationPort {
         boolean networkGame = Game.getInstance() != null && Game.getInstance().isNetworkGame();
 
         if (!correct) {
-            current.setConsecutiveFailures(current.getConsecutiveFailures() + 1);
-            current.setConsecutiveSuccesses(0);
+            if (!networkGame) {
+                if (current.getPseudo().equalsIgnoreCase(RoomService.getCurrentPseudo())) {
+                    NotificationController.show(
+                        "Wrong Answer",
+                        "Incorrect! Your turn is over.",
+                        Notification.Type.ERROR,
+                        5000
+                    );
+                }
 
-            if (current.getConsecutiveFailures() >= 3) {
-                NotificationController.show(
-                    "Critical Failure",
-                    "3 consecutive incorrect answers! You have received a penalty.",
-                    Notification.Type.ERROR,
-                    6000
-                );
-                current.setConsecutiveFailures(3);
+                current.setConsecutiveFailures(current.getConsecutiveFailures() + 1);
+                current.setConsecutiveSuccesses(0);
+
+                if (current.getConsecutiveFailures() >= 3) {
+                    SpecialCard specialCard = SpecialCardFactory.drawMalus();
+                    specialCard.apply(current);
+
+                    NotificationController.show(
+                        "Critical Failure for " + current.getPseudo(),
+                        specialCard.getName() + ": " + specialCard.getDescription(),
+                        Notification.Type.ERROR,
+                        10000
+                    );
+
+                    current.setConsecutiveFailures(0);
+                }
             }
 
         } else {
@@ -275,16 +293,21 @@ public class GameController implements GameAnimationPort {
                 default -> { }
             }
 
-            current.setConsecutiveSuccesses(current.getConsecutiveSuccesses() + 1);
-            current.setConsecutiveFailures(0);
-            if (current.getConsecutiveSuccesses() >= 3) {
-                NotificationController.show(
-                    "Win Streak!",
-                    "3 correct answers in a row! You've earned a special bonus.",
-                    Notification.Type.SUCCESS,
-                    6000
-                );
-                current.setConsecutiveSuccesses(0);
+            if (!networkGame) {
+                current.setConsecutiveSuccesses(current.getConsecutiveSuccesses() + 1);
+                current.setConsecutiveFailures(0);
+                if (current.getConsecutiveSuccesses() >= 3) {
+                    SpecialCard specialCard = SpecialCardFactory.drawBonus();
+                    specialCard.apply(current);
+
+                    NotificationController.show(
+                        "Epic Series for " + current.getPseudo(),
+                        specialCard.getName() + ": " + specialCard.getDescription(),
+                        Notification.Type.SUCCESS,
+                        10000
+                    );
+                    current.setConsecutiveSuccesses(0);
+                }
             }
         }
 
@@ -310,6 +333,22 @@ public class GameController implements GameAnimationPort {
             int distance = isBoat ? TRAVEL_HINT_MAX_DISTANCE : result.zones().size() - 1;
 
             if (distance > 0 && distance <= TRAVEL_HINT_MAX_DISTANCE) {
+                if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+                    NotificationController.show(
+                        "Traveling",
+                        current.getPseudo() + " moving to " + targetZone.getName() + " (" + distance + " zones).",
+                        Notification.Type.SUCCESS,
+                        3000
+                    );
+
+                } else {
+                    NotificationController.show(
+                        "Traveling",
+                        "Moving to " + targetZone.getName() + " (" + distance + " zones).",
+                        Notification.Type.SUCCESS,
+                        3000
+                    );
+                }
 
                 setPendingAction(PendingAction.NONE);
                 clearTravelPreviewLine();
@@ -330,7 +369,6 @@ public class GameController implements GameAnimationPort {
 
                 current.setCurrentZone(targetZone);
                 refreshTurnUI();
-
             }
         }
     }
@@ -360,8 +398,6 @@ public class GameController implements GameAnimationPort {
         }
 
         if (current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
-
-
             setPendingAction(PendingAction.NONE);
             return;
         }
@@ -370,12 +406,22 @@ public class GameController implements GameAnimationPort {
 
         if (result > 0) {
             targetZone.setPower(result);
-            NotificationController.show(
-                "Attack Progress",
-                "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
-                Notification.Type.INFORMATION,
-                5000
-            );
+            if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+                NotificationController.show(
+                    "Attack Progress",
+                    current.getPseudo() + "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
+                    Notification.Type.SUCCESS,
+                    5000
+                );
+
+            } else {
+                NotificationController.show(
+                    "Attack Progress",
+                    "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
+                    Notification.Type.SUCCESS,
+                    5000
+                );
+            }
 
         } else if(result == 0) {
             for(Player p : players ) {
@@ -385,12 +431,22 @@ public class GameController implements GameAnimationPort {
                 }
             }
 
-            NotificationController.show(
-                "Zone Neutralized",
-                "The defenses have fallen! The zone is now neutral.",
-                Notification.Type.SUCCESS,
-                5000
-            );
+            if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+                NotificationController.show(
+                    "Zone Neutralized",
+                    current.getPseudo() + ": The defenses have fallen! The zone is now neutral.",
+                    Notification.Type.SUCCESS,
+                    5000
+                );
+
+            } else {
+                NotificationController.show(
+                    "Zone Neutralized",
+                    "The defenses have fallen! The zone is now neutral.",
+                    Notification.Type.SUCCESS,
+                    5000
+                );
+            }
             targetZone.setPower(0);
             targetZone.setNameOwner("Nobody");
             targetZone.setColor(targetZone.getBaseColor());
@@ -417,6 +473,22 @@ public class GameController implements GameAnimationPort {
             }
 
             current.addZone(targetZone);
+            if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+                NotificationController.show(
+                    "Victory!",
+                    current.getPseudo() + ": You have captured " + targetZone.getName() + " with " + finalPower + " power!",
+                    Notification.Type.SUCCESS,
+                    6000
+                );
+
+            } else {
+                NotificationController.show(
+                    "Victory!",
+                    "You have captured " + targetZone.getName() + " with " + finalPower + " power!",
+                    Notification.Type.SUCCESS,
+                    6000
+                );
+            }
             checkWinCondition();
         }
 
@@ -432,9 +504,13 @@ public class GameController implements GameAnimationPort {
 
     public void applyPowerUp() {
         Player current = getCurrentPlayer();
-        if (current == null || targetZone == null) {
-            return;
-        }
+        if (current == null) return;
+
+        GameController controller = GameController.getInstance();
+        if (controller == null) return;
+
+        if (current.getCurrentZone() == null) return;
+        targetZone = current.getCurrentZone();
 
         if (!current.getPseudo().equalsIgnoreCase(targetZone.getNameOwner())) {
             NotificationController.show(
@@ -453,69 +529,49 @@ public class GameController implements GameAnimationPort {
         if (currentPower < maxPower) {
             int newPower = Math.min(currentPower + currentDifficulty, maxPower);
             targetZone.setPower(newPower);
-            NotificationController.show(
-                "Zone Upgraded",
-                targetZone.getName() + " power increased to " + newPower + "!",
-                Notification.Type.SUCCESS,
-                3000
-            );
+            if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+                NotificationController.show(
+                    "Zone Upgraded",
+                    current.getPseudo() + ": " + targetZone.getName() + " power increased to " + newPower + "!",
+                    Notification.Type.SUCCESS,
+                    3000
+                );
+
+            } else {
+                NotificationController.show(
+                    "Zone Upgraded",
+                    targetZone.getName() + " power increased to " + newPower + "!",
+                    Notification.Type.SUCCESS,
+                    3000
+                );
+            }
             setPendingAction(PendingAction.NONE);
             refreshTurnUI();
 
         } else {
-            NotificationController.show(
-                "Maximum Power",
-                "This zone is already at maximum capacity.",
-                Notification.Type.ERROR,
-                3000
-            );
+            if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+                NotificationController.show(
+                    "Maximum Power",
+                    current.getPseudo() + ": This zone is already at maximum capacity.",
+                    Notification.Type.ERROR,
+                    3000
+                );
+
+            } else {
+                NotificationController.show(
+                    "Maximum Power",
+                    "This zone is already at maximum capacity.",
+                    Notification.Type.ERROR,
+                    3000
+                );
+            }
         }
-    }
-
-    public void setCurrentPlayerIndexFromNetwork(int index) {
-        if (index < 0 || index >= players.size()) {
-            return;
-        }
-
-        currentPlayerIndex = index;
-        hasAnsweredCorrectly = false;
-        currentDifficulty = 0;
-        selectedAction = PendingAction.NONE;
-        clearTravelHint();
-
-        Player nextP = getCurrentPlayer();
-        NotificationController.show(
-            "Next Turn",
-            "It's now " + nextP.getPseudo() + "'s turn!",
-            Notification.Type.INFORMATION,
-            3000
-        );
-
-        if (nextP.getPendingAllianceRequest() != null) {
-            showAllianceDecisionMenu(nextP);
-        }
-
-        refreshTurnUI();
     }
 
     public void setPlayerCount(int count) {
         if (count > 0) {
             nbPlayer = count;
         }
-    }
-
-    public Zone findZoneByName(String zoneName) {
-        if (zoneName == null || zoneName.isBlank() || worldMap == null) {
-            return null;
-        }
-
-        for (Zone zone : worldMap.getAllZones()) {
-            if (zoneName.equalsIgnoreCase(zone.getName())) {
-                return zone;
-            }
-        }
-
-        return null;
     }
 
     private void checkWinCondition() {
@@ -576,15 +632,25 @@ public class GameController implements GameAnimationPort {
     }
 
 
+    public void setCurrentPlayerIndexFromNetwork(int index) {
+        if (index < 0 || index >= players.size()) {
+            return;
+        }
+        currentPlayerIndex = index;
+    }
+
     public void nextPlayer() {
         currentPlayerIndex = (currentPlayerIndex + 1) % nbPlayer;
+        applyPlayerChange();
+    }
 
-        this.hasAnsweredCorrectly = false;
-        this.currentDifficulty = 0;
+    public void applyPlayerChange() {
+        hasAnsweredCorrectly = false;
+        currentDifficulty = 0;
+        selectedAction = PendingAction.NONE;
         clearTravelHint();
 
         Player nextP = getCurrentPlayer();
-
         NotificationController.show(
             "Next Turn",
             "It's now " + nextP.getPseudo() + "'s turn!",
@@ -975,6 +1041,10 @@ public class GameController implements GameAnimationPort {
 
     public Zone getTargetZone() {
         return targetZone;
+    }
+
+    public WorldMap getWorldMap() {
+        return worldMap;
     }
 
     public PendingAction getSelectedAction() {

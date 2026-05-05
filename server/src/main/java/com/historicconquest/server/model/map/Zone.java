@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Zone {
     private final String name;
-    private final TypeThemes themes;
+    private TypeThemes themes;
     private int power;
     private static final int MAX_POWER_ZONE = 8;
 
@@ -64,6 +64,10 @@ public class Zone {
 
     public TypeThemes getThemes() {
         return themes;
+    }
+
+    public void setThemes(TypeThemes themes) {
+        this.themes = themes;
     }
 
     public void setPower(int power) {

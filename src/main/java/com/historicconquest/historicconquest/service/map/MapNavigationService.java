@@ -9,10 +9,6 @@ public class MapNavigationService {
     private static final double ZOOM_FACTOR = 1.1;
     private static final double ZOOM_MIN = 0.75;
     private static final double ZOOM_MAX = 10.0;
-    private static final double TRANSLATE_X_MIN = -1200;
-    private static final double TRANSLATE_X_MAX = 800;
-    private static final double TRANSLATE_Y_MIN = -400;
-    private static final double TRANSLATE_Y_MAX = 500;
     private double mouseAnchorX, mouseAnchorY;
     private double translateAnchorX, translateAnchorY;
 
@@ -44,7 +40,6 @@ public class MapNavigationService {
             plateau.setTranslateX(plateau.getTranslateX() - errorX);
             plateau.setTranslateY(plateau.getTranslateY() - errorY);
 
-            clampTranslate(plateau);
             event.consume();
         });
 
@@ -59,14 +54,6 @@ public class MapNavigationService {
         root.setOnMouseDragged(event -> {
             plateau.setTranslateX(translateAnchorX + (event.getSceneX() - mouseAnchorX));
             plateau.setTranslateY(translateAnchorY + (event.getSceneY() - mouseAnchorY));
-            clampTranslate(plateau);
         });
-    }
-
-    private void clampTranslate(Group plateau) {
-        double clampedX = Math.clamp(plateau.getTranslateX(), TRANSLATE_X_MIN, TRANSLATE_X_MAX);
-        double clampedY = Math.clamp(plateau.getTranslateY(), TRANSLATE_Y_MIN, TRANSLATE_Y_MAX);
-        plateau.setTranslateX(clampedX);
-        plateau.setTranslateY(clampedY);
     }
 }

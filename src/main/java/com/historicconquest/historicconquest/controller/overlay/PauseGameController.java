@@ -3,13 +3,13 @@ package com.historicconquest.historicconquest.controller.overlay;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -33,6 +33,7 @@ public class PauseGameController implements Initializable {
                     "Yes", () -> {
                         AppController.getInstance().showPage(AppPage.HOME);
                         GameController.clearGame();
+                        GameNetworkService.detach();
                         PauseGameController.close();
                     },
                     "No", () -> { }

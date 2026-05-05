@@ -195,6 +195,21 @@ public class WorldMap {
     }
 
 
+    public Zone findZoneByName(String zoneName) {
+        if (zoneName == null || zoneName.isBlank()) {
+            return null;
+        }
+
+        for (Zone zone : this.getAllZones()) {
+            if (zoneName.equalsIgnoreCase(zone.getName())) {
+                return zone;
+            }
+        }
+
+        return null;
+    }
+
+
 
     public List<Zone> getAllZones() {
         List<Zone> allZones = new ArrayList<>();

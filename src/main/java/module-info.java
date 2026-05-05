@@ -10,6 +10,7 @@ module com.historicconquest.historicconquest {
     requires java.xml;
     requires tools.jackson.databind;
     requires com.fasterxml.jackson.core;
+    requires java.prefs;
 
     // EXPORTS
     exports com.historicconquest.historicconquest.app;

@@ -39,7 +39,7 @@ public class QuestionController {
     @FXML public ImageView IconThemeLabelChoice, IconThemeLabelQuestion;
     @FXML public Slider slider;
     @FXML public Button answer1, answer2, answer3, answer4;
-    @FXML public Label theme_label_question, theme_label_choice, questionId;
+    @FXML public Label theme_label_question, theme_label_choice, LevelLabel, questionId;
 
 
 
@@ -58,6 +58,10 @@ public class QuestionController {
         try {
             StackPane difficultStackPane = questionLoader.load();
             QuestionController controller = questionLoader.getController();
+
+            controller.slider.valueProperty().addListener((obs, old, val) ->
+                controller.LevelLabel.setText("LEVEL " + (int) val.doubleValue())
+            );
 
             controller.theme = findCurrentTheme();
             controller.setLabelsTheme();

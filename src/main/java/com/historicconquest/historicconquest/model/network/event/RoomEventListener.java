@@ -23,6 +23,7 @@ public interface RoomEventListener {
     void onGameAction(String action, String playerId, String zoneName, Integer difficulty, Boolean correct);
     void onTurnChanged(String currentPlayerId, Integer currentPlayerIndex);
     void onAnswerResult(String currentPlayerId, Boolean currentCorrect, Integer currentDifficulty);
+    void onBonusMalus(String playerId, String kind, String nameKind, Map<String, Object> resultSpecialCard);
 
     void onGameWon(String winnerName);
 

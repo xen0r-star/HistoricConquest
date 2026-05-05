@@ -189,6 +189,15 @@ public class Room {
         return playerId == null ? null : currentZoneByPlayerId.get(playerId);
     }
 
+    public synchronized List<Zone> getPlayerZones(String playerId) {
+        if (playerId == null || worldMap == null) return List.of();
+
+        return worldMap.getBlocs().stream()
+            .flatMap(bloc -> bloc.getZones().stream())
+            .filter(zone -> playerId.equals(zone.getNameOwner()))
+            .toList();
+    }
+
     public synchronized void setCurrentZoneName(String playerId, String zoneName) {
         if (playerId == null) return;
         if (zoneName == null || zoneName.isBlank()) {
@@ -319,6 +328,17 @@ public class Room {
 
     public synchronized String getAlliancePartner(String playerId) {
         return allianceByPlayer.get(playerId);
+    }
+
+    public String getCurrentPhase() {
+        if (isGameStarted()) return "IN_PROGRESS";
+        if (isGameStarting()) return "STARTING";
+        if (isZoneSelectionStarted()) return "ZONE_SELECTION";
+        return "LOBBY";
+    }
+
+    public WorldMap getWorldMap() {
+        return worldMap;
     }
 
     public synchronized String createAlliance(String playerAId, String playerBId) {

@@ -7,6 +7,7 @@ import com.historicconquest.historicconquest.model.network.model.NetworkPlayer;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum RoomInfo {
@@ -144,6 +145,8 @@ public enum RoomInfo {
         }
     },
 
+
+
     GAME_ACTION {
         @Override
         public void handle(JsonNode node, RoomEventListener listener) {
@@ -186,6 +189,18 @@ public enum RoomInfo {
                 getText(node, "playerId"),
                 getBoolean(node),
                 getInteger(node, "difficulty")
+            ));
+        }
+    },
+
+    BONUS_MALUS {
+        @Override
+        public void handle(JsonNode node, RoomEventListener listener) {
+            notifyIfPresent(listener, l -> l.onBonusMalus(
+                getText(node, "playerId"),
+                getText(node, "kind"),
+                getText(node, "nameKind"),
+                readMap(node, "resultSpecialCard")
             ));
         }
     },
@@ -284,16 +299,32 @@ public enum RoomInfo {
         }
     }
 
-    private static java.util.List<String> readStringList(JsonNode node) {
+    private static Map<String, Object> readMap(JsonNode node, String field) {
+        JsonNode value = node.get(field);
+
+        if (value == null || value.isNull() || !value.isObject()) {
+            return Map.of();
+        }
+
+        try {
+            return MAPPER.convertValue(value, new TypeReference<>() {});
+
+        } catch (Exception e) {
+            return Map.of();
+        }
+    }
+
+
+    private static List<String> readStringList(JsonNode node) {
         if (node == null || node.isNull()) {
-            return java.util.List.of();
+            return List.of();
         }
 
         try {
             return MAPPER.convertValue(node, new TypeReference<>() { });
 
         } catch (Exception e) {
-            return java.util.List.of();
+            return List.of();
         }
     }
 

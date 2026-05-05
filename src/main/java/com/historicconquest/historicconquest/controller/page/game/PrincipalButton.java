@@ -21,6 +21,7 @@ public class PrincipalButton {
     @FXML private Button attackButton;
     @FXML private Button travelButton;
     @FXML private Button powerUpButton;
+    @FXML private Button acceptButton;
     @FXML private AnchorPane actionContainer;
     @FXML private Label actionLabel;
     @FXML private HBox mainActionsBox;
@@ -29,23 +30,26 @@ public class PrincipalButton {
 
 
     public void attack() {
-        if (!MultiplayerGameOverlay.ensureLocalTurn("attack")) return;
+        if (MultiplayerGameOverlay.ensureRemoteTurn("attack")) return;
         GameController.getInstance().setPendingAction(GameController.PendingAction.ATTACK);
         setActionSelection(attackButton);
+        acceptButton.setDisable(false);
         showActionContainer("Attack", getCurrentZoneName());
     }
 
     public void travel() {
-        if (!MultiplayerGameOverlay.ensureLocalTurn("travel")) return;
+        if (MultiplayerGameOverlay.ensureRemoteTurn("travel")) return;
         GameController.getInstance().setPendingAction(GameController.PendingAction.TRAVEL);
         setActionSelection(travelButton);
-        showActionText("Travel to ....");
+        acceptButton.setDisable(true);
+        showActionText("Travel to ...");
     }
 
     public void powerUp() {
-        if (!MultiplayerGameOverlay.ensureLocalTurn("power up")) return;
+        if (MultiplayerGameOverlay.ensureRemoteTurn("power up")) return;
         GameController.getInstance().setPendingAction(GameController.PendingAction.POWER_UP);
         setActionSelection(powerUpButton);
+        acceptButton.setDisable(false);
         showActionContainer("Power up", getCurrentZoneName());
     }
 
@@ -57,7 +61,7 @@ public class PrincipalButton {
     }
 
     public void skipTurn() {
-        if (!MultiplayerGameOverlay.ensureLocalTurn("skip turn")) return;
+        if (MultiplayerGameOverlay.ensureRemoteTurn("skip turn")) return;
 
         if (GameNetworkService.isEnabled()) {
             GameNetworkService.sendSkipAction();
@@ -144,7 +148,7 @@ public class PrincipalButton {
     private void showActionContainer(String action, String zoneName) {
         if (actionLabel != null) {
             if (zoneName == null || zoneName.isBlank()) {
-                actionLabel.setText(action + " (Level 1 - 4)");
+                actionLabel.setText(action + " on ..." + " (Level 1 - 4)");
             } else {
                 actionLabel.setText(action + " on " + zoneName + " (Level 1 - 4)");
             }
@@ -157,6 +161,8 @@ public class PrincipalButton {
 
     public void updateTravelTarget(String zoneName, int distance, boolean isBoat) {
         if (zoneName == null || zoneName.isBlank() || distance <= 0) return;
+
+        acceptButton.setDisable(false);
 
         String transportType = isBoat ? "Boat" : "Horse-drawn";
         showActionText("Travel to " + zoneName + " via " + transportType + " (Level " + distance + ")");
@@ -220,6 +226,7 @@ public class PrincipalButton {
     private String getCurrentZoneName() {
         GameController controller = GameController.getInstance();
         if (controller == null) return null;
+
         Player current = controller.getCurrentPlayer();
         if (current == null || current.getCurrentZone() == null) return null;
         return current.getCurrentZone().getName();

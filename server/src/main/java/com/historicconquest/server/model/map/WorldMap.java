@@ -132,6 +132,15 @@ public class WorldMap {
         return allZones;
     }
 
+    public TypeBloc getBlocTypeForZone(String zoneName) {
+        return blocs.stream()
+            .filter(bloc -> bloc.getZones().stream()
+                    .anyMatch(z -> z.getName().equalsIgnoreCase(zoneName)))
+            .map(Bloc::getName)
+            .findFirst()
+            .orElse(null);
+    }
+
     public List<Bloc> getBlocs() {
         return Collections.unmodifiableList(blocs);
     }

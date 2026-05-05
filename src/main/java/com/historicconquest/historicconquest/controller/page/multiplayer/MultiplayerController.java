@@ -1,5 +1,6 @@
 package com.historicconquest.historicconquest.controller.page.multiplayer;
 
+import com.historicconquest.historicconquest.app.App;
 import com.historicconquest.historicconquest.controller.core.AppPage;
 import com.historicconquest.historicconquest.controller.core.AppController;
 import com.historicconquest.historicconquest.controller.game.GameController;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
+import java.util.prefs.Preferences;
 
 public class MultiplayerController {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerController.class);
@@ -131,11 +133,39 @@ public class MultiplayerController {
 
     private void configureSelectModeHandlers() {
         JoinPane.setOnMouseClicked(e -> {
-            setPanel(PanelState.JOIN_CODE);
+            Preferences prefs = Preferences.userNodeForPackage(App.class);
+            String tokenRecupere = prefs.get("room_token", null);
 
-            for (TextField field : getTextFields()) {
-                field.requestFocus();
-                break;
+            if (tokenRecupere != null) {
+                // TODO: Make reconnexion
+                RoomService.create(tokenRecupere, this::showAlert);
+                RoomService.setListener(createRoomListener());
+
+                ApiService.request(
+                    ApiService.getInfoRoomForReconnection(tokenRecupere),
+                    ApiService.ReconnectionRoomResponse.class,
+                    response -> {
+                        RoomService.setCurrentPseudo(response.pseudo());
+                        RoomService.setCurrentColor(response.color());
+
+                        for (NetworkPlayer player : response.players()) {
+                            roomPlayers.add(new RoomPlayer(
+                                player.id(),     player.pseudo(),
+                                player.color(), !player.type().equals("Player"),
+                                player.ping(),   player.status(),
+                                false
+                            ));
+                        }
+                    }
+                );
+
+            } else {
+                setPanel(PanelState.JOIN_CODE);
+
+                for (TextField field : getTextFields()) {
+                    field.requestFocus();
+                    break;
+                }
             }
         });
 
@@ -651,25 +681,17 @@ public class MultiplayerController {
             public void onAnswerResult(String playerId, Boolean correct, Integer difficulty) {
                 Platform.runLater(() -> {
                     GameNetworkService.handleAnswerResult(playerId, correct);
-                    GameController.getInstance().applyQuestionResult(difficulty, correct);
 
-                    RoomPlayer roomPlayer = roomPlayers.stream()
-                            .filter(obj -> Objects.equals(obj.getId(), playerId))
-                            .findFirst()
-                            .orElse(null);
-
-                    String pseudo = roomPlayer != null ? roomPlayer.getName() : "Player";
-
-
-                    String message = correct ? " answered the question correctly" : " failed to answer the question";
-
-                    NotificationController.show(
-                        "Quiz results",
-                        pseudo + message,
-                        correct ? Notification.Type.SUCCESS : Notification.Type.ERROR,
-                        3000
-                    );
+                    GameController gameController = GameController.getInstance();
+                    if (gameController != null) {
+                        GameController.getInstance().applyQuestionResult(difficulty, correct);
+                    }
                 });
+            }
+
+            @Override
+            public void onBonusMalus(String playerId, String kind, String nameKind, Map<String, Object> resultSpecialCard) {
+                Platform.runLater(() -> GameNetworkService.handleBonusMalus(playerId, kind, nameKind, resultSpecialCard));
             }
 
             @Override

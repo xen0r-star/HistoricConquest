@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
-    private static final long VALIDITY_TIME = 2 * 60 * 60 * 1000; // 2 hours
+    private static final long VALIDITY_TIME = 3 * 60 * 60 * 1000; // 3 hours
     private static final PrivateKey privateKey;
     private static final PublicKey publicKey;
 

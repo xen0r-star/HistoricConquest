@@ -15,9 +15,7 @@ public class Game {
     }
 
     public static Game init(boolean modeMulti) {
-        if (instance == null) {
-            instance = new Game(modeMulti);
-        }
+        instance = new Game(modeMulti);
         return instance;
     }
 

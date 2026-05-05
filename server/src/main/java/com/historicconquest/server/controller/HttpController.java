@@ -214,4 +214,33 @@ public class HttpController {
             );
         }
     }
+
+
+
+    @PostMapping("/gameroom/reconnection")
+    public Map<String, Object> reconnectionRoom(Authentication authentication) {
+        JwtHttpPrincipal principal = (JwtHttpPrincipal) authentication.getPrincipal();
+
+        if (principal == null) return Map.of(
+            "error", Map.of(
+                "title", "Error connecting to the server",
+                "message", "An error has occurred! Please try again."
+            )
+        );
+
+        Player player = roomService.getRoom(principal.roomCode()).getPlayerById(principal.playerId());
+
+        return Map.of(
+            "consecutiveSuccesses", player.getConsecutiveSuccesses(),
+            "consecutiveFailures", player.getConsecutiveFailures(),
+            "color", player.getColor(),
+            "pseudo", player.getPseudo(),
+            "players", roomService.getRoom(principal.roomCode()).getPlayers(),
+            "currentPhase", roomService.getRoom(principal.roomCode()).getCurrentPhase(),
+            "selectedZones", roomService.getRoom(principal.roomCode()).getSelectedZones(),
+            "currentPlayerId", roomService.getRoom(principal.roomCode()).getCurrentPlayerId(),
+            "turnOrder", roomService.getRoom(principal.roomCode()).getPlayers().stream().map(Player::getId).toList(),
+            "pendingAction", roomService.getRoom(principal.roomCode()).getPendingAction()
+        );
+    }
 }

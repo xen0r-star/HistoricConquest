@@ -308,3 +308,7 @@
 .check-box:selected .mark {
     -fx-background-color: #313131;
 }
+
+.rounded-bottom {
+    -fx-background-radius: 0 0 10 10;
+}
