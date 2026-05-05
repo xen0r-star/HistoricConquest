@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class ApiService {
-    private static final String API_BASE_URL = "http://localhost:8081/api";
+    private static final String API_BASE_URL = "http://51.38.227.202:8084/api";
 
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final ObjectMapper mapper = new ObjectMapper();
