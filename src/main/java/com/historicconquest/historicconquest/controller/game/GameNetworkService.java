@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class GameNetworkService {
     private static final String ACTION_ANSWER_RESULT = "ANSWER_RESULT";
@@ -124,6 +125,13 @@ public final class GameNetworkService {
         String targetId = getNetworkPlayerId(target);
         if (targetId == null) return;
 
+        NotificationController.show(
+            "Alliance Request Sent",
+            "You have sent an alliance request to " + target.getPseudo() + ".",
+            Notification.Type.SUCCESS,
+            10000
+        );
+
         RoomService.sendCoalitionRequest(targetId);
     }
 
@@ -195,15 +203,29 @@ public final class GameNetworkService {
 
     public static void handleAnswerResult(String playerId, Boolean correct) {
         if (!enabled || controller == null || playerId == null || correct == null) return;
-        if (isLocalTurn()) return;
 
         Player player = getPlayerByNetworkId(playerId);
-        String name = player == null ? "Player" : player.getPseudo();
-        String message = correct
-            ? name + " answered the question correctly."
-            : name + " answered the question incorrectly.";
+        if (isLocalTurn()) {
+            if (player != null) {
+                if (correct) {
+                    player.setConsecutiveSuccesses(player.getConsecutiveSuccesses() + 1);
+                    player.setConsecutiveFailures(0);
 
-        controller.setTurnStatusMessage(message);
+                } else {
+                    player.setConsecutiveFailures(player.getConsecutiveFailures() + 1);
+                    player.setConsecutiveSuccesses(0);
+                }
+                controller.refreshPlayerInfo(player);
+            }
+
+        } else {
+            if (player != null) {
+                String name = player.getPseudo();
+
+                if (correct) controller.setTurnStatusMessage(name + " answered the question correctly.");
+                else controller.setTurnStatusMessage(name + " answered the question incorrectly.");
+            }
+        }
     }
 
     public static void handleBonusMalus(String playerId, String kind, String nameKind, Map<String, Object> resultSpecialCard) {

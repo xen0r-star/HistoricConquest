@@ -895,7 +895,12 @@ public class RoomSocketController {
         }
 
         if (!room.setPendingAllianceRequest(playerId, targetPlayerId)) {
-            sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Alliance request cannot be sent");
+            if (room.isRequestAlreadyPending(playerId, targetPlayerId)) {
+                sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "You have already sent an alliance request to this player");
+
+            } else {
+                sendActionUnavailable(playerId, ACTION_COALITION_REQUEST, "Alliance request cannot be sent");
+            }
             return;
         }
 

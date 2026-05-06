@@ -227,6 +227,8 @@ public class QuestionController {
     @FXML
     public void checkWin() {
         if (GameNetworkService.isEnabled() && currentNetworkQuestionId != null) {
+            if (myAnswer == null || myAnswer.isEmpty()) return;
+
             RoomService.sendGameAction(
                 "SUBMIT_ANSWER",
                 Map.of("questionId", currentNetworkQuestionId,  "answer", myAnswer)

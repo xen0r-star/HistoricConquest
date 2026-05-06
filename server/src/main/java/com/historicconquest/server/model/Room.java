@@ -307,11 +307,15 @@ public class Room {
         if (requesterId == null || targetPlayerId == null) return false;
         if (requesterId.equals(targetPlayerId)) return false;
         if (hasAlliance(requesterId) || hasAlliance(targetPlayerId)) return false;
-        if (pendingAllianceRequests.containsKey(targetPlayerId)) return false;
-        if (hasPendingAllianceRequestFrom(requesterId)) return false;
+        isRequestAlreadyPending(requesterId, targetPlayerId);
 
         pendingAllianceRequests.put(targetPlayerId, requesterId);
         return true;
+    }
+
+    public boolean isRequestAlreadyPending(String requesterId, String targetPlayerId) {
+        return pendingAllianceRequests.containsKey(targetPlayerId)
+                || hasPendingAllianceRequestFrom(requesterId);
     }
 
     public synchronized void clearPendingAllianceRequest(String targetPlayerId) {

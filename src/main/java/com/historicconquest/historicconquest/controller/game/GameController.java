@@ -333,8 +333,8 @@ public class GameController implements GameAnimationPort {
             if (distance > 0 && distance <= TRAVEL_HINT_MAX_DISTANCE) {
                 if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
                     NotificationController.show(
-                        "Traveling",
-                        current.getPseudo() + " moving to " + targetZone.getName() + " (" + distance + " zones).",
+                        current.getPseudo(),
+                        "Moving to " + targetZone.getName() + " (" + distance + " zones).",
                         Notification.Type.SUCCESS,
                         3000
                     );
@@ -406,8 +406,8 @@ public class GameController implements GameAnimationPort {
             targetZone.setPower(result);
             if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
                 NotificationController.show(
-                    "Attack Progress",
-                    current.getPseudo() + "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
+                    current.getPseudo(),
+                    "Attack successful! The enemy is weakened (Power remaining: " + result + ")",
                     Notification.Type.SUCCESS,
                     5000
                 );
@@ -431,8 +431,8 @@ public class GameController implements GameAnimationPort {
 
             if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
                 NotificationController.show(
-                    "Zone Neutralized",
-                    current.getPseudo() + ": The defenses have fallen! The zone is now neutral.",
+                    current.getPseudo(),
+                    "Zone Neutralized: The defenses have fallen! The zone is now neutral.",
                     Notification.Type.SUCCESS,
                     5000
                 );
@@ -473,8 +473,8 @@ public class GameController implements GameAnimationPort {
             current.addZone(targetZone);
             if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
                 NotificationController.show(
-                    "Victory!",
-                    current.getPseudo() + ": You have captured " + targetZone.getName() + " with " + finalPower + " power!",
+                    current.getPseudo(),
+                    "Victory!: You have captured " + targetZone.getName() + " with " + finalPower + " power!",
                     Notification.Type.SUCCESS,
                     6000
                 );
@@ -529,16 +529,16 @@ public class GameController implements GameAnimationPort {
             targetZone.setPower(newPower);
             if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
                 NotificationController.show(
-                    "Zone Upgraded",
-                    current.getPseudo() + ": " + targetZone.getName() + " power increased to " + newPower + "!",
+                    current.getPseudo(),
+                     "Zone Upgraded: " + targetZone.getName() + " power increased to " + newPower + "!",
                     Notification.Type.SUCCESS,
                     3000
                 );
 
             } else {
                 NotificationController.show(
-                    "Zone Upgraded",
-                    targetZone.getName() + " power increased to " + newPower + "!",
+                    targetZone.getName(),
+                     "Zone Upgraded: power increased to " + newPower + "!",
                     Notification.Type.SUCCESS,
                     3000
                 );
@@ -549,8 +549,8 @@ public class GameController implements GameAnimationPort {
         } else {
             if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
                 NotificationController.show(
-                    "Maximum Power",
-                    current.getPseudo() + ": This zone is already at maximum capacity.",
+                    current.getPseudo(),
+                    "Maximum Power: This zone is already at maximum capacity.",
                     Notification.Type.ERROR,
                     3000
                 );
@@ -757,10 +757,13 @@ public class GameController implements GameAnimationPort {
         Player currentPlayer = getCurrentPlayer();
 
         gameHUD.refreshGameInfo(players, currentPlayerIndex);
-        gameHUD.refreshPlayerInfo(currentPlayer);
 
 
         if (Game.getInstance() != null && Game.getInstance().isNetworkGame()) {
+            if (GameNetworkService.isLocalTurn()) {
+                gameHUD.refreshPlayerInfo(currentPlayer);
+            }
+
             boolean isMyTurn = GameNetworkService.isLocalTurn();
             gameHUD.updateActionButtonVisibility(isMyTurn);
 
@@ -771,9 +774,15 @@ public class GameController implements GameAnimationPort {
             }
 
         } else {
+            gameHUD.refreshPlayerInfo(currentPlayer);
+
             gameHUD.updateActionButtonVisibility(true);
             gameHUD.updateTurnStatus(null);
         }
+    }
+
+    public void refreshPlayerInfo(Player player) {
+        gameHUD.refreshPlayerInfo(player);
     }
 
     private String buildTurnStatusMessage(Player currentPlayer) {
