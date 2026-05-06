@@ -113,8 +113,6 @@ public class QuestionController {
         TypeThemes LabelTheme = targetZone.getThemes();
 
         theme_label_choice.setText(LabelTheme.getLabel());
-        theme_label_question.setText(LabelTheme.getLabel());
-
 
         setThemeIcon(LabelTheme, IconThemeLabelChoice);
 
@@ -171,6 +169,10 @@ public class QuestionController {
             controller.theme = findCurrentTheme();
             controller.currentNetworkQuestionId = questionId;
             controller.setTextQuestionPage(question, choices);
+
+            Zone targetZone = GameController.getInstance().getTargetZone();
+            TypeThemes LabelTheme = targetZone.getThemes();
+            controller.theme_label_question.setText(LabelTheme.getLabel());
 
             mainStackPane.getChildren().add(questionStackPane);
 
