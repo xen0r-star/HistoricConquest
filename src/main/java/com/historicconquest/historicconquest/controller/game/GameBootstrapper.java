@@ -61,7 +61,7 @@ public final class GameBootstrapper {
         if (root == null || players.isEmpty()) return;
 
         try {
-            GameUIContext ctx = setupGameUI(root);
+            GameUIContext ctx = setupGameUI(root, true);
             List<Player> playersSnapshot = new ArrayList<>(players);
             List<Zone> preferredStartZones = buildPreferredStartZones(playersSnapshot, roomPlayers, selectedZonesByPlayerId, ctx.worldMap.getAllZones());
             ctx.gameController.initializeGameState(playersSnapshot, ctx.worldMap, ctx.mapView, ctx.mapInterface, preferredStartZones);
@@ -82,7 +82,7 @@ public final class GameBootstrapper {
         if (root == null || players == null || players.isEmpty()) return;
 
         try {
-            GameUIContext ctx = setupGameUI(root);
+            GameUIContext ctx = setupGameUI(root, false);
             List<Zone> resolvedStartZones = buildPreferredStartZones(preferredStartZoneNames, ctx.worldMap.getAllZones());
             launchSoloGameInternal(ctx, players, resolvedStartZones);
 
@@ -103,7 +103,7 @@ public final class GameBootstrapper {
     }
 
 
-    private static GameUIContext setupGameUI(StackPane root) throws Exception {
+    private static GameUIContext setupGameUI(StackPane root, boolean isMulti) throws Exception {
         root.getChildren().clear();
         WorldMap worldMap = new WorldMap(true, true, true, Color.web("#f2e1bf"), Color.web("#C5A682"));
         MapView mapView = MapViewFactory.build(worldMap, true);
@@ -114,6 +114,16 @@ public final class GameBootstrapper {
         GameHUD gameHUD = hudLoader.getController();
         hudVisual.setPickOnBounds(false);
         root.getChildren().add(hudVisual);
+
+        // 🚑️ Remove Bonus/Malus in online for critical hotfix
+        if (isMulti) {
+            gameHUD.setPlayerInfoVisible(false);
+
+        } else {
+            gameHUD.setPlayerInfoVisible(true);
+            gameHUD.resetActionButtonVisibility();
+            gameHUD.updateActionButtonVisibility(true);
+        }
 
         FXMLLoader infoLoader = new FXMLLoader(GameBootstrapper.class.getResource("/view/fxml/game/ZoneInfoPanel.fxml"));
         Parent infoVisual = infoLoader.load();

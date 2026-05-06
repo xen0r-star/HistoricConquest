@@ -1,8 +1,10 @@
 package com.historicconquest.historicconquest.controller.page.game;
 
 import com.historicconquest.historicconquest.controller.game.GameController;
+import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.overlay.Notification;
 import com.historicconquest.historicconquest.controller.overlay.NotificationController;
+import com.historicconquest.historicconquest.model.game.Game;
 import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.util.Texture;
 import javafx.fxml.FXML;
@@ -28,6 +30,7 @@ public class GameHUD {
     private DisplayInfoPlayer cachedPlayerInfo;
     private DisplayInfoGame cachedGameInfo;
     private PrincipalButton principalButtonController;
+    private Parent playerInfoNode;
 
     private List<Player> pendingPlayers;
     private Integer pendingCurrentIndex;
@@ -43,6 +46,7 @@ public class GameHUD {
         root.getChildren().add(noiseLayer);
         noiseLayer.setViewOrder(-1.0);
         setupPrincipalButton();
+
         setupDisplayInfoPlayer();
         setupDisplayInfoGame();
 
@@ -86,7 +90,7 @@ public class GameHUD {
     private void setupDisplayInfoPlayer() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/fxml/game/DisplayInfoPlayer.fxml"));
-            Parent playerInfoNode = loader.load();
+            playerInfoNode = loader.load();
 
             cachedPlayerInfo = loader.getController();
 
@@ -200,6 +204,12 @@ public class GameHUD {
         }
     }
 
+    public void resetActionButtonVisibility() {
+        if (principalButtonController != null) {
+            principalButtonController.resetActionSelection();
+        }
+    }
+
     public void updateTurnStatus(String message) {
         if (principalButtonController == null) {
             return;
@@ -211,5 +221,12 @@ public class GameHUD {
         }
 
         principalButtonController.showTurnStatus(message);
+    }
+
+    public void setPlayerInfoVisible(boolean visible) {
+        if (playerInfoNode != null) {
+            playerInfoNode.setVisible(visible);
+            playerInfoNode.setManaged(visible);
+        }
     }
 }

@@ -185,7 +185,7 @@ public class RoomSocketController {
             broadcastPayload(roomCode, moveMsg);
         }
 
-        updateAnswerStreak(room, roomCode, playerId, correct);
+        // updateAnswerStreak(room, roomCode, playerId, correct);
 
         broadcastPayload(roomCode, Map.of(
             "type", "ANSWER_RESULT",
@@ -1110,7 +1110,7 @@ public class RoomSocketController {
                 Question question = questionService.getQuestion((String) questionId);
                 boolean isCorrect = question.answer().equalsIgnoreCase(String.valueOf(answer));
 
-                updateAnswerStreak(room, roomCode, playerId, isCorrect);
+                // updateAnswerStreak(room, roomCode, playerId, isCorrect);
 
                 if (isCorrect) {
                     applyActionToRoom(room, playerId, room.getPendingAction(), room.getPendingZone(), question.difficulty());

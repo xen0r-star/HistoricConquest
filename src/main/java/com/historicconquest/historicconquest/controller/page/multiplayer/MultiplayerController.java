@@ -692,7 +692,7 @@ public class MultiplayerController {
             @Override
             public void onBonusMalus(String playerId, String kind, String nameKind, Map<String, Object> resultSpecialCard) {
                 System.out.println("Received bonus/malus for player " + playerId + ": " + kind + " - " + nameKind);
-                Platform.runLater(() -> GameNetworkService.handleBonusMalus(playerId, kind, nameKind, resultSpecialCard));
+                // Platform.runLater(() -> GameNetworkService.handleBonusMalus(playerId, kind, nameKind, resultSpecialCard));
             }
 
             @Override
