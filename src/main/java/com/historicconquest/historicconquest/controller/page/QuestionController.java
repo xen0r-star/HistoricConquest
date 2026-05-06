@@ -158,7 +158,7 @@ public class QuestionController {
         else if(e.getSource() == answer4) myAnswer = answer4.getText();
     }
 
-    public static void showQuestionPage(String questionId, String question, List<String> choices) {
+    public static void showQuestionPage(String questionId, String question, List<String> choices, String serverTheme) {
         FXMLLoader questionLoader = new FXMLLoader(
                 Objects.requireNonNull(QuestionController.class.getResource("/view/fxml/question/QuestionPage.fxml")));
 
@@ -166,7 +166,16 @@ public class QuestionController {
             StackPane questionStackPane = questionLoader.load();
             QuestionController controller = questionLoader.getController();
 
-            controller.theme = findCurrentTheme();
+            Theme matchedTheme = themes.stream()
+                    .filter(t -> t.getName().name().equalsIgnoreCase(serverTheme))
+                    .findFirst()
+                    .orElseGet(QuestionController::findCurrentTheme);
+
+            controller.theme = matchedTheme;
+
+            controller.theme_label_question.setText(matchedTheme.getName().getLabel());
+            controller.setThemeIcon(matchedTheme.getName(), controller.IconThemeLabelQuestion);
+
             controller.currentNetworkQuestionId = questionId;
             controller.setTextQuestionPage(question, choices);
 

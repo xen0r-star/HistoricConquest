@@ -189,8 +189,10 @@ public class RoomService {
                         List<String> choices = new ArrayList<>();
                         payload.get("choices").forEach(choice -> choices.add(choice.asString()));
 
+                        String serverTheme = payload.get("theme").asString();
+
                         Platform.runLater(() ->
-                            QuestionController.showQuestionPage(questionId, questionText, choices)
+                            QuestionController.showQuestionPage(questionId, questionText, choices, serverTheme)
                         );
                     }
 
