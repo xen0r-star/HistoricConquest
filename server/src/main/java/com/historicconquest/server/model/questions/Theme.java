@@ -1,5 +1,6 @@
 package com.historicconquest.server.model.questions;
 
+import com.historicconquest.server.util.KeyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;
@@ -25,7 +26,7 @@ public class Theme {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Theme> themesMap = new LinkedHashMap<>();
 
-        try (InputStream is = Theme.class.getResourceAsStream(filePath)) {
+        try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath)) {
             if (is == null) {
                 logger.warn("File not found: {}", filePath);
                 return Collections.emptyList();

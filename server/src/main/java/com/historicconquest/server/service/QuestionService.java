@@ -16,7 +16,7 @@ public class QuestionService {
 
     @PostConstruct
     public void init() {
-        this.themes = Theme.loadThemesFromResource("/datas/questions.json");
+        this.themes = Theme.loadThemesFromResource("datas/questions.json");
     }
 
     public Question getRandomQuestion(TypeThemes typeTheme, int difficulty) {

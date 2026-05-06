@@ -136,37 +136,37 @@ public class MultiplayerController {
             Preferences prefs = Preferences.userNodeForPackage(App.class);
             String tokenRecupere = prefs.get("room_token", null);
 
-            if (tokenRecupere != null) {
-                // TODO: Make reconnexion
-                RoomService.create(tokenRecupere, this::showAlert);
-                RoomService.setListener(createRoomListener());
-
-                ApiService.request(
-                    ApiService.getInfoRoomForReconnection(tokenRecupere),
-                    ApiService.ReconnectionRoomResponse.class,
-                    response -> {
-                        RoomService.setCurrentPseudo(response.pseudo());
-                        RoomService.setCurrentColor(response.color());
-
-                        for (NetworkPlayer player : response.players()) {
-                            roomPlayers.add(new RoomPlayer(
-                                player.id(),     player.pseudo(),
-                                player.color(), !player.type().equals("Player"),
-                                player.ping(),   player.status(),
-                                false
-                            ));
-                        }
-                    }
-                );
-
-            } else {
+//            if (tokenRecupere != null) {
+//                // TODO: Make reconnexion
+//                RoomService.create(tokenRecupere, this::showAlert);
+//                RoomService.setListener(createRoomListener());
+//
+//                ApiService.request(
+//                    ApiService.getInfoRoomForReconnection(tokenRecupere),
+//                    ApiService.ReconnectionRoomResponse.class,
+//                    response -> {
+//                        RoomService.setCurrentPseudo(response.pseudo());
+//                        RoomService.setCurrentColor(response.color());
+//
+//                        for (NetworkPlayer player : response.players()) {
+//                            roomPlayers.add(new RoomPlayer(
+//                                player.id(),     player.pseudo(),
+//                                player.color(), !player.type().equals("Player"),
+//                                player.ping(),   player.status(),
+//                                false
+//                            ));
+//                        }
+//                    }
+//                );
+//
+//            } else {
                 setPanel(PanelState.JOIN_CODE);
 
                 for (TextField field : getTextFields()) {
                     field.requestFocus();
                     break;
                 }
-            }
+//            }
         });
 
         HostPane.setOnMouseClicked(e -> {
