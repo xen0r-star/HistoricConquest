@@ -28,8 +28,8 @@ public class Room {
 
     private final Map<String, String> currentZoneByPlayerId = new ConcurrentHashMap<>();
 
-    private static final String ALLIANCE_COLOR_PRIMARY = "#ffb0b0";
-    private static final String ALLIANCE_COLOR_SECONDARY = "#b0e2ff";
+    private static final String ALLIANCE_COLOR_PRIMARY = "#ba6a6a";
+    private static final String ALLIANCE_COLOR_SECONDARY = "#6aa9ba";
     private final Map<String, String> allianceByPlayer = new ConcurrentHashMap<>();
     private final Map<String, String> pendingAllianceRequests = new ConcurrentHashMap<>();
     private int allianceCount;

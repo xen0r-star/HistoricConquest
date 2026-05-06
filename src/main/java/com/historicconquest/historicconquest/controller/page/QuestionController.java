@@ -170,10 +170,6 @@ public class QuestionController {
             controller.currentNetworkQuestionId = questionId;
             controller.setTextQuestionPage(question, choices);
 
-            Zone targetZone = GameController.getInstance().getTargetZone();
-            TypeThemes LabelTheme = targetZone.getThemes();
-            controller.theme_label_question.setText(LabelTheme.getLabel());
-
             mainStackPane.getChildren().add(questionStackPane);
 
         } catch (IOException e) {

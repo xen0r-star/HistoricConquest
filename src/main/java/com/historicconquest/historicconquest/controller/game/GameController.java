@@ -56,8 +56,8 @@ public class GameController implements GameAnimationPort {
     private int nbPlayer = 4;
     private final List<Player> players;
     private WorldMap worldMap;
-    public static final Color ALLIANCE_1_COLOR = Color.web("#ffb0b0");
-    public static final Color ALLIANCE_2_COLOR = Color.web("#b0e2ff");
+    public static final Color ALLIANCE_1_COLOR = Color.web("#ba6a6a");
+    public static final Color ALLIANCE_2_COLOR = Color.web("#6aa9ba");
 
     private static final int TRAVEL_HINT_MAX_DISTANCE = 4;
     private static final double TRAVEL_PREVIEW_CORNER_RADIUS = 18.0;
