@@ -146,16 +146,6 @@ public class QuestionController {
             controller.theme = findCurrentTheme();
             controller.startQuestion();
 
-            controller.theme_label_question.setText(controller.theme.getName().getLabel());
-
-            switch (controller.theme.getName()) {
-                case ENTERTAINMENT -> controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
-                case INFORMATICS ->   controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
-                case TOURISM ->       controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
-                case MYSTERY ->       controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/mystery-icon.png")).toExternalForm()));
-                default ->            controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/default.png")).toExternalForm()));
-            }
-
             mainStackPane.getChildren().add(questionStackPane);
 
         } catch (IOException e) {
@@ -198,7 +188,6 @@ public class QuestionController {
 
     public void startQuestion() {
         List<Question> listQuestion = new ArrayList<>();
-        System.out.println(theme.getName());
         for(Question themeQuestion : theme.getQuestions()){
             if(themeQuestion.difficulty() == difficultyQuestion){
                 listQuestion.add(themeQuestion);
@@ -207,6 +196,16 @@ public class QuestionController {
 
         if (listQuestion.isEmpty()) {
             throw new IllegalStateException("No question found for theme " + theme.getName() + " and difficulty " + difficultyQuestion);
+        }
+
+        theme_label_question.setText(theme.getName().getLabel());
+
+        switch (theme.getName()) {
+            case ENTERTAINMENT -> IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
+            case INFORMATICS ->   IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
+            case TOURISM ->       IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
+            case MYSTERY ->       IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/mystery-icon.png")).toExternalForm()));
+            default ->            IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/default.png")).toExternalForm()));
         }
 
         int random = (int) (Math.random() * listQuestion.size());
