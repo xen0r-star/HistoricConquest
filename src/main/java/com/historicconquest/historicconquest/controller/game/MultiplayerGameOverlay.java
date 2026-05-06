@@ -5,6 +5,7 @@ import com.historicconquest.historicconquest.controller.overlay.NotificationCont
 import com.historicconquest.historicconquest.model.map.WorldMap;
 import com.historicconquest.historicconquest.model.map.Zone;
 import com.historicconquest.historicconquest.model.player.Player;
+import com.historicconquest.historicconquest.model.questions.TypeThemes;
 
 public final class MultiplayerGameOverlay {
     private static GameController controller;
@@ -47,9 +48,12 @@ public final class MultiplayerGameOverlay {
             GameController controller = GameController.getInstance();
             if (controller == null) return;
 
-            Player current = controller.getCurrentPlayer();
-            if (current == null || current.getCurrentZone() == null) return;
-            targetZone = current.getCurrentZone();
+            targetZone = controller.getTargetZone();
+            if (targetZone == null) {
+                Player current = controller.getCurrentPlayer();
+                if (current == null || current.getCurrentZone() == null) return;
+                targetZone = current.getCurrentZone();
+            }
         }
 
         if (GameNetworkService.isEnabled()) {

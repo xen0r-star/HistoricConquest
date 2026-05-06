@@ -191,9 +191,11 @@ public class QuestionController {
             throw new IllegalStateException("No question found for theme " + theme.getName() + " and difficulty " + difficultyQuestion);
         }
 
-        theme_label_question.setText(theme.getName().getLabel());
+        Zone targetZone = GameController.getInstance().getTargetZone();
+        TypeThemes LabelTheme = targetZone.getThemes();
+        theme_label_question.setText(LabelTheme.getLabel());
 
-        setThemeIcon(theme.getName(), IconThemeLabelQuestion);
+        setThemeIcon(LabelTheme, IconThemeLabelQuestion);
 
         int random = (int) (Math.random() * listQuestion.size());
         Question selectedQuestion = listQuestion.get(random);
