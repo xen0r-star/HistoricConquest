@@ -146,14 +146,9 @@ public class QuestionController {
             controller.theme = findCurrentTheme();
             controller.startQuestion();
 
-            Player player = GameController.getInstance().getCurrentPlayer();
-            TypeThemes LabelTheme = player.getCurrentZone().getThemes();
+            controller.theme_label_question.setText(controller.theme.getName().getLabel());
 
-            controller.theme_label_question.setText(LabelTheme.getLabel());
-            System.out.println(LabelTheme.getLabel());
-
-
-            switch (LabelTheme) {
+            switch (controller.theme.getName()) {
                 case ENTERTAINMENT -> controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
                 case INFORMATICS ->   controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
                 case TOURISM ->       controller.IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
