@@ -22,6 +22,7 @@ public class EndGame {
             AppController.getInstance().showPage(AppPage.HOME);
             GameController.clearGame();
             PauseGameController.close();
+            root.setVisible(false);
             // TODO: Ajouter fermeture
         });
     }
