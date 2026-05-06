@@ -113,6 +113,7 @@ public class QuestionController {
         TypeThemes LabelTheme = targetZone.getThemes();
 
         theme_label_choice.setText(LabelTheme.getLabel());
+        theme_label_question.setText(LabelTheme.getLabel());
 
 
         setThemeIcon(LabelTheme, IconThemeLabelChoice);
