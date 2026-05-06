@@ -7,7 +7,6 @@ import com.historicconquest.historicconquest.controller.game.GameController;
 import com.historicconquest.historicconquest.controller.game.GameNetworkService;
 import com.historicconquest.historicconquest.controller.game.MultiplayerGameOverlay;
 import com.historicconquest.historicconquest.model.map.Zone;
-import com.historicconquest.historicconquest.model.player.Player;
 import com.historicconquest.historicconquest.model.questions.Question;
 import com.historicconquest.historicconquest.model.questions.Theme;
 import com.historicconquest.historicconquest.model.questions.TypeThemes;
@@ -110,19 +109,13 @@ public class QuestionController {
     }
 
     public void setLabelsTheme() {
-        Player player = GameController.getInstance().getCurrentPlayer();
+        Zone targetZone = GameController.getInstance().getTargetZone();
+        TypeThemes LabelTheme = targetZone.getThemes();
 
-        TypeThemes LabelTheme = player.getCurrentZone().getThemes();
         theme_label_choice.setText(LabelTheme.getLabel());
 
 
-        switch (LabelTheme) {
-            case ENTERTAINMENT -> IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
-            case INFORMATICS ->   IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
-            case TOURISM ->       IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
-            case MYSTERY ->       IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/mystery-icon.png")).toExternalForm()));
-            default ->            IconThemeLabelChoice.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/default.png")).toExternalForm()));
-        }
+        setThemeIcon(LabelTheme, IconThemeLabelChoice);
 
         difficultyQuestion = (int) Math.round(slider.getValue());
     }
@@ -200,13 +193,7 @@ public class QuestionController {
 
         theme_label_question.setText(theme.getName().getLabel());
 
-        switch (theme.getName()) {
-            case ENTERTAINMENT -> IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/entertainment-icon.png")).toExternalForm()));
-            case INFORMATICS ->   IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/informatics-icon.png")).toExternalForm()));
-            case TOURISM ->       IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/tourism-icon.png")).toExternalForm()));
-            case MYSTERY ->       IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/mystery-icon.png")).toExternalForm()));
-            default ->            IconThemeLabelQuestion.setImage(new Image(Objects.requireNonNull(QuestionController.class.getResource("/view/icons/default.png")).toExternalForm()));
-        }
+        setThemeIcon(theme.getName(), IconThemeLabelQuestion);
 
         int random = (int) (Math.random() * listQuestion.size());
         Question selectedQuestion = listQuestion.get(random);
@@ -239,6 +226,20 @@ public class QuestionController {
         }
 
         mainStackPane.getChildren().removeLast();
+    }
+
+    private void setThemeIcon(TypeThemes theme, ImageView target) {
+        String icon = switch (theme) {
+            case ENTERTAINMENT -> "entertainment-icon.png";
+            case INFORMATICS -> "informatics-icon.png";
+            case TOURISM -> "tourism-icon.png";
+            case MYSTERY -> "mystery-icon.png";
+            default -> "default.png";
+        };
+
+        target.setImage(new Image(Objects.requireNonNull(
+            QuestionController.class.getResource("/view/icons/" + icon)
+        ).toExternalForm()));
     }
 
     public static void setDifficultyQuestion(int difficultyQuestion) {
