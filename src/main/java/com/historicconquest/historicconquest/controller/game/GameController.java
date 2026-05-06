@@ -258,14 +258,12 @@ public class GameController implements GameAnimationPort {
 
         if (!correct) {
             if (!networkGame) {
-                if (current.getPseudo().equalsIgnoreCase(RoomService.getCurrentPseudo())) {
-                    NotificationController.show(
-                        "Wrong Answer",
-                        "Incorrect! Your turn is over.",
-                        Notification.Type.ERROR,
-                        5000
-                    );
-                }
+                NotificationController.show(
+                    "Wrong Answer",
+                    "Incorrect! Your turn is over.",
+                    Notification.Type.ERROR,
+                    5000
+                );
 
                 current.setConsecutiveFailures(current.getConsecutiveFailures() + 1);
                 current.setConsecutiveSuccesses(0);

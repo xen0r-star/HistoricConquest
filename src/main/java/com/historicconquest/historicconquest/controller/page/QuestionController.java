@@ -150,6 +150,7 @@ public class QuestionController {
             TypeThemes LabelTheme = player.getCurrentZone().getThemes();
 
             controller.theme_label_question.setText(LabelTheme.getLabel());
+            System.out.println(LabelTheme.getLabel());
 
 
             switch (LabelTheme) {
@@ -202,6 +203,7 @@ public class QuestionController {
 
     public void startQuestion() {
         List<Question> listQuestion = new ArrayList<>();
+        System.out.println(theme.getName());
         for(Question themeQuestion : theme.getQuestions()){
             if(themeQuestion.difficulty() == difficultyQuestion){
                 listQuestion.add(themeQuestion);
