@@ -23,7 +23,6 @@ public class EndGame {
             GameController.clearGame();
             PauseGameController.close();
             root.setVisible(false);
-            // TODO: Ajouter fermeture
         });
     }
 

@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Zone {
+    public static final int MAX_POWER_ZONE = 8;
+
     private final String name;
     private final String blocName;
     private int power;
-    private static final int MAX_POWER_ZONE = 8;
-
     private String nameOwner = "Nobody";
 
     private final List<Zone> adjacentZones;

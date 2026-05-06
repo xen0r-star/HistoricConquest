@@ -43,10 +43,10 @@ public class RoomSocketController {
     private static final String ACTION_COALITION_REQUEST = "COALITION_REQUEST";
     private static final String ACTION_COALITION_ACCEPT = "COALITION_ACCEPT";
     private static final String ACTION_COALITION_DECLINE = "COALITION_DECLINE";
-    private static final long BOT_THINKING_MIN_DELAY_MS = 2500L;
-    private static final long BOT_THINKING_MAX_DELAY_MS = 4000L;
-    private static final long BOT_ANSWER_MIN_DELAY_MS = 4000L;
-    private static final long BOT_ANSWER_MAX_DELAY_MS = 8000L;
+    private static final long BOT_THINKING_MIN_DELAY_MS = 1500L;
+    private static final long BOT_THINKING_MAX_DELAY_MS = 3000L;
+    private static final long BOT_ANSWER_MIN_DELAY_MS = 3000L;
+    private static final long BOT_ANSWER_MAX_DELAY_MS = 4000L;
     private static final Random BOT_RANDOM = new Random();
 
     private final RoomService roomService;

@@ -9,7 +9,7 @@ public class Zone {
     private final String name;
     private TypeThemes themes;
     private int power;
-    private static final int MAX_POWER_ZONE = 8;
+    public static final int MAX_POWER_ZONE = 8;
 
     private String nameOwner = "Nobody";
 

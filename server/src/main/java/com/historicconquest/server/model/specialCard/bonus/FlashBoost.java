@@ -34,7 +34,7 @@ public class FlashBoost implements SpecialCard {
             .findFirst().orElse(null);
 
         if (zone != null) {
-            zone.setPower(zone.getPower() + 2);
+            zone.setPower(Math.min(zone.getPower() + 2, Zone.MAX_POWER_ZONE));
             zoneChange = zone;
 
             return Map.of(

@@ -1,6 +1,5 @@
 package com.historicconquest.server.model.questions;
 
-import com.historicconquest.server.util.KeyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;

@@ -29,7 +29,7 @@ public class FlashBoost implements SpecialCard {
     public void apply(Player target) {
         if (!target.getZones().isEmpty()) {
             Zone zone = target.getZones().getLast();
-            zone.setPower(zone.getPower() + 2);
+            zone.setPower(Math.min(zone.getPower() + 2, Zone.MAX_POWER_ZONE));
         }
     }
 
@@ -37,7 +37,7 @@ public class FlashBoost implements SpecialCard {
     public void apply(Player target, Map<String, Object> params) {
         if (!target.getZones().isEmpty()) {
             String zoneName = (String) params.get("zoneChange");
-            int newPower = MAPPER.convertValue(params.get("power"), Integer.class);
+            int newPower = MAPPER.convertValue(params.get("newPower"), Integer.class);
 
             if (zoneName != null && newPower > 0) {
                 target.getZones().stream()
